@@ -47,3 +47,11 @@ size: 12.8mb
 date: 2025-07-30
 url: https://t.me/t25_discussions/386164
 note: KernelSU + SuSFS variant (filename contains ks12xxxsus). MIUI 12.5 / RVendor custom ROMs ONLY. Same base changelog as normal variant. Needs KernelSU manager and SuSFS module.
+
+name: Sea Kernel
+version: R1.9 / Ayaka (KSU 11366, Linux 4.14.332)
+maintainer: Asyanx (KSU patched by MoChenYa)
+size: 64 MB
+date: 2023-12-09
+url: https://github.com/mochenya/action_selene_seakernel_kernelsu/releases/tag/7150742824
+note: AnyKernel3 zip, also has img and img-Permissive variants. Source: github.com/mochenya/action_selene_seakernel_kernelsu
