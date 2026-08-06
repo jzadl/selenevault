@@ -1,0 +1,233 @@
+about: Full Android OS builds for selene.
+
+name: LineageOS 20.0
+version: 20.0-20250905
+maintainer: jzadl
+size: 1.3G
+date: 2025-09-05
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-20.0-20250905-UNOFFICIAL-selene.zip/download
+note: Android 13
+
+name: LineageOS 20.0
+version: 20.0-20241119
+maintainer: jzadl
+size: 1.1G
+date: 2024-11-19
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-20.0-20241119-UNOFFICIAL-selene.zip/download
+note: Android 13
+
+name: RisingOS
+version: 5.2.1-20241024
+maintainer: jzadl
+size: 1.4G
+date: 2024-10-24
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2.1-FINAL-STABLE-EOL-20241024-VANILLA-COMMUNITY-selene-ota.zip/download
+note: Android 14, Final EOL, Vanilla, Community
+
+name: PixelOS
+version: 14.0-20241003
+maintainer: jzadl
+size: 1.9G
+date: 2024-10-03
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/PixelOS_selene-14.0-20241003-0842.zip/download
+note: Android 14
+
+name: DerpFest
+version: 15-20241001
+maintainer: jzadl
+size: 1.9G
+date: 2024-10-01
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-15-Community-Alpha-selene-20241001.zip/download
+note: Android 15, Community
+
+name: RisingOS
+version: 5.2-20240910
+maintainer: jzadl
+size: 1.4G
+date: 2024-09-10
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2-FINAL-EOL-20240910-VANILLA-COMMUNITY-selene-ota.zip/download
+note: Android 14, Final EOL, Community
+
+name: TenX-OS
+version: 0.1-20240830
+maintainer: jzadl
+size: 1.9G
+date: 2024-08-30
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/TenX-OS-v0.1_selene-14.0-20240830-1219-Revival-UnOfficial.zip/download
+note: Android 14, Revival
+
+name: PixelStar
+version: 3.2-20240826
+maintainer: jzadl
+size: 2.3G
+date: 2024-08-26
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/pixelstar-3.2-uday-selene-unofficial-1650-20240826.zip/download
+note: Android 14
+
+name: AlphaDroid
+version: 14.0-v2.4-20240821
+maintainer: jzadl
+size: 1.3G
+date: 2024-08-21
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240821-selene-vanilla-v2.4.zip/download
+note: Android 14
+
+name: RisingOS
+version: 5.0-20240820-gapps
+maintainer: jzadl
+size: 2.3G
+date: 2024-08-20
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.0-FINAL-20240820-GAPPS-COMMUNITY-selene-ota.zip/download
+note: Android 14, GApps, Community
+
+name: RisingOS
+version: 5.0-20240820-vanilla
+maintainer: jzadl
+size: 1.4G
+date: 2024-08-20
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.0-FINAL-20240820-VANILLA-COMMUNITY-selene-ota.zip/download
+note: Android 14, Community
+
+name: LineageOS 21.0
+version: 21.0-20240818
+maintainer: jzadl
+size: 1.2G
+date: 2024-08-18
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-21.0-20240818-UNOFFICIAL-selene.zip/download
+note: Android 14
+
+name: RisingOS
+version: 4.2-20240808-core
+maintainer: jzadl
+size: 1.7G
+date: 2024-08-08
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-4.2-RELEASE-20240808-CORE-COMMUNITY-selene-ota.zip/download
+note: Android 14, Core, Community
+
+name: RisingOS
+version: 4.2-20240808-vanilla
+maintainer: jzadl
+size: 1.4G
+date: 2024-08-08
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-4.2-RELEASE-20240808-VANILLA_AOSP-COMMUNITY-selene-ota.zip/download
+note: Android 14, AOSP, Community
+
+name: crDroid Android
+version: 14.0-v10.6
+maintainer: jzadl
+size: 1.3G
+date: 2024-08-07
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/crDroidAndroid-14.0-20240807-selene-v10.6.zip/download
+note: Android 14
+
+name: Halcyon
+version: 14.2-20240615
+maintainer: jzadl
+size: 1.7G
+date: 2024-06-15
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/halcyon_selene-14.2-20240615-0650-UNOFFICIAL.zip/download
+note: Android 14
+
+name: DerpFest
+version: 14-20240614
+maintainer: jzadl
+size: 2.2G
+date: 2024-06-14
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-14-Community-Stable-selene-20240614.zip/download
+note: Android 14, Community
+
+name: DroidX
+version: 2.1-20240610
+maintainer: jzadl
+size: 1.2G
+date: 2024-06-10
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/droidx-2.1-20240610-1012-UNOFFICIAL-selene-Vanilla.zip/download
+note: Android 14, Unofficial
+
+name: Awaken
+version: 4.5-20240608
+maintainer: jzadl
+size: 1.8G
+date: 2024-06-08
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/awaken-4.5-ursa-selene-unofficial-1424-20240608.zip/download
+note: Android 14, Ursa
+
+name: EvolutionX
+version: 14.0-v9.0
+maintainer: jzadl
+size: 2.1G
+date: 2024-06-01
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/EvolutionX-14.0-20240601-selene-v9.0-Unofficial.zip/download
+note: Android 14
+
+name: Everest
+version: 1.2-20240529
+maintainer: jzadl
+size: 1.9G
+date: 2024-05-29
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Everest-1.2-Gokyo-selene-UNOFFICIAL-GAPPS-1219-20240529.zip/download
+note: Android 14, Gokyo, GApps
+
+name: crDroid Android
+version: 14.0-v10.5
+maintainer: jzadl
+size: 1.3G
+date: 2024-05-28
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/crDroidAndroid-14.0-20240528-selene-v10.5.zip/download
+note: Android 14
+
+name: PixelOS
+version: 14.0-20240526
+maintainer: jzadl
+size: 1.8G
+date: 2024-05-26
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/PixelOS_selene-14.0-20240526-0636.zip/download
+note: Android 14
+
+name: RisingOS
+version: 3.1-20240524-core
+maintainer: jzadl
+size: 1.6G
+date: 2024-05-24
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-3.1-RELEASE-20240524-CORE-COMMUNITY-selene-ota.zip/download
+note: Android 14, Core, Community
+
+name: AlphaDroid
+version: 14.0-v2.1-20240522
+maintainer: jzadl
+size: 1.3G
+date: 2024-05-22
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240522-selene-vanilla-v2.1.zip/download
+note: Android 14
+
+name: Matrixx
+version: 10.5.1-20240518
+maintainer: jzadl
+size: 1.4G
+date: 2024-05-18
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Matrixx-v10.5.1-Unofficial-selene-Gapps-20240518.zip/download
+note: Android 14, GApps
+
+name: AlphaDroid
+version: 14.0-v2.1-20240517
+maintainer: jzadl
+size: 1.1G
+date: 2024-05-17
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240517-selene-vanilla-v2.1.zip/download
+note: Android 14
+
+name: Project Sakura
+version: 9.1-20240516
+maintainer: jzadl
+size: 1.0G
+date: 2024-05-16
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/ProjectSakura-9.1-20240516-1834-VANILLA-selene-UNOFFICIAL.zip/download
+note: Android 14, Unofficial
+
+name: Cherish OS
+version: 5.5-20240512
+maintainer: jzadl
+size: 1.9G
+date: 2024-05-12
+url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Cherish-OS-v5.5-20240512-1529-aosp_selene-UNOFFICIAL-GApps.zip/download
+note: Android 14, AOSP, GApps
