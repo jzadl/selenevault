@@ -8,7 +8,7 @@ date: 2025-02-23
 url: https://www.mediafire.com/file/rz8iibm5vrdi9ew/%255BR%255Dselene%255BAuxiliary%255D%255BGenome%255D2025-02-23.zip/file
 note: Kernel Repaired, R Vendor, Linux 4.14.325, Neutron Clang 14.0.0, Initial Build. Tested on R Vendor Custom ROM A13, untested on MIUI. OC kernel, use with fan/cooler and Thermal Killer module. Credits: @Asyanx7, @fukiame (help), @YukinaSupremacy (base tree), @itseunbinn (original creator)
 
-name: Phi Kernel
+name: Phi Kernel - Normal
 version: beta negative 1 - Lumi
 maintainer: fukiame x erabye
 size: unknown
@@ -16,7 +16,7 @@ date: unknown
 url: https://t.me/t25_discussions/307613?single
 note: Normal variant. S Vendor. MIUI 13/14 firmware only, do NOT flash on 12.5/RVendor. Works: booting (security patch newer than April 2022), fgauge, audio, video, touch (nvt/fts), wifi/bt/volte, 90/60hz, charging, camera, fingerprint, waking, ir blaster. Not working: black screen on MIUI14/HyperOS system imgs, booting on super old MIUI 13 (<13.0.4.x), charging during power on (crash). Untested: nfc. Known issue: screen off/on glitch. READ NOT WORKING LIST + KNOWN ISSUES BEFORE FLASHING
 
-name: Phi Kernel
+name: Phi Kernel - KSU
 version: beta negative 1 - Lumi (ks12164 KSU)
 maintainer: fukiame x erabye
 size: unknown
@@ -24,7 +24,7 @@ date: unknown
 url: https://t.me/t25_discussions/307614?single
 note: KernelSU (ks12164) variant. Same notes as normal variant apply. S Vendor. MIUI 13/14 firmware only, do NOT flash on 12.5/RVendor. READ NOT WORKING LIST + KNOWN ISSUES BEFORE FLASHING
 
-name: Niigo Kernel
+name: Niigo Kernel - Normal
 version: 250730-1927 (yuki-saisei II, normal)
 maintainer: fukiame
 size: unknown
@@ -32,7 +32,7 @@ date: 2025-07-30
 url: https://t.me/t25_discussions/386160
 note: Normal (no KSU) variant. MIUI 12.5 / RVendor custom ROMs ONLY. fts and new nvt boot fine, old nvt (dsi_panel_k19a_36_02_0a_dsc_vdo) needs testing. Changelog: EXFAT makefile fix, dropped MIUI migt, disabled tracing/logging/misc fs features, videox and ion/display tweaks, dropped useless mtk workqueues, optimized cpumask helpers, 300hz, PELT halflife 16ms, introduces SuSFS variant. No known issues so far.
 
-name: Niigo Kernel
+name: Niigo Kernel - KSU
 version: 250730-1927 (yuki-saisei II, KSU no SuSFS)
 maintainer: fukiame
 size: unknown
@@ -40,7 +40,7 @@ date: 2025-07-30
 url: https://t.me/t25_discussions/386162
 note: KernelSU without SuSFS variant (filename contains ks12xxx). MIUI 12.5 / RVendor custom ROMs ONLY. Same base changelog as normal variant.
 
-name: Niigo Kernel
+name: Niigo Kernel - KSU + SuSFS
 version: 250730-1927 (yuki-saisei II, KSU + SuSFS)
 maintainer: fukiame
 size: unknown
