@@ -1,0 +1,19 @@
+about: Firmware and engineering ROMs for selene.
+
+name: Engineering ROM
+version: unknown
+maintainer: hasan6034
+size: 1708mb
+date: unknown
+url: https://t.me/Redmi10_Community/316781
+note: Engineering ROM for selene. Used for MTK authorization / flashing of engineering firmware.
+vendor: all
+
+name: Selene Firmware
+version: unknown
+maintainer: unknown
+size: unknown
+date: unknown
+url: https://xmfirmwareupdater.com/archive/miui/selene/
+note: Archive of MIUI firmware builds for selene.
+vendor: all

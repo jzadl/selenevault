@@ -1,0 +1,73 @@
+about: Guides and tutorials for selene.
+
+name: IMEI Backup
+maintainer: redmi_9indonesia
+url: https://t.me/Redmi10_Community/337581
+note: Guide to backup IMEI on MediaTek devices (Lancelot/Lava, Redmi 9 / Poco M2). Methods: sptool, via TWRP, recovery-flashable backup zip, via Termux. Credits: @Box_Boi, @mochi_wwww, @Akash23q2.
+vendor: all
+
+name: Flash fastboot ROM without PC
+maintainer: Akash (@Akash23q2)
+url: https://telegra.ph/Flashing-fastboot-rom-without-pc-07-26
+note: Guide to flash MIUI fastboot ROM without a PC (OTG + extra phone). Methods: Root (Termux) or Non-Root (Bugjaegar app). Credits: @Akash23q2 @Orainegena @Boi_Box.
+vendor: all
+
+name: Install Custom ROM (Selene)
+maintainer: unknown
+url: https://t.me/Redmi10_Community/329148
+note: Tutorial to install custom ROMs on Redmi 10 (selene). Requirements: unlocked bootloader, PC with adb/fastboot/SP Flash Tools, MIUI stock ROM, recovery ROM on microSD/OTG. Steps: flash TWRP/OFOX, format data, flash MIUI recovery ROM + custom ROM (same vendor) in one pass; for S Vendor use MIUI 13 first. Includes special case fix for bootloop on eMMC/NFC variants. BACKUP IMEI FIRST.
+vendor: all
+
+name: Fix device undetected by fastboot
+maintainer: unknown
+url: https://t.me/Redmi10_Community/340462
+note: Video tutorial to fix device undetected by fastboot.
+vendor: all
+
+name: Fix Hardware Decoder (Selene)
+maintainer: unknown
+url: https://t.me/Redmi10_Community/297213
+note: Module to fix hardware decoder on selene. Works on KernelSU/KSU-Next/Magisk/APatch, supports all Custom ROMs.
+vendor: all
+
+name: Magisk TWRP Dump Method
+maintainer: Fukiame
+url: https://t.me/Redmi10_Community/92804
+note: Guide to root with Magisk via TWRP on any ROM. Steps: dump boot img in TWRP terminal (dd if=/dev/block/by-name/boot_a of=/external_sd/boot_a.img; use boot_b/sdcard1 if needed), patch with Magisk, flash patched img to boot in TWRP. No data format required.
+vendor: all
+
+name: Rvendor Custom ROM video
+maintainer: Bendejo
+url: https://youtu.be/Yn1A0mGw6Ck
+note: Video tutorial to install Rvendor custom ROMs on selene.
+vendor: all
+
+name: Rvendor Custom ROM Guide (XDA)
+maintainer: Neelthegamer007
+url: https://xdaforums.com/t/xiaomi-redmi-10-redmi-10-prime-redmi-10-2022-redmi-10-2021-selene-custom-rom-installation-video-tutorial.4583503/
+note: XDA forum post with custom ROM installation video tutorial for Redmi 10 series (selene).
+vendor: all
+
+name: Screen type
+maintainer: unknown
+url: https://t.me/Redmi10_Community/310481
+note: Check touchscreen type with Device Info HW app (first page, Touchscreen). NVT: mostly safe with any kernel. FTS: needs kernel with new TS/LCM backported or based on new source only (only Niigo and Hydrogen qualify, for now). OMR: no support.
+vendor: all
+
+name: Tim Josten IMEI Repair
+maintainer: Tim Josten
+url: https://graph.org/IMEI-Restoration-05-04
+note: Guide to restore/repair IMEI on MediaTek devices with mtk_imei. Fill config.txt, generate imei_repair.zip (Termux or Windows) and flash in recovery or Magisk. Won't work on locked bootloader. Backup NVRAM/NVDATA first.
+vendor: all
+
+name: Flash GSI
+maintainer: unknown
+url: https://t.me/Redmi10Co/23992
+note: Guide to flash GSI on selene. Flash vbmeta (all three) with --disable-verity --disable-verification, flash boot (or boot-magisk.img for root), reboot to fastbootd, delete product_a/product_b logical partitions, flash vendor, flash GSI to system, format data in recovery.
+vendor: all
+
+name: Flash GSI Termux
+maintainer: unknown
+url: https://t.me/Redmi10Co/54498
+note: Tutorial to flash GSI without a PC. Create folder in storage, extract GSI, rename to system.img, add flash script. Install termux-adb-fastboot if needed (curl -s https://raw.githubusercontent.com/offici5l/termux-adb-fastboot/main/install | bash). Boot to fastbootd, termux-setup-storage, chmod +x FLASH_GSI.sh && bash FLASH_GSI.sh. Phone reboots to recovery, format data and reboot.
+vendor: all

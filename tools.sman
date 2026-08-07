@@ -1,0 +1,65 @@
+about: Tools and utilities for selene.
+
+name: Red Flower
+version: Pre-Release 1.0
+maintainer: stolefromcloudflare
+size: unknown
+date: 2024-07-19
+url: https://github.com/25freepb/redflower
+note: Command line tool for Windows (macOS/Linux coming soon) for Redmi 10/Prime/Note 11 4G (selene/selenes). Track logcat, show device info, download/flash custom MIUI, flash GSI, flash recoveries (TWRP/OFOX), manage packages, ADB and fastboot reboot menus, list partitions/baseband/IMEI, separate partition flashing, backup IMEI (nvram/nvdata), fix dm-verity. Uses Google platform-tools and aria2c. Use at your own risk.
+vendor: all
+
+name: Mediatek AIO Unbrick
+version: unknown
+maintainer: unknown
+size: unknown
+date: 2024-10-06
+url: https://drive.google.com/file/d/1l4zl07tUVAa9-I_HwYwajusV2PuUH9tu/view?usp=drive_link
+note: All-in-One zipfile with everything to unbrick MediaTek devices. Tested on selene/selenes. Zip password: MTKUnbrick. Disable Windows Defender to prevent Bypass.exe removal. Supported chipsets: https://sxbin.gay/EnEFJYfR
+vendor: all
+
+name: Kaeru
+version: unknown
+maintainer: R0rt1z2
+size: unknown
+date: 2026-07-30
+url: https://github.com/R0rt1z2/kaeru
+note: Arbitrary code execution on MediaTek bootloaders. Spoofs the LK bootloader state (locked) for integrity checks. S Vendor only. Usage: fastboot flash lk kaeru.bin, fastboot oem bldr_spoof on, flash disabled vbmeta files if not MIUI, then use Play Integrity Fix. Download: https://t.me/Redmi10Co/44818
+vendor: svendor
+
+name: dieD vendor
+version: unknown
+maintainer: creativchic
+size: unknown
+date: unknown
+url: https://drive.google.com/drive/mobile/folders/16WnaIXTCQtdRrLtZbAN9dKSG6bt1DTw8?usp=sharing
+note: Custom vendor based on MIUI 14.0.7, main goal is to fix bugs and improve user experience. Supports Android 13+ GSI only. Features: https://telegra.ph/Features-07-16-6, flashing instructions: https://telegra.ph/Flashing-guide-07-16, settings after first boot: https://telegra.ph/Settings-after-first-boot-07-16
+vendor: svendor
+
+name: MIUI Boot images
+version: unknown
+maintainer: unknown
+size: unknown
+date: unknown
+url: https://t.me/selene_bootimg
+note: Collection of stock MIUI boot images for selene. Use to restore stock boot or extract ramdisk.
+vendor: all
+
+name: Flash GSI Script
+version: unknown
+maintainer: unknown
+size: unknown
+date: unknown
+url: https://t.me/Redmi10Co/13926
+note: Script to flash GSI on selene.
+vendor: all
+
+name: Porting Kit Selene
+version: unknown
+maintainer: Adrish (@zelsta7)
+size: 54mb
+date: unknown
+url: https://t.me/Redmi10Co/53422
+note: Kit to port ROMs for selene more easily.
+vendor: all
+
