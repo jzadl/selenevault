@@ -1,0 +1,97 @@
+about: Custom recoveries for selene.
+
+name: TWRP
+version: Unofficial (01/01/22)
+maintainer: yazidkucrit
+size: unknown
+date: 2022-01-01
+url: https://drive.google.com/file/d/1tE1ZVQjmJ5IhRwQeJJyDvw5YvMm3-0BF/view?usp=sharing
+note: Android 11. Switched to ZipEntry64, fixed OTA >4GiB fuse error.
+
+name: TWRP
+version: Unofficial (07/01/22)
+maintainer: yazidkucrit
+size: unknown
+date: 2022-01-09
+url: https://t.me/KCPORT/89
+note: Android 11. Fixed install rom zip bug on latest build.
+
+name: PBRP
+version: 4.0 Unofficial (S vendor)
+maintainer: hasan6034
+size: unknown
+date: 2024-02-05
+url: https://t.me/selenetr/4942
+note: S vendor custom rom install support, decrypts MIUI and AOSP roms, vibration and flashlight added. Needed 50 testers to go official.
+
+name: PBRP
+version: 4.0 Unofficial (R vendor)
+maintainer: hasan6034
+size: unknown
+date: 2024-03-01
+url: https://mega.nz/file/vmAThBAB#TL-5aPi3jmy0zEcrZGqElkH6AqZJi8WlxcVVVbbhLQg
+note: R vendor initial build, added libshim_beanpod. R vendor A12+ AOSP only.
+
+name: PitchBlack Recovery
+version: V4.0 Official (23/03/24)
+maintainer: Hasan6034
+size: unknown
+date: 2024-03-23
+url: unknown
+note: Based on TWRP 3.7.1_12. Initial official PBRP build. MD5 99f477a3db63dbdd0308b20a14de3bb5
+
+name: OrangeFox Recovery
+version: R11.1_4 (rvendor, unofficial)
+maintainer: TillYourTearGoes & fukiame
+size: unknown
+date: 2024-04-12
+url: https://t.me/fukiamimir/200
+note: R Vendor, don't flash on MIUI 13/14. Decrypts Android 12+ AOSP, stock kernel, FTS compatible.
+
+name: Hitori Ame Recovery Project
+version: v0.0.1_infdev (official)
+maintainer: TillYourTearGoes & fukiame
+size: unknown
+date: 2024-06-07
+url: https://t.me/fukiamimir/221
+note: R Vendor recovery, decrypts Android 12+ AOSP.
+
+name: Hitori Ame Recovery Project
+version: v0.0.2_infdev_r (official)
+maintainer: TillYourTearGoes & fukiame
+size: unknown
+date: 2024-10-07
+url: https://t.me/fukiamimir/334
+note: R Vendor recovery, decrypts Android 12+ AOSP. Fixed flashing progress bar, invisible pattern lock, wrong battery percent placement.
+
+name: Hitori Ame Recovery Project
+version: v0.0.2-S_infdev (official)
+maintainer: fukiame
+size: unknown
+date: 2025-06-18
+url: https://t.me/t25_discussions/300770
+note: MIUI 13/14 / S Vendor only, don't flash on MIUI 12.5/R Vendor. Incompatible with super old MIUI 13 (security patch older than April 2022).
+
+name: PitchBlack Recovery Project
+version: 4.0 OFFICIAL (06/02/25)
+maintainer: Hasan6034
+size: unknown
+date: 2025-02-06
+url: https://sourceforge.net/projects/pbrp/files/selene/PBRP-selene-4.0-20250206-0444-OFFICIAL.zip/download
+note: Official PBRP recovery for selene.
+
+name: PitchBlack Recovery Project
+version: 4.0 OFFICIAL (26/04/24)
+maintainer: Hasan6034
+size: unknown
+date: 2024-04-26
+url: https://sourceforge.net/projects/pbrp/files/selene/PBRP-selene-4.0-20240426-1905-OFFICIAL.zip/download
+note: Official PBRP recovery for selene.
+
+name: PitchBlack Recovery Project
+version: 4.0 OFFICIAL (23/03/24, website copy)
+maintainer: Hasan6034
+size: unknown
+date: 2024-03-23
+url: https://sourceforge.net/projects/pbrp/files/selene/PBRP-selene-4.0-20240323-0203-OFFICIAL.zip/download
+note: Official PBRP recovery for selene.
