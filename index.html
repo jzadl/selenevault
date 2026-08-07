@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>svault :: selene device archive</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .devicebar{padding:44px 28px 28px 28px; border-bottom:1px solid var(--line);}
+  .devicebar h1{font-size:28px; font-weight:600; letter-spacing:-0.02em;}
+  .devicebar .sub{color:var(--fg-dim); font-size:13px; margin-top:8px; max-width:560px;}
+
+  main{padding:32px 28px 0 28px;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    gap:16px;
+  }
+
+  .seccard{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    border-top:2px solid var(--sec-accent, var(--line-strong));
+    padding:22px;
+    display:flex; flex-direction:column; gap:14px;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .seccard:hover{background:var(--bg-raised); border-color:var(--line-strong);}
+  .seccard-top{display:flex; align-items:baseline; justify-content:space-between;}
+  .seccard h2{font-size:17px; font-weight:600; letter-spacing:-0.01em;}
+  .seccard .count{font-family:var(--mono); font-size:12px; color:var(--sec-accent, var(--fg-faint));}
+  .seccard p{color:var(--fg-dim); font-size:12.5px;}
+  .seccard .enter{
+    font-family:var(--mono); font-size:11px; color:var(--sec-accent, var(--accent));
+    display:flex; align-items:center; gap:4px; margin-top:auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><div class="dot"></div><b>svault</b><span>selene archive</span></div>
+</div>
+
+<div class="devicebar">
+  <h1>selene device archive</h1>
+  <div class="sub">custom roms, ports, kernels, recovery, firmware and guides for selene. community built, use at your own risk.</div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div>svault :: selene device archive</div>
+  <div><a href="#">contribution guide</a> :: <a href="#">contact@jzadl.xyz</a></div>
+</footer>
+
+<script>
+/* Each section lives in its own subdirectory with its own index.html
+   and its own .sman manifest. This page only links to them, it does
+   not read entry data itself. Counts are fetched live so this page
+   never needs manual updates when a section changes. */
+const BASE = "https://cdn.jsdelivr.net/gh/jzadl/cdn/svault/";
+
+const SECTIONS = [
+  { key:"rom",       title:"Custom ROM",              file:"rom.sman",       accent:"#7dff8a", desc:"Full Android OS builds for selene." },
+  { key:"ports",     title:"Ports",                    file:"ports.sman",     accent:"#7db8ff", desc:"OS ports not originally built for this device." },
+  { key:"kernel",    title:"Custom Kernel",             file:"kernel.sman",    accent:"#ffb454", desc:"Kernel builds and sources for selene." },
+  { key:"recovery",  title:"Recovery",                  file:"recovery.sman",  accent:"#ff8a7d", desc:"Custom recovery images." },
+  { key:"firmware",  title:"Boot, Vendor and Firmware", file:"firmware.sman",  accent:"#c98aff", desc:"Stock and modified boot, vendor, and firmware images." },
+  { key:"tutorials", title:"Tutorials",                 file:"tutorials.sman", accent:"#8fe3d9", desc:"Guides for flashing, unlocking, and recovering selene." },
+];
+
+function countEntries(text){
+  return text.split("\n\n").filter(b => /^\s*name:/m.test(b)).length;
+}
+
+async function loadCount(sec){
+  try{
+    const res = await fetch(BASE + sec.file);
+    if(!res.ok) throw new Error();
+    return countEntries(await res.text());
+  }catch(e){ return null; }
+}
+
+async function init(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = SECTIONS.map(s => `
+    <a class="seccard" href="./${s.key}/" style="--sec-accent:${s.accent}">
+      <div class="seccard-top">
+        <h2>${s.title}</h2>
+        <span class="count" data-key="${s.key}">···</span>
+      </div>
+      <p>${s.desc}</p>
+      <span class="enter">open section →</span>
+    </a>
+  `).join("");
+
+  SECTIONS.forEach(async s => {
+    const n = await loadCount(s);
+    const el = grid.querySelector(`.count[data-key="${s.key}"]`);
+    el.textContent = n === null ? "—" : String(n).padStart(2,"0");
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>
