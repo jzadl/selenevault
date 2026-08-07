@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>selenevault</title>
+<style>
+body{font-family:monospace;background:#000;color:#ddd;padding:20px;max-width:800px;margin:0 auto}
+h1{color:cyan}
+h2{border-bottom:1px solid gray;padding-bottom:4px;margin-top:30px}
+input{background:#000;color:#ddd;border:1px solid #444;padding:6px;width:100%;font-family:monospace;margin-bottom:10px}
+.entry{margin:10px 0;padding:8px;border:1px solid #333}
+.entry b{color:#fff}
+.entry .meta{color:#888;font-size:12px}
+.entry a{color:cyan}
+</style>
+</head>
+<body>
+<h1>selenevault</h1>
+<input id="search" placeholder="search...">
+<div id="out">loading...</div>
+
+<script src="sman-parser.js"></script>
+<script>
+  //ts is the search engine :)
+const files = ["rom.sman","kernels.sman","recovery.sman","firmware.sman","ports.sman","tools.sman","guides.sman"];
+
+async function load(){
+  let html = "";
+  for(const f of files){
+    const text = await (await fetch(f)).text();
+    const {entries} = parseSman(text);
+    html += `<h2>${f} (${entries.length})</h2>`;
+    entries.forEach(e => {
+      const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
+      html += `<div class="entry" data-search="${esc(search)}">
+        <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
+        <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
+        <div>${esc(e.note||"")}</div>
+        ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
+      </div>`;
+    });
+  }
+  document.getElementById("out").innerHTML = html;
+}
+
+document.getElementById("search").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll(".entry").forEach(el => {
+    el.style.display = el.dataset.search.includes(q) ? "" : "none";
+  });
+});
+
+load();
+</script>
+</body>
+</html>
