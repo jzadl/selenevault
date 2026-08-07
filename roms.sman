@@ -38,7 +38,7 @@ maintainer: hasan6034
 size: 1.9G
 date: 2024-10-01
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-15-Community-Alpha-selene-20241001.zip/download
-note: Android 15, Community
+note: Android 15, Community, Alpha
 
 name: RisingOS
 version: 5.2-20240910
@@ -134,7 +134,7 @@ maintainer: hasan6034
 size: 2.2G
 date: 2024-06-14
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-14-Community-Stable-selene-20240614.zip/download
-note: Android 14, Community
+note: Android 14, Community, Stable
 
 name: DroidX
 version: 2.1-20240610
@@ -231,3 +231,595 @@ size: 1.9G
 date: 2024-05-12
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Cherish-OS-v5.5-20240512-1529-aosp_selene-UNOFFICIAL-GApps.zip/download
 note: Android 14, AOSP, GApps
+
+name: Nusantara Project Surakarta
+version: Official
+maintainer: Mikazuuu07
+size: unknown
+date: 2022-08-30
+url: https://nusantararom.org/device/selene/
+note: Android 12.1, S/L Vendor. Upstream kernel 4.14.288, selene/selenes/eos board support.
+
+name: Kaleidoscope Sunflowerleaf
+version: Unofficial (initial S vendor)
+maintainer: Mikazuuu07
+size: unknown
+date: 2022-08-31
+url: https://www.pling.com/p/1885588/
+note: Android 12.1, S Vendor, OSS. User build with encryption enabled.
+
+name: Kaleidoscope Sunflowerleaf
+version: Unofficial (S vendor update)
+maintainer: Mikazuuu07
+size: unknown
+date: 2022-09-12
+url: https://www.pling.com/p/1885588/
+note: Android 12.1, S Vendor, OSS.
+
+name: Havoc OS
+version: 4.19 Unofficial
+maintainer: askairt
+size: unknown
+date: 2022-11-03
+url: https://www.pling.com/p/1926079/
+note: Android 11, R Vendor. Bugs: blur broken, MTP maybe broken.
+
+name: Cherish OS
+version: 3.6 Official
+maintainer: yazidkucrit
+size: unknown
+date: 2022-04-10
+url: http://www.pling.com/p/1692434/
+note: Android 12L. Upstream kernel 4.14.275, VoLTE fix for India, Dolby from Moto G.
+
+name: LineageOS
+version: Unofficial (Feb 2023)
+maintainer: atharv2951
+size: unknown
+date: 2023-02-08
+url: https://t.me/atharv2951_builds/2
+note: Android 13, R Vendor, OSS. AOD/90Hz work, no faceunlock, VoLTE/VoWiFi broken.
+
+name: Pixel Experience Plus
+version: Unofficial (08/03/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-03-08
+url: https://mega.nz/file/2l9HXD4T#SON2LtFGgvWhiTnhmKF56RZpqIM1ba12TkW8YASSldQ
+note: Android 13, OSS_R. MIUI 12.x only, not MIUI 13. Special devices need Yukina kernel.
+
+name: Pixel Experience Plus
+version: Unofficial (12/03/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-03-12
+url: https://mega.nz/file/24NW0QjC#LRDcKcJaO1RqNNzWcvpNd65NktDlvVtJ5fl1AWXb01Y
+note: Android 13, OSS_R. Switched to Paramex kernel, MIUI13 surfaceflinger props.
+
+name: LineageOS 22.2
+version: Unofficial
+maintainer: atharv2951
+size: unknown
+date: 2025-04-01
+url: https://hyp.sh/FaDlM0O
+note: Android 15 QPR2, R Vendor. Flash with provided boot.img, custom recoveries may not work. Screen recording dead.
+
+name: ArrowOS
+version: Unofficial (25/03/23)
+maintainer: stacz00
+size: unknown
+date: 2023-03-26
+url: https://drive.google.com/file/d/1Jbh5-ngJQSPzqmoqvWrCUBTH8P8MF4gt/view?usp=drivesdk
+note: Android 13, OSS_R, R Vendor. Vanilla, use NikGApps/Magisk GApps. Special devices need Yukina/Sea kernel.
+
+name: CherishOS
+version: Unofficial (26/03/23)
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-03-26
+url: https://t.me/YudhoPatriantoDriveChannel/102
+note: Android 13, OSS_R, R Vendor. GApps build. MIUI 12.x only.
+
+name: RiceDroid
+version: Unofficial (26/03/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-03-26
+url: https://mega.nz/file/Hw9AmDSa#_g79uojhTvXVqA8DiDbwmX15TtTNykS-rDTb_ZlKrLA
+note: Android 13, OSS_R. SELinux permissive, VoLTE/VoWiFi broken.
+
+name: RiceDroid
+version: Unofficial (29/03/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-03-30
+url: https://mega.nz/file/yo8zTaYS#A1Bm-O-52g2RXPRfWBIU_yxtaXTUzU-BYfsfQ_R7VdE
+note: Android 13, OSS_R. Switched to SELinux enforcing, fixed VoLTE/VoWiFi. MIUI 12.x only.
+
+name: RiceDroid
+version: Unofficial (01/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-01
+url: https://mega.nz/file/e4c2mIhY#vToU0exfPa2Qg9XolnKL1Mt4AGRcotPEcihy1Hka9OE
+note: Android 13, OSS_R. Fixed storage and 90hz issue, no longer needs Luna kernel.
+
+name: Superior OS
+version: Unofficial (03/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-03
+url: https://mega.nz/file/G5k2FD5T#EXII371N1iE80PR6KoM_b3oS7nGMXnxTnQGlVLeMFR8
+note: Android 13, OSS_R. SELinux enforcing. Needs Luna kernel on SC and non-SC devices.
+
+name: RiceDroid
+version: Unofficial (07/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-07
+url: https://mega.nz/file/DgkjxBQa#9ieY4CbBJu3xx4lETMyLzhndYTGDJ6yB88D50TSX27Y
+note: Android 13, OSS_R. Introduces BesLoudness, MtkRadio, kernel tweaks.
+
+name: PixelExperience
+version: Unofficial (11/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-11
+url: https://mega.nz/file/Xp8SXIwY#X48aD91-SwJ58pO687DLTNyh0MY_PHHjPtzlXGx83Es
+note: Android 13, OSS_R. Fixed VoLTE/VoWiFi, upstream kernel 4.14.311.
+
+name: PixelExperience
+version: Unofficial (20/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-25
+url: https://mega.nz/file/2hMB2ayD#RAhDl4xFnJXjqkm4Rsr7mSoqLv3TFV7WPl4pir6VPps
+note: Android 13, OSS_R. Switched to OSS powerhal, faster boot, better battery.
+
+name: VoidUI
+version: Unofficial
+maintainer: itseunbinn
+size: unknown
+date: 2023-04-25
+url: https://mega.nz/file/OwN10JYQ#XBYtDWyYkmQVoYjXzs_kr2w565m1dU-yKcok6BvepmE
+note: Android 13, OSSR. GApps build, fixed camera and SysUI crash.
+
+name: crDroid
+version: Unofficial (25/04/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-04-26
+url: https://mega.nz/file/L5cU0bAb#4q0y42iB2ukSo7u8kmIZSqzbaNtesECQ34_PDSqMgNM
+note: Android 13, OSSR. GApps build, MIUI 12.x only.
+
+name: RisingOS
+version: 1.0 Unofficial
+maintainer: itseunbinn
+size: unknown
+date: 2023-04-27
+url: https://sourceforge.net/projects/krxyzndocs/files/Selene-test/risingOS-v1.0-Atlantis-202304261254-selene-CORE-COMMUNITY.zip/download
+note: Android 13, OSSR. GApps build, fixed camera and VoLTE/VoWiFi.
+
+name: PixelExtended
+version: 5.7 Unofficial
+maintainer: itseunbinn
+size: unknown
+date: 2023-04-29
+url: https://sourceforge.net/projects/krxyzndocs/files/selene/PixelExtended-5.7_selene-13.0-20230428-0324-UNOFFICIAL.zip/download
+note: Android 13.0, OSSR. GApps build.
+
+name: OctaviOS
+version: Unofficial
+maintainer: Thomsiiii
+size: unknown
+date: 2023-05-04
+url: https://mega.nz/file/jkkEAZAR#jINNdn7eL__76D2qLTkI7cuUCvzbxcrThngpYvevzUs
+note: Android 13, OSSR. GApps build, MIUI 12.x only. Bug: DT2W.
+
+name: RisingOS
+version: 1.1 Unofficial
+maintainer: Thomsiiii
+size: unknown
+date: 2023-05-11
+url: https://mega.nz/file/jp8CWDpQ#xpXYS3Na0wNvJTSR-Ch6hR90tIclR4QSjz3YBFnOzGA
+note: Android 13. Fixed DT2W and VoLTE.
+
+name: crDroid
+version: Unofficial (18/05/23)
+maintainer: Thomsiiii
+size: unknown
+date: 2023-05-18
+url: https://mega.nz/file/b99TxSDC#cRwfSj4mSUCv-2crwn96b3VMbYzTS_idtbORhNj2UkQ
+note: Android 13, OSSR. Vanilla build, fixed SysUI crash and DT2W. MIUI 12.x only.
+
+name: BananaDroid Tanduk
+version: Unofficial Vanilla
+maintainer: itseunbinn
+size: unknown
+date: 2023-05-20
+url: https://sourceforge.net/projects/krxyzndocs/files/selene/BananaDroid-Tanduk-selene-UNOFFICIAL-20230513-Vanilla.zip/download
+note: Android 13, OSS, R Vendor, Vanilla. Yukina Kernel by default. MIUI 12.5/R Vendor only.
+
+name: xDroid Pixel
+version: Beta Unofficial
+maintainer: itseunbinn
+size: unknown
+date: 2023-06-04
+url: https://sourceforge.net/projects/krxyzndocs/files/selene/INA.XD.13.0.49-selene-04062023-1513-REL.zip/download
+note: Android 13, OSS, R Vendor. GrapheneOS camera and Sea Kernel by default. MIUI 12.5/R Vendor only.
+
+name: PixelExtended
+version: 5.8 Unofficial
+maintainer: AdItYa_SdM_Gng
+size: unknown
+date: 2023-06-23
+url: https://sourceforge.net/projects/adi-builds/files/RMX1941/PixelExtended-5.8_selene-13.0-20230623-1306-UNOFFICIAL.zip/download
+note: Android 13. Beta build, MIUI 14 required, recovery encryption should be fixed.
+
+name: LineageOS
+version: Unofficial (28/07/23)
+maintainer: thomsiiii
+size: unknown
+date: 2023-07-28
+url: https://mega.nz/file/Sk1QHKQT#JeMdYsmNMEiICjt-B_YHl_ghjD4qP17sD3-tjUqjmEo
+note: Android 13. Upstream kernel 4.14.319 with KernelSU, fixed fast charging and audio stuttering.
+
+name: SuperiorOS
+version: Unofficial (28/07/23, ryzenforce)
+maintainer: ryzenforce
+size: unknown
+date: 2023-07-28
+url: https://sourceforge.net/projects/redmi10/files/SuperiorOS-Thirteen-selene-COMMUNITY-20230728-1758.zip/download
+note: Android 13.0. HDR/AOSP color props, upstream kernel 4.14.320. GApps and Vanilla variants.
+
+name: SuperiorOS
+version: Thirteen Unofficial GApps/Vanilla
+maintainer: various
+size: unknown
+date: 2023-07-28
+url: https://sourceforge.net/projects/redmi10/files/SuperiorOS-Thirteen-selene-GAPPS-COMMUNITY-20230728-1714.zip/download
+note: Android 13, R_OSS, R Vendor. GApps and Vanilla variants available.
+
+name: DerpFest
+version: Unofficial (31/07/23)
+maintainer: fukiame
+size: unknown
+date: 2023-07-31
+url: https://drive.google.com/file/d/1nhnWtoBCGigmCrzj_yy9pjfo8aaXmJCD/view?usp=sharing
+note: Android 13, R_OSS, R Vendor. GApps builtin (no vanilla). Laggy QS known issue.
+
+name: DerpFest Tango
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-08-03
+url: https://drive.google.com/file/d/1cyWS9zkcmu4okl35cd5bpjBv-lTWqIps/view?usp=sharing
+note: Android 13, R_OSS, R Vendor. Fixed high brightness issue, legacy bootanimation.
+
+name: ArrowOS
+version: 13.1 Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-08-08
+url: https://drive.google.com/file/d/1bDXyKA8VUmRMcq64DVMiRYRnjYYgPYum/view?usp=sharing
+note: Android 13, R_OSS, R Vendor, vanilla. GrapheneOS camera by default. 90hz inconsistent.
+
+name: SkylineUI
+version: Unofficial (initial)
+maintainer: fukiame
+size: unknown
+date: 2023-08-12
+url: https://drive.google.com/file/d/1zO0yCq7WVu7amA94Q2RjjlvbM8kCOhUR/view?usp=sharing
+note: Android 13, R_OSS, R Vendor. Based on PixelExperience Plus, GApps included.
+
+name: ProtonPlus
+version: 13.2 Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-08-26
+url: https://drive.google.com/file/d/1axLN1Qmxacwra0BY-p0nbX2nJb87Si-e/view?usp=sharing
+note: Android 13, R_OSS, R Vendor, vanilla. MIUI-like brightness, janky audio known issue.
+
+name: CherishOS
+version: 4.11 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-09-06
+url: https://sourceforge.net/projects/yudhoprjktroms/files/cherish4.11/Cherish-OS-v4.11-20230904-1221-selene-UNOFFICIAL-GApps.zip/download
+note: Android 13.0. Upstream kernel 4.14.324, fixed VoLTE/VoWiFi. R Vendor, MIUI 12.5.15+.
+
+name: ProjectBlaze
+version: 2.9 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-09-06
+url: https://sourceforge.net/projects/yudhoprjktroms/files/projectblaze2.9/
+note: Android 13.0. Upstream kernel 4.14.324, fixed D2TW. R Vendor, MIUI 12.5.15+.
+
+name: PixelOS
+version: Unofficial (07/09/23)
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-09-08
+url: https://sourceforge.net/projects/yudhoprjktroms/files/pixelos/
+note: Android 13.0. Graphene Camera, GApps. R Vendor, MIUI 12.5.15+.
+
+name: SkylineUI
+version: 8.5 Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-09-10
+url: https://drive.google.com/file/d/1is4IRrnc7Cg3q48ApJhu0r_adhYdeTZ-/view?usp=sharing
+note: Android 13, R_OSS, R Vendor. Synced August patch, upstream kernel 4.14.325.
+
+name: EvolutionX
+version: 7.9.8 Lugaw Community
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-09-19
+url: https://sourceforge.net/projects/yudhoprjktroms/files/Evolution-X/Lugaw/
+note: Android 13.0, R_OSS, R Vendor. GApps build. No file manager/browser preinstalled.
+
+name: FireDroid
+version: 1.8 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-09-21
+url: https://sourceforge.net/projects/yudhoprjktroms/files/FireDroid/1.8/
+note: Android 13.0, R_OSS, R Vendor, GApps. FP only works on fpc, not goodix_fp.
+
+name: Pixel Experience
+version: Unofficial (01/10/23)
+maintainer: cirrus-ci maintained
+size: unknown
+date: 2023-10-01
+url: https://t.me/YudhoPatriantoDriveDiscussions/21009
+note: Android 13. Synced September patch, GApps included.
+
+name: Pixel Experience Plus
+version: Unofficial (01/10/23)
+maintainer: cirrus-ci maintained
+size: unknown
+date: 2023-10-02
+url: https://t.me/YudhoPatriantoDriveDiscussions/21200
+note: Android 13. Synced September patch, GApps included.
+
+name: crDroid
+version: 9.9 Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-10-08
+url: https://drive.google.com/file/d/1jo83RD-njk_z8JnopU1yRrpJf44beIxM/view?usp=drive_link
+note: Android 13, R_OSS, R Vendor, vanilla. Kernel Linux 4.14.326, September patch.
+
+name: DroidX UI
+version: Unofficial
+maintainer: itseunbinn
+size: unknown
+date: 2023-10-10
+url: https://sourceforge.net/projects/krxyzndocs/files/Hanz/Droidx-selene/droidx-1.5.3-20231010-UNOFFICIAL-selene-Gapps.zip/download
+note: Android 13, OSS, R Vendor, GApps. MIUI 12.5/R Vendor only.
+
+name: RisingOS Elysium
+version: 1.4 Community
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-10-13
+url: https://sourceforge.net/projects/yudhoprjktroms/files/RisingOS/Elysium
+note: Android 13.0, R_OSS, R Vendor. GApps build.
+
+name: Alphadroid
+version: 1.10 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-10-26
+url: https://sourceforge.net/projects/yudhoprjktroms/files/Alphadroid/1.10/
+note: Android 13.0, R_OSS, R Vendor, GApps. Maintainer name may not display in settings.
+
+name: AlphaDroid
+version: 1.10 Official
+maintainer: itseunbinn
+size: unknown
+date: 2023-10-27
+url: https://sourceforge.net/projects/alphadroid-project/files/selene/AlphaDroid-13.0-20231027-selene-gapps-v1.10.zip/download
+note: Android 13. GApps build. Official release for selene.
+
+name: ColtOS
+version: 13.4 minimal Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-11-01
+url: https://sourceforge.net/projects/yudhoprjktroms/files/ColtOS/minimal/
+note: Android 13.0, R_OSS, R Vendor, GApps.
+
+name: Evolution X
+version: 7.9.9 Tocino Community
+maintainer: Kartik11i
+size: unknown
+date: 2023-11-05
+url: https://pixeldrain.com/u/vSHuFGkH
+note: Android 13, R_OSS, R Vendor, GApps. October patch, keylayout support for 3-button headset.
+
+name: SparkOS
+version: 13.9 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2023-11-07
+url: https://sourceforge.net/projects/yudhoprjktroms/files/SparkOS/13.9/
+note: Android 13.0, R_OSS, R Vendor, GApps.
+
+name: AfterLife Project
+version: 4.0 Wrath Unofficial
+maintainer: fukiame
+size: unknown
+date: 2023-12-10
+url: https://sourceforge.net/projects/fukiame-builds/files/afterlife/231210/AfterLife-V4.0-Wrath-COMMUNITY-selene-20231210-Vanilla.zip/download
+note: Android 13, R_OSS, R Vendor. Vanilla and CoreGApps variants.
+
+name: LeafOS
+version: 3.1 Unofficial (initial)
+maintainer: fukiame
+size: unknown
+date: 2024-01-04
+url: https://sourceforge.net/projects/fukiame-builds/files/leaf/240104/leaf-3.1-20240104-UNOFFICIAL-VANILLA-selene.zip/download
+note: Android 14, R Vendor, R_OSS. Vanilla only, no lock screen customization.
+
+name: LeafOS
+version: 3.1 Unofficial (10/01/24)
+maintainer: fukiame
+size: unknown
+date: 2024-01-10
+url: https://sourceforge.net/projects/fukiame-builds/files/leaf/240110/leaf-3.1-20240110-UNOFFICIAL-VANILLA-selene.zip/download
+note: Android 14, R Vendor, R_OSS. Fixed 90hz refresh rate, smoother brightness curve.
+
+name: Project Matrixx
+version: Community (11/01/24)
+maintainer: fukiame
+size: unknown
+date: 2024-01-11
+url: https://sourceforge.net/projects/fukiame-builds/files/matrixx/240111/Matrixx-v10.2.0-Unofficial-selene-Vanilla-20240111.zip/download
+note: Android 14, R Vendor, R_OSS. Vanilla only. Funky screen on some NVT devices with stock kernel.
+
+name: LineageOS 20
+version: Unofficial
+maintainer: atharv2951
+size: unknown
+date: 2024-01-16
+url: https://onedrive-vercel-index-kohl-eight-30.vercel.app//lineage%2d20%2e0%2d20240116%2dUNOFFICIAL%2dselene%2ezip
+note: Android 13. MIUI 13 based S Vendor, flash with provided boot.img. VoLTE dead.
+
+name: crDroid
+version: v10.1 Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-01-25
+url: https://sourceforge.net/projects/fukiame-builds/files/crdroid/240125/crDroidAndroid-14.0-20240125-selene-v10.1.zip/download
+note: Android 14, R_OSS, R Vendor, vanilla only. VoLTE broken, some devices reboot on calls under 40% battery.
+
+name: PixelStar Uday
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-01-31
+url: https://pixeldrain.com/u/5ZijRTC7
+note: Android 14, R_OSS, R Vendor, GApps. VoLTE broken, offline charging issue.
+
+name: HorizonDroid Luna
+version: 13.0 Unofficial
+maintainer: YudhoPatrianto
+size: unknown
+date: 2024-02-04
+url: https://sourceforge.net/projects/yudhoprjktroms/files/HorizonDroid/Android13/HorizonDroid-Luna-selene-13.0-20240203-2327-Unofficial.zip/download
+note: Android 13.0, R_OSS, R Vendor, GApps.
+
+name: DerpFest 14
+version: Community Stable
+maintainer: fukiame and TillYourTearGoes
+size: unknown
+date: 2024-02-10
+url: https://sourceforge.net/projects/fukiame-builds/files/derpfest/240210/DerpFest-14-Community-Stable-selene-20240210.zip/download
+note: Android 14, R_OSS, R Vendor. GApps included, VoLTE and offline charging issues.
+
+name: LineageOS 21
+version: Unofficial
+maintainer: atharv2951
+size: unknown
+date: 2024-02-19
+url: https://onedrive-vercel-index-kohl-eight-30.vercel.app/api/raw/?path=/selene-test/lineage-21.0-20240219-UNOFFICIAL-selene.zip
+note: Android 14. MIUI 14 based T Vendor. Kanged NN Blobs and Dolby from emerald. VoLTE dead.
+
+name: LineageOS
+version: Unofficial (18/02/24)
+maintainer: Mikazuuu07
+size: unknown
+date: 2024-02-21
+url: https://www.pling.com/p/2130715/
+note: Android 11, OSS_R.
+
+name: DotOS
+version: Unofficial
+maintainer: Mikazuuu07
+size: unknown
+date: 2024-02-21
+url: https://www.pling.com/p/2131494/
+note: Android 11, OSS_R. Merged android-security-11.0.0_r76.
+
+name: XDroid-CAF
+version: Unofficial
+maintainer: Mikazuuu07
+size: unknown
+date: 2024-02-28
+url: https://www.pling.com/p/2133527/
+note: Android 11, OSS_R. Fixed BT audio SysUI crash and uid/gid autoset for obb games.
+
+name: Project Matrixx
+version: Community (29/02/24)
+maintainer: fukiame
+size: unknown
+date: 2024-02-29
+url: https://sourceforge.net/projects/fukiame-builds/files/matrixx/240229/Matrixx-v10.3.0-Unofficial-selene-Vanilla-20240229.zip/download
+note: Android 14, R_OSS, R Vendor, vanilla only. VoLTE dead.
+
+name: Superior Extended
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-03-03
+url: https://sourceforge.net/projects/fukiame-builds/files/superior_extended/240303/SuperiorExtended-COMMUNITY-14-selene-VANILLA-20240303-0400.zip/download
+note: Android 14, R Vendor, vanilla only, 64bit apps only. VoLTE dead, not Play certified.
+
+name: Project Afterlife
+version: Unofficial (06/03/24)
+maintainer: Mikazuuu07
+size: unknown
+date: 2024-03-05
+url: https://www.pling.com/p/2135214/
+note: Android 13, OSS_R. Gapps/CoreGApps/Vanilla variants. Do not change kernel (breaks DT2W).
+
+name: Project Afterlife
+version: Unofficial (hotfix 09/03/24)
+maintainer: Mikazuuu07
+size: unknown
+date: 2024-03-09
+url: https://www.pling.com/p/2135214/
+note: Android 13, OSS_R. Fixed offline charging, fingerprint, keylayout.
+
+name: Miku UI Udon
+version: Unofficial (10/03/24)
+maintainer: fukiame
+size: unknown
+date: 2024-03-10
+url: https://t.me/fukiamimir/175
+note: Android 14, 64bit apps only. VoLTE dead, Play Integrity DEVICE fails.
+
+name: RisingOS 2.2 Ignis
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-05-15
+url: https://t.me/fukiamimir/216
+note: Android 14 QPR2. Fixed VoLTE, thermal config. Incompatible with most custom kernels.
+
+name: MikuUI v0.9.0 Udon v2
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-05-17
+url: https://t.me/fukiamimir/217
+note: Android 14 QPR2. Fixed VoLTE, thermal config, missing libperfmgr. Doesn't pass Play Integrity DEVICE by default.
+
+name: SuperiorOS
+version: Unofficial (07/06/24)
+maintainer: fukiame
+size: unknown
+date: 2024-06-07
+url: https://t.me/fukiamimir/236
+note: Android 14 QPR2. Signed build, must clean flash, vanilla, recommends NikGapps U Core.
+
+name: AICP
+version: Unofficial
+maintainer: fukiame
+size: unknown
+date: 2024-08-07
+url: https://sourceforge.net/projects/fukiame-builds/files/aicp/240809/aicp_selene_t-18.0-UNOFFICIAL-20240807.zip/download
+note: Android 13, R Vendor, vanilla. Play Integrity DEVICE dies.
