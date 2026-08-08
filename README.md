@@ -3,9 +3,6 @@
 Community index of ROMs, kernels, recoveries, firmware, ports, tools, guides, and
 Telegram channels for the **Xiaomi Redmi 10** (codename `selene`).
 
-Built from years of pinned messages scattered across Telegram groups, put into one
-searchable place.
-
 Live at [selenevault.pages.dev](#)
 
 ## Format: `.sman`
