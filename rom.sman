@@ -18,6 +18,15 @@ url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-20.0
 note: Android 13
 vendor: rvendor
 
+name: LineageOS 23.2 Test
+version: 23.2-20260809
+maintainer: hasan6034
+size: 1.1G
+date: 2026-08-09
+url: https://drive.google.com/file/d/1HjlQpe8p3_msHLO5QthIivJsyLvgjPZb/view
+note: need tesers
+vendor: svendor
+
 name: RisingOS
 version: 5.2.1-20241024
 maintainer: hasan6034
