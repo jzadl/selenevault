@@ -1,27 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>selenevault</title>
 <meta name="description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+
+<!-- Open Graph / WhatsApp / Telegram -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://svault.jzadl.xyz">
 <meta property="og:title" content="selenevault">
 <meta property="og:description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<!-- Absolute URL with explicit dimensions helps WhatsApp/Telegram scrape images reliably -->
 <meta property="og:image" content="https://cdn.jzadl.xyz/svault/logo.png">
-<meta property="og:url" content="https://svault.jzadl.xyz">
-<meta property="og:type" content="website">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="300">
+<meta property="og:image:height" content="300">
+
+<!-- Twitter -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="selenevault">
 <meta name="twitter:description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
 <meta name="twitter:image" content="https://cdn.jzadl.xyz/svault/logo.png">
+
 <style>
-body{font-family:monospace;background:#000;color:#ddd;padding:20px;max-width:800px;margin:0 auto}
-h1{color:cyan}
-h2{border-bottom:1px solid gray;padding-bottom:4px;margin-top:30px}
-input{background:#000;color:#ddd;border:1px solid #444;padding:6px;width:100%;font-family:monospace;margin-bottom:10px}
-.entry{margin:10px 0;padding:8px;border:1px solid #333}
-.entry b{color:#fff}
-.entry .meta{color:#888;font-size:12px}
-.entry a{color:cyan}
+* { box-sizing: border-box; }
+body {
+  font-family: monospace;
+  background: #000;
+  color: #ddd;
+  padding: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+h1 { color: cyan; margin-top: 10px; }
+h2 { border-bottom: 1px solid gray; padding-bottom: 4px; margin-top: 30px; }
+input {
+  background: #000;
+  color: #ddd;
+  border: 1px solid #444;
+  padding: 10px;
+  width: 100%;
+  font-family: monospace;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.entry {
+  margin: 10px 0;
+  padding: 8px;
+  border: 1px solid #333;
+  word-wrap: break-word;
+}
+.entry b { color: #fff; }
+.entry .meta { color: #888; font-size: 12px; }
+.entry a { color: cyan; }
 </style>
 </head>
 <body>
@@ -31,24 +64,31 @@ input{background:#000;color:#ddd;border:1px solid #444;padding:6px;width:100%;fo
 
 <script src="sman-parser.js"></script>
 <script>
-  //ts is the search engine :)
+function esc(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 const files = ["rom.sman","kernels.sman","recovery.sman","firmware.sman","ports.sman","tools.sman","guides.sman","channels.sman"];
 
 async function load(){
   let html = "";
   for(const f of files){
-    const text = await (await fetch(f)).text();
-    const {entries} = parseSman(text);
-    html += `<h2>${f} (${entries.length})</h2>`;
-    entries.forEach(e => {
-      const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-      html += `<div class="entry" data-search="${esc(search)}">
-        <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
-        <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
-        <div>${esc(e.note||"")}</div>
-        ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
-      </div>`;
-    });
+    try {
+      const text = await (await fetch(f)).text();
+      const {entries} = parseSman(text);
+      html += `<h2>${f} (${entries.length})</h2>`;
+      entries.forEach(e => {
+        const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
+        html += `<div class="entry" data-search="${esc(search)}">
+          <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
+          <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
+          <div>${esc(e.note||"")}</div>
+          ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
+        </div>`;
+      });
+    } catch(err) {
+      console.error("Error loading " + f, err);
+    }
   }
   document.getElementById("out").innerHTML = html;
 }
@@ -63,4 +103,4 @@ document.getElementById("search").addEventListener("input", e => {
 load();
 </script>
 </body>
-</html>
+</html>v
