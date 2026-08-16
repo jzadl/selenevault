@@ -1,12 +1,20 @@
 about: Ports (ROMs ported from other devices) for selene.
 
+name: HyperOS 3.0
+version: OS3.0.10.0.VNQCNXM (China)
+maintainer: zelsta7
+size: 2.89G
+date: 2026-08-16
+url: https://pixeldrain.com/u/1Bs3BGx5
+note: Port for selene/eos, Android 15, stock mod. Full message with details: https://t.me/Redmi10Up/22
+
 name: HyperOS
 version: V1.0.2.0 (Port)
 maintainer: davefleur
 size: unknown
 date: 2024-06-06
 url: https://drive.google.com/drive/folders/1-Zi50LFfvYeaVD32YrQUZ09YxbMnYfBA?usp=sharing
-note: Android 13, ported from Fire (same G88), fully stock, based on Global. Fastboot ROM, no blur, AOD available, face unlock doesn't work. Let it settle 10-15 mins. Tags: #HyperOS #MIUI #Port #T #Selene.
+note: Android 13, ported from Fire (same G88), fully stock, based on Global. Fastboot ROM, no blur, AOD available, face unlock doesn't work. Let it settle 10-15 mins.
 vendor: svendor
 
 name: HyperOS
@@ -15,7 +23,7 @@ maintainer: TheRealAldehyde
 size: unknown
 date: 2024-06-14
 url: https://drive.google.com/drive/folders/1UZgEn_HtZTkzGKoY17gPezkIfPBzyqKu?usp=sharing
-note: Android 14, ported (fleur), Global based for selene/eos. Mods: launcher, Leica cam, file explorer, SystemUI-plugin, Miui dialer and MMS. No blur, account activation takes a bit. Tags: #HyperOS #MIUI #U #Selene.
+note: Android 14, ported (fleur), Global based for selene/eos. Mods: launcher, Leica cam, file explorer, SystemUI-plugin, Miui dialer and MMS. No blur, account activation takes a bit.
 vendor: svendor
 
 name: NothingOS
@@ -24,7 +32,7 @@ maintainer: TheRealAldehyde
 size: unknown
 date: 2024-07-26
 url: https://drive.google.com/drive/folders/1YI0iJeBry-4zNxM4EE_9M7slhDhSWcjd?usp=sharing
-note: Android 14, Nothing OS 2.5 port from Nothing 2a (Pacman). All vbmeta patched, SELinux permissive. Known bugs: face unlock, adaptive brightness, brightness slider. Flash from MIUI 14 or HOS. Tags: #NothingOS #NOS #U #Selene #EOS.
+note: Android 14, Nothing OS 2.5 port from Nothing 2a (Pacman). All vbmeta patched, SELinux permissive. Known bugs: face unlock, adaptive brightness, brightness slider. Flash from MIUI 14 or HOS.
 vendor: svendor
 
 name: HyperRemodUI
@@ -70,15 +78,6 @@ size: unknown
 date: 2024-09-03
 url: https://drive.google.com/file/d/1p78oamF-MjjfNmk2j7w4LuME29-YgwcG/view?usp=sharing
 note: Realme UI 12.5 port, bootloader lock spoof, Security 8.1.2, debloated gapps + Via Browser. Tags: #MIUI #R #Selene #RUI.
-vendor: rvendor
-
-name: iOS 18.1 Port
-version: 01/04/25
-maintainer: Selene90Herez
-size: unknown
-date: 2025-04-01
-url: https://bit.ly/3FQQih0
-note: iOS 18.1 port from iPhone 16 Pro Max. Designed for Redmi 10/10 2022, no bugs, KernelSU included, NFC working for eos. Recovery ROM, do not flash custom kernel. Tags: #iOS #18.1 #Selene #EOS #R_Vendor.
 vendor: rvendor
 
 name: HyperOS Lite
