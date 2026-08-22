@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>selenevault</title>
+<meta name="description" content="Community archive of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+
+<!-- Open Graph / WhatsApp / Telegram -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://svault.jzadl.xyz">
+<meta property="og:title" content="selenevault">
+<meta property="og:description" content="Community archive of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<meta property="og:image" content="https://cdn.jzadl.xyz/svault/logo.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="300">
+<meta property="og:image:height" content="300">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="selenevault">
+<meta name="twitter:description" content="Community archive of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<meta name="twitter:image" content="https://cdn.jzadl.xyz/svault/logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>/
+:root{
+  /* Material Design 1 palette - Indigo primary / Teal accent, on a flat gray-100 canvas */
+  --primary:#3F51B5;
+  --primary-dark:#303F9F;
+  --primary-light:#C5CAE9;
+  --accent:#009688;
+  --accent-dark:#00796B;
+  --canvas:#EEEEEE;
+  --surface:#FFFFFF;
+  --text-primary:rgba(0,0,0,.87);
+  --text-secondary:rgba(0,0,0,.54);
+  --text-hint:rgba(0,0,0,.38);
+  --divider:rgba(0,0,0,.12);
+  --on-primary:#FFFFFF;
+  --red:#F44336;
+  --orange:#FF9800;
+  --green:#4CAF50;
+  --blue:#2196F3;
+  --amber:#FFC107;
+  --font: 'Roboto', Arial, sans-serif;
+  --mono: 'Roboto Mono', ui-monospace, Menlo, monospace;
+
+  /* MD elevation shadows */
+  --e1: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+  --e2: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.23);
+  --e4: 0 10px 20px rgba(0,0,0,.19), 0 6px 6px rgba(0,0,0,.23);
+}
+*{ box-sizing:border-box; }
+html{ -webkit-font-smoothing:antialiased; }
+body{
+  font-family: var(--font);
+  background: var(--canvas);
+  color: var(--text-primary);
+  margin:0;
+  font-size: 14px;
+  line-height:1.5;
+}
+a{ color:var(--primary); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+button{ font-family:var(--font); }
+*:focus-visible{ outline: 2px solid var(--accent); outline-offset:2px; }
+
+/* ---------- App Bar ---------- */
+.appbar{
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--e2);
+  position: sticky; top:0; z-index:20;
+}
+.appbar-row{
+  display:flex; align-items:center; gap:14px;
+  padding: 0 16px; height:64px;
+  max-width: 1180px; margin:0 auto;
+}
+.appbar-title{ font-size:20px; font-weight:500; letter-spacing:.01em; flex-shrink:0; }
+.appbar-title .path{ font-family:var(--mono); font-weight:400; opacity:.75; font-size:14px; margin-left:2px; }
+.appbar-search{
+  flex:1; display:flex; align-items:center; gap:8px;
+  background: rgba(255,255,255,.16);
+  border-radius:2px; padding: 0 12px; height:38px; max-width:520px;
+  transition: background .15s ease;
+}
+.appbar-search:focus-within{ background: rgba(255,255,255,.26); }
+.appbar-search svg{ width:18px; height:18px; opacity:.8; flex-shrink:0; }
+.appbar-search input{
+  background:transparent; border:none; color:#fff; font-family:var(--font);
+  font-size:14px; width:100%; outline:none;
+}
+.appbar-search input::placeholder{ color:rgba(255,255,255,.7); }
+
+/* ---------- Tabs (Material tabs under app bar) ---------- */
+.tabs{
+  background: var(--primary-dark);
+  overflow-x:auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar{ display:none; }
+.tabs-row{
+  display:flex; max-width:1180px; margin:0 auto; padding: 0 8px;
+}
+.tab{
+  color: rgba(255,255,255,.7);
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight:500;
+  text-transform: uppercase;
+  letter-spacing:.03em;
+  white-space:nowrap;
+  cursor:pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+  display:flex; align-items:center; gap:6px;
+}
+.tab:hover{ color:#fff; }
+.tab.active{ color:#fff; border-bottom-color: var(--accent); }
+.tab .count{
+  background: rgba(255,255,255,.18); color:#fff; font-size:10.5px; font-weight:700;
+  padding: 1px 6px; border-radius: 9px;
+}
+.tab.active .count{ background: var(--accent); }
+
+/* ---------- Layout ---------- */
+.container{ max-width: 1180px; margin:0 auto; padding: 20px 16px 90px; display:grid; grid-template-columns: 260px 1fr; gap:20px; }
+@media (max-width: 900px){ .container{ grid-template-columns: 1fr; } .side-col{ order:2; } }
+
+/* ---------- Side card (filters, stats, links) ---------- */
+.card{
+  background: var(--surface); border-radius:2px; box-shadow: var(--e1); padding:16px;
+}
+.side-col{ display:flex; flex-direction:column; gap:16px; }
+.side-col .card{ position: sticky; top:80px; }
+@media (max-width:900px){ .side-col .card{ position:static; } }
+
+.card h3{
+  font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary);
+  margin:0 0 12px; font-weight:700;
+}
+.stat-row{ display:flex; justify-content:space-between; padding:6px 0; font-size:13px; color:var(--text-secondary); border-bottom:1px solid var(--divider); }
+.stat-row:last-child{ border-bottom:none; }
+.stat-row b{ color:var(--text-primary); font-weight:500; }
+
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+.field select{
+  width:100%; background:var(--surface); border:none; border-bottom:1px solid var(--divider);
+  padding:8px 4px; font-family:var(--font); font-size:14px; color:var(--text-primary); cursor:pointer;
+  border-radius:0;
+}
+.field select:focus{ border-bottom:2px solid var(--primary); outline:none; margin-bottom:-1px; }
+
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  background: var(--canvas); border-radius:16px; padding:6px 12px 6px 6px; margin:0 6px 6px 0;
+  font-size:13px; cursor:pointer; color:var(--text-secondary); border:1px solid transparent;
+}
+.chip .swatch{ width:20px; height:20px; border-radius:50%; display:inline-block; }
+.chip:hover{ background:#E0E0E0; }
+.chip.active{ background: var(--primary-light); color: var(--primary-dark); font-weight:500; }
+
+.link-list a{
+  display:flex; align-items:center; gap:8px; padding:8px 4px; color:var(--text-primary); font-size:13.5px; border-radius:2px;
+}
+.link-list a:hover{ background: var(--canvas); text-decoration:none; }
+.link-list svg{ width:18px; height:18px; opacity:.6; flex-shrink:0; }
+
+.fav-toggle-row{
+  display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  padding:10px 4px; border-radius:2px;
+}
+.fav-toggle-row:hover{ background:var(--canvas); }
+.fav-toggle-row.active{ color: var(--amber); }
+.fav-toggle-row .star{ font-size:18px; }
+
+/* ---------- Main column ---------- */
+.main-col{ min-width:0; }
+.section-title{
+  font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary);
+  margin: 22px 0 10px; display:flex; align-items:center; justify-content:space-between;
+}
+.section-title:first-child{ margin-top:0; }
+.section-title .n{ font-weight:400; color:var(--text-hint); }
+
+/* ---------- Entry card ---------- */
+.entry{
+  background: var(--surface);
+  border-radius: 2px;
+  box-shadow: var(--e1);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: box-shadow .18s ease;
+  position:relative;
+  border-left: 4px solid transparent;
+}
+.entry:hover{ box-shadow: var(--e2); }
+.entry.cat-rom{ border-left-color: var(--blue); }
+.entry.cat-kernels{ border-left-color: var(--red); }
+.entry.cat-recovery{ border-left-color: var(--orange); }
+.entry.cat-firmware{ border-left-color: var(--green); }
+.entry.cat-ports{ border-left-color: #9C27B0; }
+.entry.cat-tools{ border-left-color: var(--accent); }
+.entry.cat-guides{ border-left-color: var(--amber); }
+.entry.cat-channels{ border-left-color: #607D8B; }
+
+.entry-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.entry-title{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; min-width:0; }
+.entry-title .name{ font-size:16px; font-weight:500; color:var(--text-primary); }
+.entry-title .version{ font-family:var(--mono); font-size:12.5px; color:var(--accent-dark); background:#E0F2F1; padding:2px 6px; border-radius:2px; }
+
+.entry-actions{ display:flex; gap:2px; flex-shrink:0; }
+.icon-btn{
+  background:none; border:none; color:var(--text-hint); cursor:pointer;
+  width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  transition: background .15s ease, color .15s ease;
+}
+.icon-btn svg{ width:19px; height:19px; }
+.icon-btn:hover{ background: var(--canvas); color:var(--text-secondary); }
+.icon-btn.starred{ color: var(--amber); }
+.icon-btn.starred:hover{ color:#FFA000; }
+
+.badge-row{ display:flex; gap:6px; flex-wrap:wrap; margin: 8px 0 6px; }
+.badge{
+  font-size:11px; font-weight:500; padding:3px 8px; border-radius:2px; color:#fff;
+}
+.badge.vendor-rvendor{ background:#1976D2; }
+.badge.vendor-svendor{ background:#F57C00; }
+.badge.tag-android{ background:var(--green); }
+.badge.tag-eol{ background:var(--red); }
+.badge.tag-beta{ background:var(--amber); color: rgba(0,0,0,.8); }
+.badge.tag-stable{ background:var(--accent); }
+
+.entry-meta{ color: var(--text-secondary); font-size:12.5px; margin-bottom: 6px; }
+.entry-meta span{ margin-right:12px; }
+.entry-meta span::before{ content:"· "; color:var(--text-hint); }
+.entry-meta span:first-child::before{ content:""; }
+
+.entry-note{ color: var(--text-secondary); font-size:13px; line-height:1.55; }
+.entry-note.clamped{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.entry-note-toggle{ color:var(--primary); font-size:12px; cursor:pointer; margin-top:4px; display:inline-block; font-weight:500; }
+.entry-note-toggle:hover{ text-decoration:underline; }
+
+.entry-link{
+  display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-size:13px;
+  color: var(--primary); font-weight:500; text-transform:uppercase; letter-spacing:.03em;
+  padding: 6px 4px;
+}
+.entry-link:hover{ text-decoration:none; color:var(--primary-dark); }
+
+.empty-state{ text-align:center; color:var(--text-hint); padding: 60px 10px; }
+.empty-state .big{ font-size: 40px; margin-bottom:10px; }
+.empty-state .msg{ font-size:14px; }
+
+/* ---------- Snackbar (MD1 style) ---------- */
+.snackbar{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:#323232; color:#fff; padding:14px 24px; border-radius:2px; box-shadow:var(--e4);
+  font-size:14px; opacity:0; transition: all .2s cubic-bezier(.4,0,.2,1); pointer-events:none; z-index:60;
+  min-width:280px; max-width: 90vw;
+}
+.snackbar.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- FAB ---------- */
+.fab{
+  position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%;
+  background: var(--accent); color:#fff; border:none; box-shadow:var(--e2);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:30;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+.fab:hover{ box-shadow:var(--e4); }
+.fab:active{ transform: scale(.94); }
+.fab svg{ width:24px; height:24px; }
+
+.skeleton{
+  height:88px; border-radius:2px; background:var(--surface); box-shadow:var(--e1); margin-bottom:12px;
+  position:relative; overflow:hidden;
+}
+.skeleton::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,.04), transparent);
+  animation: shine 1.3s infinite;
+}
+@keyframes shine{ 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+.mobile-only{ display:none; }
+@media (max-width:900px){ .mobile-only{ display:block; } }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-row">
+    <div class="appbar-title">selenevault <span class="path">/ selene</span></div>
+    <div class="appbar-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" placeholder="Search name, maintainer, note...">
+    </div>
+  </div>
+  <nav class="tabs">
+    <div class="tabs-row" id="tabsRow">
+      <div class="tab active" data-cat="all">All <span class="count" id="count-all">-</span></div>
+    </div>
+  </nav>
+</header>
+
+<div class="container">
+  <aside class="side-col">
+    <div class="card">
+      <h3>Overview</h3>
+      <div id="statsBox"></div>
+    </div>
+
+    <div class="card">
+      <h3>Filters</h3>
+      <div class="field">
+        <label>Sort by</label>
+        <select id="sortSel">
+          <option value="date-desc">Newest first</option>
+          <option value="date-asc">Oldest first</option>
+          <option value="name-asc">Name A-Z</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Vendor</label>
+        <div>
+          <span class="chip active" data-vendor="">All</span>
+          <span class="chip" data-vendor="rvendor"><span class="swatch" style="background:#1976D2"></span>rvendor</span>
+          <span class="chip" data-vendor="svendor"><span class="swatch" style="background:#F57C00"></span>svendor</span>
+        </div>
+      </div>
+      <div class="fav-toggle-row" id="favToggle">
+        <span><span class="star">★</span>&nbsp; Favorites only</span>
+        <span class="count" id="count-fav">0</span>
+      </div>
+    </div>
+
+    <div class="card link-list">
+      <h3>Links</h3>
+      <a href="https://github.com/jzadl/selenevault" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85 0 1.34-.01 2.42-.01 2.75 0 .27.18.58.69.48A10.02 10.02 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+        GitHub repo
+      </a>
+      <a href="https://t.me/Redmi10_Community" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 2 2 10.5l6 2.2L21 4l-13 10 8 6L22 2z"/></svg>
+        Telegram community
+      </a>
+      <div style="color:var(--text-hint); font-size:11.5px; margin-top:6px;" id="lastUpdated"></div>
+    </div>
+  </aside>
+
+  <main class="main-col">
+    <div id="out">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </main>
+</div>
+
+<button class="fab" id="fabTop" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
+</button>
+
+<div class="snackbar" id="snackbar"></div>
+
+<script src="sman-parser.js"></script>
+<script>
+function esc(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+const CATS = [
+  { key: "rom",       file: "rom.sman",      label: "ROMs" },
+  { key: "kernels",   file: "kernels.sman",  label: "Kernels" },
+  { key: "recovery",  file: "recovery.sman", label: "Recovery" },
+  { key: "firmware",  file: "firmware.sman", label: "Firmware" },
+  { key: "ports",     file: "ports.sman",    label: "Ports" },
+  { key: "tools",     file: "tools.sman",    label: "Tools" },
+  { key: "guides",    file: "guides.sman",   label: "Guides" },
+  { key: "channels",  file: "channels.sman", label: "Channels" },
+];
+
+let DATA = {};
+let state = {
+  cat: "all",
+  favOnly: false,
+  query: "",
+  sort: "date-desc",
+  vendor: "",
+  expanded: new Set()
+};
+
+const FAV_KEY = "selenevault_favs_v1";
+function getFavs(){ try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")); } catch(e){ return new Set(); } }
+function saveFavs(set){ localStorage.setItem(FAV_KEY, JSON.stringify([...set])); }
+let favs = getFavs();
+
+function entryId(catKey, e, idx){
+  return catKey + ":" + idx + ":" + (e.name||"") + (e.version||"");
+}
+
+function parseDate(d){
+  if(!d || d.toLowerCase() === "unknown") return null;
+  const t = Date.parse(d);
+  return isNaN(t) ? null : t;
+}
+
+function detectTags(e){
+  const tags = [];
+  const hay = ((e.note||"") + " " + (e.version||"")).toLowerCase();
+  const androidMatch = hay.match(/android\s?(\d{1,2})/);
+  if(androidMatch) tags.push({ cls:"tag-android", label:"Android " + androidMatch[1] });
+  if(/\beol\b|final/.test(hay)) tags.push({ cls:"tag-eol", label:"EOL" });
+  if(/\bbeta\b|\btest\b|unofficial|wip/.test(hay)) tags.push({ cls:"tag-beta", label:"Beta/Test" });
+  else if(/stable|official/.test(hay)) tags.push({ cls:"tag-stable", label:"Stable" });
+  return tags;
+}
+
+function showSnack(msg){
+  const t = document.getElementById("snackbar");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showSnack._h);
+  showSnack._h = setTimeout(()=> t.classList.remove("show"), 2200);
+}
+
+async function loadAll(){
+  for(const c of CATS){
+    try {
+      const text = await (await fetch(c.file)).text();
+      const { entries } = parseSman(text);
+      DATA[c.key] = entries;
+    } catch(err) {
+      console.error("Error loading " + c.file, err);
+      DATA[c.key] = [];
+    }
+  }
+  buildTabs();
+  buildStats();
+  render();
+}
+
+function buildTabs(){
+  const row = document.getElementById("tabsRow");
+  let total = 0;
+  CATS.forEach(c => {
+    const n = (DATA[c.key]||[]).length;
+    total += n;
+    const div = document.createElement("div");
+    div.className = "tab";
+    div.dataset.cat = c.key;
+    div.innerHTML = `${c.label} <span class="count">${n}</span>`;
+    row.appendChild(div);
+  });
+  document.getElementById("count-all").textContent = total;
+
+  document.querySelectorAll(".tab").forEach(el => {
+    el.addEventListener("click", () => {
+      state.cat = el.dataset.cat;
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      el.classList.add("active");
+      render();
+    });
+  });
+}
+
+function buildStats(){
+  const total = CATS.reduce((s,c)=> s+(DATA[c.key]||[]).length, 0);
+  let newest = null;
+  CATS.forEach(c => (DATA[c.key]||[]).forEach(e => {
+    const d = parseDate(e.date);
+    if(d && (!newest || d>newest)) newest = d;
+  }));
+  const box = document.getElementById("statsBox");
+  box.innerHTML = `
+    <div class="stat-row"><span>Total entries</span><b>${total}</b></div>
+    <div class="stat-row"><span>Categories</span><b>${CATS.length}</b></div>
+    ${newest ? `<div class="stat-row"><span>Latest</span><b>${new Date(newest).toISOString().slice(0,10)}</b></div>` : ""}
+  `;
+  if(newest){
+    document.getElementById("lastUpdated").textContent = "Updated " + new Date(newest).toISOString().slice(0,10);
+  }
+}
+
+function matchesQuery(e, q){
+  if(!q) return true;
+  const hay = [e.name, e.maintainer, e.note, e.version, e.vendor].join(" ").toLowerCase();
+  return hay.includes(q);
+}
+
+function sortEntries(list){
+  const arr = [...list];
+  if(state.sort === "date-desc"){
+    arr.sort((a,b) => (parseDate(b.e.date)||0) - (parseDate(a.e.date)||0));
+  } else if(state.sort === "date-asc"){
+    arr.sort((a,b) => (parseDate(a.e.date)||0) - (parseDate(b.e.date)||0));
+  } else if(state.sort === "name-asc"){
+    arr.sort((a,b) => (a.e.name||"").localeCompare(b.e.name||""));
+  }
+  return arr;
+}
+
+function renderEntry(catKey, e, idx){
+  const id = entryId(catKey, e, idx);
+  const isFav = favs.has(id);
+  const isExpanded = state.expanded.has(id);
+  const tags = detectTags(e);
+  const note = e.note || e.content || "";
+  const needsClamp = note.length > 140;
+
+  const vendorBadge = e.vendor ? `<span class="badge vendor-${esc(e.vendor)}">${esc(e.vendor)}</span>` : "";
+  const tagBadges = tags.map(t => `<span class="badge ${t.cls}">${esc(t.label)}</span>`).join("");
+
+  const starIcon = isFav
+    ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+  const copyIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
+  const linkIcon = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>`;
+
+  return `
+  <div class="entry cat-${esc(catKey)}" data-id="${esc(id)}">
+    <div class="entry-head">
+      <div class="entry-title">
+        <span class="name">${esc(e.name||"untitled")}</span>
+        ${e.version ? `<span class="version">${esc(e.version)}</span>` : ""}
+      </div>
+      <div class="entry-actions">
+        ${e.url ? `<button class="icon-btn" data-copy="${esc(e.url)}" title="Copy link">${copyIcon}</button>` : ""}
+        <button class="icon-btn ${isFav?'starred':''}" data-fav="${esc(id)}" title="Favorite">${starIcon}</button>
+      </div>
+    </div>
+    ${(vendorBadge || tagBadges) ? `<div class="badge-row">${vendorBadge}${tagBadges}</div>` : ""}
+    <div class="entry-meta">
+      ${e.maintainer ? `<span>${esc(e.maintainer)}</span>` : ""}
+      ${e.date && e.date!=="unknown" ? `<span>${esc(e.date)}</span>` : ""}
+      ${e.size && e.size!=="unknown" ? `<span>${esc(e.size)}</span>` : ""}
+    </div>
+    ${note ? `<div class="entry-note ${needsClamp && !isExpanded ? 'clamped':''}" data-note-id="${esc(id)}">${esc(note)}</div>` : ""}
+    ${needsClamp ? `<span class="entry-note-toggle" data-toggle="${esc(id)}">${isExpanded ? 'SHOW LESS' : 'SHOW MORE'}</span>` : ""}
+    ${e.url ? `<a class="entry-link" href="${esc(e.url)}" target="_blank" rel="noopener">${linkIcon} Open link</a>` : ""}
+  </div>`;
+}
+
+function render(){
+  const out = document.getElementById("out");
+  const q = state.query.trim().toLowerCase();
+
+  let catsToShow = state.cat === "all" ? CATS : CATS.filter(c => c.key === state.cat);
+  let html = "";
+  let totalShown = 0;
+
+  catsToShow.forEach(c => {
+    let entries = (DATA[c.key] || []).map((e, idx) => ({ e, idx }));
+
+    if(state.favOnly){
+      entries = entries.filter(({e, idx}) => favs.has(entryId(c.key, e, idx)));
+    }
+    if(state.vendor){
+      entries = entries.filter(({e}) => e.vendor === state.vendor);
+    }
+    if(q){
+      entries = entries.filter(({e}) => matchesQuery(e, q));
+    }
+    entries = sortEntries(entries);
+
+    if(entries.length === 0) return;
+    totalShown += entries.length;
+
+    html += `<div class="section-title"><span>${c.label}</span><span class="n">${entries.length}</span></div>`;
+    entries.forEach(({e, idx}) => { html += renderEntry(c.key, e, idx); });
+  });
+
+  if(totalShown === 0){
+    html = `<div class="empty-state"><div class="big">📭</div>
+      <div class="msg">${state.favOnly ? "No favorites yet — tap the star on any entry to save it here." : "No entries match your filters."}</div>
+    </div>`;
+  }
+
+  out.innerHTML = html;
+  attachEntryEvents();
+}
+
+function attachEntryEvents(){
+  document.querySelectorAll("[data-fav]").forEach(btn => {
+    btn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const id = btn.dataset.fav;
+      if(favs.has(id)){ favs.delete(id); } else { favs.add(id); }
+      saveFavs(favs);
+      document.getElementById("count-fav").textContent = favs.size;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      ev.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        showSnack("Link copied to clipboard");
+      } catch(e){ showSnack("Could not copy link"); }
+    });
+  });
+  document.querySelectorAll("[data-toggle]").forEach(btn => {
+    btn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const id = btn.dataset.toggle;
+      if(state.expanded.has(id)) state.expanded.delete(id); else state.expanded.add(id);
+      render();
+    });
+  });
+}
+
+document.getElementById("search").addEventListener("input", e => {
+  state.query = e.target.value;
+  render();
+});
+document.getElementById("sortSel").addEventListener("change", e => {
+  state.sort = e.target.value;
+  render();
+});
+document.querySelectorAll(".chip[data-vendor]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    state.vendor = chip.dataset.vendor;
+    document.querySelectorAll(".chip[data-vendor]").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    render();
+  });
+});
+document.getElementById("favToggle").addEventListener("click", (e) => {
+  state.favOnly = !state.favOnly;
+  e.currentTarget.classList.toggle("active", state.favOnly);
+  render();
+});
+
+document.getElementById("fabTop").addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+window.addEventListener("scroll", () => {
+  document.getElementById("fabTop").style.display = window.scrollY > 300 ? "flex" : "none";
+});
+document.getElementById("fabTop").style.display = "none";
+
+document.getElementById("count-fav").textContent = favs.size;
+loadAll();
+</script>
+</body>
+</html>
