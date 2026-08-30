@@ -197,3 +197,12 @@ date: 2024-02-29
 url: https://t.me/fukiamimir/168
 note: MIUI 12.5/RVendor only. Linux 4.14.336 EOL, sched/block/mm optimizations, ged_ski fix gpu_freq node. Known issue: FTS screen dead touch after boot (reboot recovery then system fixes it).
 vendor: rvendor
+
+name: LittleSpammyMailman-legacy
+version: 2026.8.30-r
+maintainer: sabrinium0
+size: 13.9mb
+date: 2026-08-30
+url: https://t.me/sabris_selene_stuff/4
+note: Linux 4.14.357+17, KernelSU-Next + SuSFS v2.2.0, OverlayFS, BBR, zstd zram. Fixed thermal black-screen bug and 3 NULL deref crashes. Camera in progress.
+vendor: svendor
