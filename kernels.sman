@@ -204,5 +204,5 @@ maintainer: sabrinium0
 size: 13.9mb
 date: 2026-08-30
 url: https://t.me/sabris_selene_stuff/4
-note: Linux 4.14.357+17, KernelSU-Next + SuSFS v2.2.0, OverlayFS, BBR, zstd zram. Fixed thermal black-screen bug and 3 NULL deref crashes. Camera in progress.
+note: Linux 4.14.357+17, KernelSU-Next + SuSFS v2.2.0, OverlayFS, BBR, zstd zram. Fixed thermal black-screen bug and 3 NULL deref crashes. Leica camera port in progress.
 vendor: svendor
