@@ -962,3 +962,120 @@ date: 2024-10-11
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2.1-FINAL-STABLE-EOL-20241011-VANILLA-COMMUNITY-selene-ota.zip/download
 note: Android 14, Final EOL Vanilla, Community. Miui camera and Lawnchair launcher included. Bug: VoLTE.
 vendor: rvendor
+
+name: CherishOS
+version: v3.9.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-11-10
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.9.5-20221110-0510-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.9
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-07-10
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.9-20220709-0117-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.7
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-06-05
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.7-20220509-0944-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.6.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-04-25
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6.5-20220423-0644-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.6
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-04-10
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6-20220409-2119-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.6
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-04-06
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6-20220406-1454-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.5.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-04-06
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.5-20220405-2129-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.5.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-03-29
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.5-20220329-0939-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.5.2
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-03-26
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.2-20220325-1638-selene-OFFICIAL-GApps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.4.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-02-22
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.4.5-20220222-0041-selene-OFFICIAL-Gapps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.4
+maintainer: hungphan2001
+size: 1.4G
+date: 2022-02-13
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.4-20220212-1222-selene-OFFICIAL-Gapps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.3.5
+maintainer: hungphan2001
+size: 1.6G
+date: 2022-02-07
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220203-1844-selene-OFFICIAL-Gapps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
+
+name: CherishOS
+version: v3.3.5
+maintainer: hungphan2001
+size: 1.5G
+date: 2022-02-06
+url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220127-1437-selene-OFFICIAL-Gapps.zip/download
+note: Official GApps build. Android 11.
+vendor: rvendor
