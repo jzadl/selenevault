@@ -206,3 +206,12 @@ date: 2026-08-30
 url: https://t.me/sabris_selene_stuff/4
 note: Linux 4.14.357+17, KernelSU-Next + SuSFS v2.2.0, OverlayFS, BBR, zstd zram. Fixed thermal black-screen bug and 3 NULL deref crashes. Leica camera port in progress.
 vendor: svendor
+
+name: LittleSpammyMailman
+version: 2026.9.6-r
+maintainer: sabrinium0
+size: 15.1mb
+date: 2026-09-06
+url: https://t.me/sabris_selene_stuff/16
+note: Linux 4.19.325 (CIP SLTS), KernelSU-Next + SuSFS. Hotfix for charging bug capping current at ~450mA regardless of adapter (missing charging algorithm init, fell back to SwitchCharging). Now reaches ~1644mA. Update from 2026.9.3 required.
+vendor: svendor
