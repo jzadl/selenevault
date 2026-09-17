@@ -1,0 +1,18 @@
+name: Set Telegram Webhook (workers.dev test)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  set:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Set webhook
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RESULT=$(curl -s "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=https://svault-bot.felixzamoranoj.workers.dev")
+          gh issue create --repo "${{ github.repository }}" --title "webhook-set-workersdev" --body "$RESULT" --label "debug"
