@@ -98,9 +98,28 @@ document.getElementById("search").addEventListener("input", e => {
   document.querySelectorAll(".entry").forEach(el => {
     el.style.display = el.dataset.search.includes(q) ? "" : "none";
   });
+  const url = new URL(window.location);
+  if (q) url.searchParams.set("q", e.target.value);
+  else url.searchParams.delete("q");
+  history.replaceState(null, "", url);
 });
 
-load();
+async function init(){
+  await load();
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("q");
+  if (q) {
+    const input = document.getElementById("search");
+    input.value = q;
+    input.dispatchEvent(new Event("input"));
+    setTimeout(() => {
+      const firstVisible = [...document.querySelectorAll(".entry")].find(el => el.style.display !== "none");
+      if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }
+}
+
+init();
 </script>
 </body>
 </html>v
