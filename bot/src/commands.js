@@ -82,6 +82,10 @@ export async function cmdStats(env, arg) {
   return lines.join("\n");
 }
 
+function normalize(s) {
+  return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
 export async function cmdSearch(env, arg) {
   if (!arg) return "Usage: /search \\[category\\] query";
 
@@ -97,26 +101,50 @@ export async function cmdSearch(env, arg) {
   if (!query) return "Give me something to search for\\.";
 
   const categories = category ? [category] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
-  const results = [];
+  const direct = [];
+  const other = [];
   const q = query.toLowerCase();
+  const qNorm = normalize(query);
 
   for (const cat of categories) {
     const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]);
     for (const entry of entries) {
-      if (entry.name && entry.name.toLowerCase().includes(q)) {
-        results.push({ category: cat, entry });
+      const name = (entry.name || "").toLowerCase();
+      const nameNorm = normalize(entry.name);
+      if (name.includes(q) || nameNorm.includes(qNorm)) {
+        direct.push({ category: cat, entry });
+        continue;
+      }
+      const note = (entry.note || "").toLowerCase();
+      const version = (entry.version || "").toLowerCase();
+      if (note.includes(q) || version.includes(q)) {
+        other.push({ category: cat, entry });
       }
     }
-    if (results.length >= 5) break;
   }
 
-  if (results.length === 0) return `No results for *${escapeMd(query)}*\\.`;
-
-  const lines = [`*Results for* \`${escapeMd(query)}\`:`, ""];
-  for (const { category: cat, entry } of results.slice(0, 5)) {
-    lines.push(formatEntry(env.SITE_URL, cat, entry));
-    lines.push("");
+  if (direct.length === 0 && other.length === 0) {
+    return `No results for *${escapeMd(query)}*\\.`;
   }
+
+  const lines = [`*Results for* \`${escapeMd(query)}\`:`];
+
+  if (direct.length > 0) {
+    lines.push("", "*\\[ RESULTS \\]*", "");
+    for (const { category: cat, entry } of direct.slice(0, 15)) {
+      lines.push(formatEntry(env.SITE_URL, cat, entry));
+      lines.push("");
+    }
+  }
+
+  if (other.length > 0) {
+    lines.push("*\\[ OTHER RESULTS \\]*", "");
+    for (const { category: cat, entry } of other.slice(0, 10)) {
+      lines.push(formatEntry(env.SITE_URL, cat, entry));
+      lines.push("");
+    }
+  }
+
   return lines.join("\n").trim();
 }
 
