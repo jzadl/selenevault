@@ -30,6 +30,22 @@ async function handleCommand(env, command, arg) {
   }
 }
 
+const TELEGRAM_MAX_LENGTH = 4096;
+
+function splitMessage(text) {
+  if (text.length <= TELEGRAM_MAX_LENGTH) return [text];
+  const chunks = [];
+  let remaining = text;
+  while (remaining.length > TELEGRAM_MAX_LENGTH) {
+    let cut = remaining.lastIndexOf("\n\n", TELEGRAM_MAX_LENGTH);
+    if (cut <= 0) cut = TELEGRAM_MAX_LENGTH;
+    chunks.push(remaining.slice(0, cut));
+    remaining = remaining.slice(cut).trimStart();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method !== "POST") {
@@ -63,15 +79,28 @@ export default {
     try {
       reply = await handleCommand(env, command, arg);
     } catch (err) {
-      reply = "Something broke on my end, try again in a bit\\.";
+      reply = `Something broke on my end, try again in a bit\\.\n\`${escapeMdSafe(String(err))}\``;
     }
 
     if (reply) {
-      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, reply, {
-        replyToMessageId: msg.message_id,
-      });
+      const chunks = splitMessage(reply);
+      for (let i = 0; i < chunks.length; i++) {
+        const result = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, chunks[i], {
+          replyToMessageId: i === 0 ? msg.message_id : undefined,
+        });
+        if (!result.ok) {
+          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "I found something but could not send it properly\\.", {
+            replyToMessageId: msg.message_id,
+          });
+          break;
+        }
+      }
     }
 
     return new Response("ok", { status: 200 });
   },
 };
+
+function escapeMdSafe(text) {
+  return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
+}
