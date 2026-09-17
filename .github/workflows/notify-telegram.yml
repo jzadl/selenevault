@@ -15,13 +15,18 @@ jobs:
       - name: Send message to Telegram
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: "@svaultjz"
+          CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
           TEXT: ${{ github.event.issue.body }}
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${CHAT_ID}" \
-            -d "parse_mode=MarkdownV2" \
-            --data-urlencode "text=${TEXT}"
+          IFS=',' read -ra IDS <<< "$CHAT_IDS"
+          for ID in "${IDS[@]}"; do
+            ID_TRIMMED=$(echo "$ID" | xargs)
+            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${ID_TRIMMED}" \
+              -d "parse_mode=MarkdownV2" \
+              --data-urlencode "text=${TEXT}"
+            echo ""
+          done
 
       - name: Close the issue
         env:
