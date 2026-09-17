@@ -6,9 +6,13 @@ on:
 jobs:
   info:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Get info
+      - name: Get info and post as issue
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -s "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo"
+          RESULT=$(curl -s "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo")
+          gh issue create --repo "${{ github.repository }}" --title "webhook-debug" --body "$RESULT" --label "debug"
