@@ -2,6 +2,10 @@ name = "svault-bot"
 main = "src/index.js"
 compatibility_date = "2026-09-17"
 
+routes = [
+  { pattern = "toelicking.selenevault.bot.jzadl.xyz", custom_domain = true }
+]
+
 [vars]
 CDN_BASE = "https://cdn.jsdelivr.net/gh/jzadl/selenevault@main"
 SITE_URL = "https://svault.jzadl.xyz"
