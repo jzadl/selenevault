@@ -2,7 +2,7 @@ import { parseSman, CATEGORY_FILES, CATEGORY_LABELS } from "./sman.js";
 import { escapeMd } from "./telegram.js";
 
 async function fetchSman(cdnBase, filename) {
-  const res = await fetch(`${cdnBase}/${filename}`, { cf: { cacheTtl: 60 } });
+  const res = await fetch(`${cdnBase}/${filename}?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
   if (!res.ok) return { about: "", entries: [] };
   return parseSman(await res.text());
 }
@@ -21,24 +21,39 @@ function formatEntry(siteUrl, category, entry) {
   return `*${name}*${version} \\- ${label}${date}\n[View on svault](${link})`;
 }
 
+async function fetchLastCommitDate(githubApiBase, filename) {
+  const res = await fetch(
+    `${githubApiBase}/commits?path=${filename}&per_page=1`,
+    { headers: { "User-Agent": "svault-bot" }, cf: { cacheTtl: 60 } }
+  );
+  if (!res.ok) return null;
+  const commits = await res.json();
+  if (!commits.length) return null;
+  return commits[0].commit.committer.date;
+}
+
 export async function cmdLatest(env, arg) {
   const categories = arg && CATEGORY_FILES[arg] ? [arg] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
-  let newest = null;
+
+  let newestFileDate = null;
   let newestCategory = null;
 
   for (const category of categories) {
-    const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[category]);
-    for (const entry of entries) {
-      if (!entry.date) continue;
-      if (!newest || entry.date > newest.date) {
-        newest = entry;
-        newestCategory = category;
-      }
+    const commitDate = await fetchLastCommitDate(env.GITHUB_API_BASE, CATEGORY_FILES[category]);
+    if (!commitDate) continue;
+    if (!newestFileDate || commitDate > newestFileDate) {
+      newestFileDate = commitDate;
+      newestCategory = category;
     }
   }
 
-  if (!newest) return "No entries found\\.";
-  return `*Latest addition:*\n\n${formatEntry(env.SITE_URL, newestCategory, newest)}`;
+  if (!newestCategory) return "No entries found\\.";
+
+  const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[newestCategory]);
+  if (!entries.length) return "No entries found\\.";
+
+  const last = entries[entries.length - 1];
+  return `*Latest addition:*\n\n${formatEntry(env.SITE_URL, newestCategory, last)}`;
 }
 
 export async function cmdStats(env, arg) {
