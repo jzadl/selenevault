@@ -67,7 +67,9 @@ export default {
     }
 
     if (reply) {
-      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, reply);
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, reply, {
+        replyToMessageId: msg.message_id,
+      });
     }
 
     return new Response("ok", { status: 200 });

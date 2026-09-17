@@ -8,17 +8,23 @@ async function fetchSman(cdnBase, filename) {
 }
 
 function entryLink(siteUrl, category, entry) {
+  if (category === "channel" && entry.url) return entry.url;
   const q = encodeURIComponent(entry.name);
   return `${siteUrl}/?q=${q}`;
 }
 
 function formatEntry(siteUrl, category, entry) {
-  const name = escapeMd(entry.name);
-  const label = escapeMd(CATEGORY_LABELS[category] || category);
+  const rawName = entry.name || "";
+  const name = escapeMd(rawName);
+  const labelText = CATEGORY_LABELS[category] || category;
+  const nameHasLabel = rawName.toLowerCase().includes(`(${labelText.toLowerCase()})`);
+  const label = nameHasLabel ? "" : ` \\- ${escapeMd(labelText)}`;
   const version = entry.version ? ` \`${escapeMd(entry.version)}\`` : "";
+  const maintainer = entry.maintainer ? ` by ${escapeMd(entry.maintainer)}` : "";
   const date = entry.date ? ` \\(${escapeMd(entry.date)}\\)` : "";
   const link = entryLink(siteUrl, category, entry);
-  return `*${name}*${version} \\- ${label}${date}\n[View on svault](${link})`;
+  const linkLabel = category === "channel" ? "Open channel" : "View on svault";
+  return `*${name}*${version}${label}${maintainer}${date}\n[${linkLabel}](${link})`;
 }
 
 async function fetchLastCommitDate(githubApiBase, filename) {
@@ -33,7 +39,7 @@ async function fetchLastCommitDate(githubApiBase, filename) {
 }
 
 export async function cmdLatest(env, arg) {
-  const categories = arg && CATEGORY_FILES[arg] ? [arg] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
+  const categories = arg && CATEGORY_FILES[arg] ? [arg] : Object.keys(CATEGORY_FILES);
 
   let newestFileDate = null;
   let newestCategory = null;
