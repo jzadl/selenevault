@@ -1079,12 +1079,3 @@ date: 2022-02-06
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220127-1437-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
-
-name: HyperOS 2.0
-version: 2.0.209.0VMXMIXM
-maintainer: Farh4d979
-size: 2.4G
-date: 2026-09-17
-url: https://drive.google.com/file/d/1XQi043WV0BbwU80n6XxalZSB3U3uJmi1/view
-note: Android 15. Heavily debloated, HyperOS 3 icons, KSU kernel included, firmware included. Flash in fastboot, clean flash required. Known bugs: reading mode, occasional freeze in settings.
-vendor: svendor
