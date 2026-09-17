@@ -141,23 +141,17 @@ export async function cmdSearch(env, arg) {
 
   if (direct.length > 0) {
     lines.push("", "*\\[ RESULTS \\]*", "");
-    for (const { category: cat, entry } of direct.slice(0, 8)) {
+    for (const { category: cat, entry } of direct) {
       lines.push(formatEntry(env.SITE_URL, cat, entry));
       lines.push("");
-    }
-    if (direct.length > 8) {
-      lines.push(`_and ${direct.length - 8} more, use a category filter to narrow it down_`, "");
     }
   }
 
   if (other.length > 0) {
     lines.push("*\\[ OTHER RESULTS \\]*", "");
-    for (const { category: cat, entry } of other.slice(0, 5)) {
+    for (const { category: cat, entry } of other) {
       lines.push(formatEntry(env.SITE_URL, cat, entry));
       lines.push("");
-    }
-    if (other.length > 5) {
-      lines.push(`_and ${other.length - 5} more_`, "");
     }
   }
 
