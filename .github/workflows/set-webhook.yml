@@ -1,0 +1,14 @@
+name: Set Telegram Webhook
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  set:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set webhook
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -s "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=https://toelicking.selenevault.bot.jzadl.xyz"
