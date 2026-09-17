@@ -41,15 +41,19 @@ async function fetchLastCommitDate(githubApiBase, filename) {
 export async function cmdLatest(env, arg) {
   const categories = arg && CATEGORY_FILES[arg] ? [arg] : Object.keys(CATEGORY_FILES);
 
+  const dates = await Promise.all(
+    categories.map((cat) =>
+      fetchLastCommitDate(env.GITHUB_API_BASE, CATEGORY_FILES[cat]).then((date) => ({ cat, date }))
+    )
+  );
+
   let newestFileDate = null;
   let newestCategory = null;
-
-  for (const category of categories) {
-    const commitDate = await fetchLastCommitDate(env.GITHUB_API_BASE, CATEGORY_FILES[category]);
-    if (!commitDate) continue;
-    if (!newestFileDate || commitDate > newestFileDate) {
-      newestFileDate = commitDate;
-      newestCategory = category;
+  for (const { cat, date } of dates) {
+    if (!date) continue;
+    if (!newestFileDate || date > newestFileDate) {
+      newestFileDate = date;
+      newestCategory = cat;
     }
   }
 
@@ -69,14 +73,17 @@ export async function cmdStats(env, arg) {
     return `*${label}s on svault:* ${entries.length}`;
   }
 
+  const categoryEntries = Object.entries(CATEGORY_FILES).filter(([cat]) => cat !== "channel");
+  const counts = await Promise.all(
+    categoryEntries.map(([cat, file]) => fetchSman(env.CDN_BASE, file).then((r) => ({ cat, count: r.entries.length })))
+  );
+
   const lines = ["*svault stats:*", ""];
   let total = 0;
-  for (const [category, file] of Object.entries(CATEGORY_FILES)) {
-    if (category === "channel") continue;
-    const { entries } = await fetchSman(env.CDN_BASE, file);
-    total += entries.length;
-    const label = escapeMd(CATEGORY_LABELS[category]);
-    lines.push(`${label}s: ${entries.length}`);
+  for (const { cat, count } of counts) {
+    total += count;
+    const label = escapeMd(CATEGORY_LABELS[cat]);
+    lines.push(`${label}s: ${count}`);
   }
   lines.push("", `Total: ${total}`);
   return lines.join("\n");
@@ -106,8 +113,11 @@ export async function cmdSearch(env, arg) {
   const q = query.toLowerCase();
   const qNorm = normalize(query);
 
-  for (const cat of categories) {
-    const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]);
+  const results = await Promise.all(
+    categories.map((cat) => fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
+  );
+
+  for (const { cat, entries } of results) {
     for (const entry of entries) {
       const name = (entry.name || "").toLowerCase();
       const nameNorm = normalize(entry.name);
