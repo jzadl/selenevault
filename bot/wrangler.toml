@@ -1,0 +1,9 @@
+name = "svault-bot"
+main = "src/index.js"
+compatibility_date = "2026-09-17"
+
+[vars]
+CDN_BASE = "https://cdn.jsdelivr.net/gh/jzadl/selenevault@main"
+SITE_URL = "https://svault.jzadl.xyz"
+
+# Set with: wrangler secret put TELEGRAM_BOT_TOKEN
