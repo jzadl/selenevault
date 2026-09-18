@@ -10,20 +10,22 @@ jobs:
       - name: Send DM
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          MSG_TEXT: |
+            *New updates on Svault and Svault Bot\!*
+
+            _Website_
+            \- Builds of the same ROM/kernel/port now group into one collapsible section, newest first
+            \- Added filters for category, creator, and vendor
+            \- Fixed duplicate entries showing up under slightly different names \(e\.g\. CherishOS vs Cherish OS\)
+
+            _Bot_
+            \- Commands are now `/slatest`, `/sstats`, `/ssearch`, `/schannels` to avoid clashing with other bots in the group
+            \- Search now shows every match, split across messages if needed
+            \- Bot replies now reply directly to your message
+
+            svault\.jzadl\.xyz
         run: |
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
             -d "chat_id=5722152704" \
             -d "parse_mode=MarkdownV2" \
-            --data-urlencode "text=*New updates on Svault and Svault Bot\!*
-
-_Website_
-\- Builds of the same ROM/kernel/port now group into one collapsible section, newest first
-\- Added filters for category, creator, and vendor
-\- Fixed duplicate entries showing up under slightly different names \(e\.g\. CherishOS vs Cherish OS\)
-
-_Bot_
-\- Commands are now \`/slatest\`, \`/sstats\`, \`/ssearch\`, \`/schannels\` to avoid clashing with other bots in the group
-\- Search now shows every match, split across messages if needed
-\- Bot replies now reply directly to your message
-
-svault\.jzadl\.xyz"
+            --data-urlencode "text=${MSG_TEXT}"
