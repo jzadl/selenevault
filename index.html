@@ -55,6 +55,36 @@ input {
 .entry b { color: #fff; }
 .entry .meta { color: #888; font-size: 12px; }
 .entry a { color: cyan; }
+.group {
+  border: 1px solid #333;
+  margin: 10px 0;
+}
+.group summary {
+  cursor: pointer;
+  padding: 10px;
+  color: #fff;
+  font-weight: bold;
+  list-style: none;
+}
+.group summary::-webkit-details-marker { display: none; }
+.group summary::before {
+  content: "▸ ";
+  color: cyan;
+}
+.group[open] summary::before {
+  content: "▾ ";
+}
+.group summary .count {
+  color: #888;
+  font-weight: normal;
+  font-size: 12px;
+}
+.group .entries {
+  padding: 0 10px 10px 10px;
+}
+.group .entry:first-child {
+  border-color: #0aa;
+}
 </style>
 </head>
 <body>
@@ -70,6 +100,27 @@ function esc(str) {
 
 const files = ["rom.sman","kernels.sman","recovery.sman","firmware.sman","ports.sman","tools.sman","guides.sman","channels.sman"];
 
+function groupKey(name) {
+  if (!name) return "";
+  let base = name;
+  base = base.replace(/\s*[\(\[][^)\]]*[\)\]]\s*/g, " ");
+  base = base.replace(/\bv?\d+(\.\d+){1,3}[a-z]?\b.*$/i, "");
+  base = base.replace(/\b\d{4}[.\-]\d{1,2}[.\-]\d{1,2}\b.*$/, "");
+  base = base.replace(/\b\d{8}\b.*$/, "");
+  base = base.trim();
+  return base || name.trim();
+}
+
+function entryHtml(e) {
+  const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
+  return `<div class="entry" data-search="${esc(search)}">
+    <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
+    <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
+    <div>${esc(e.note||"")}</div>
+    ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
+  </div>`;
+}
+
 async function load(){
   let html = "";
   for(const f of files){
@@ -77,14 +128,32 @@ async function load(){
       const text = await (await fetch(f)).text();
       const {entries} = parseSman(text);
       html += `<h2>${f} (${entries.length})</h2>`;
+
+      if (f === "channels.sman" || f === "guides.sman") {
+        entries.forEach(e => { html += entryHtml(e); });
+        continue;
+      }
+
+      const groups = new Map();
       entries.forEach(e => {
-        const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-        html += `<div class="entry" data-search="${esc(search)}">
-          <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
-          <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
-          <div>${esc(e.note||"")}</div>
-          ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
-        </div>`;
+        const key = groupKey(e.name);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(e);
+      });
+
+      groups.forEach((groupEntries, key) => {
+        groupEntries.sort((a, b) => (b.date||"").localeCompare(a.date||""));
+
+        if (groupEntries.length === 1) {
+          html += entryHtml(groupEntries[0]);
+          return;
+        }
+
+        const search = groupEntries.map(e => (e.name+" "+e.maintainer+" "+e.note).toLowerCase()).join(" ");
+        html += `<details class="group" data-search="${esc(search)}">
+          <summary>${esc(key)} <span class="count">(${groupEntries.length} builds)</span></summary>
+          <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
+        </details>`;
       });
     } catch(err) {
       console.error("Error loading " + f, err);
@@ -95,8 +164,10 @@ async function load(){
 
 document.getElementById("search").addEventListener("input", e => {
   const q = e.target.value.toLowerCase();
-  document.querySelectorAll(".entry").forEach(el => {
-    el.style.display = el.dataset.search.includes(q) ? "" : "none";
+  document.querySelectorAll(".entry, .group").forEach(el => {
+    const match = el.dataset.search.includes(q);
+    el.style.display = match ? "" : "none";
+    if (match && q && el.tagName === "DETAILS") el.open = true;
   });
   const url = new URL(window.location);
   if (q) url.searchParams.set("q", e.target.value);
@@ -113,7 +184,7 @@ async function init(){
     input.value = q;
     input.dispatchEvent(new Event("input"));
     setTimeout(() => {
-      const firstVisible = [...document.querySelectorAll(".entry")].find(el => el.style.display !== "none");
+      const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
       if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
   }
@@ -122,4 +193,4 @@ async function init(){
 init();
 </script>
 </body>
-</html>v
+</html>
