@@ -4,26 +4,26 @@ import { cmdLatest, cmdStats, cmdSearch, cmdChannels } from "./commands.js";
 const HELP_TEXT = [
   "*svault bot commands:*",
   "",
-  "\\!latest \\[category\\] \\- newest addition",
-  "\\!stats \\[category\\] \\- entry counts",
-  "\\!search \\[category\\] query \\- find an entry",
-  "\\!channels \\- community channels",
+  "\\!latests \\[category\\] \\- newest addition",
+  "\\!statss \\[category\\] \\- entry counts",
+  "\\!searchs \\[category\\] query \\- find an entry",
+  "\\!channelss \\- community channels",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
 
 async function handleCommand(env, command, arg) {
   switch (command) {
-    case "!start":
-    case "!help":
+    case "!starts":
+    case "!helps":
       return HELP_TEXT;
-    case "!latest":
+    case "!latests":
       return cmdLatest(env, arg ? arg.toLowerCase() : null);
-    case "!stats":
+    case "!statss":
       return cmdStats(env, arg ? arg.toLowerCase() : null);
-    case "!search":
+    case "!searchs":
       return cmdSearch(env, arg);
-    case "!channels":
+    case "!channelss":
       return cmdChannels(env);
     default:
       return null;
