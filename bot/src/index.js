@@ -1,5 +1,5 @@
 import { sendMessage } from "./telegram.js";
-import { cmdLatest, cmdStats, cmdSearch, cmdChannels } from "./commands.js";
+import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv } from "./commands.js";
 
 const HELP_TEXT = [
   "*svault bot commands:*",
@@ -64,8 +64,17 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
+    if (msg.chat.type !== "private") {
+      await sendMessage(
+        env.TELEGRAM_BOT_TOKEN,
+        "5722152704",
+        `DEBUG: got group message\\. chat\\_id=${escapeMdSafe(String(msg.chat.id))} chat\\_type=${escapeMdSafe(msg.chat.type)} text=${escapeMdSafe(msg.text.slice(0, 100))}`
+      );
+    }
+
     const text = msg.text.trim();
-    if (!text.startsWith("/s")) {
+    const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv");
+    if (!isCommand) {
       return new Response("ok", { status: 200 });
     }
 
@@ -77,6 +86,24 @@ export default {
 
     if (command === "/sid") {
       await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Your chat ID: \`${msg.chat.id}\``, {
+        replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/isthisonsv") {
+      const replyMsg = msg.reply_to_message;
+      const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
+      let isReply;
+      try {
+        isReply = await cmdIsThisOnSv(env, replyText);
+      } catch (err) {
+        isReply = "Something broke on my end, try again in a bit\\.";
+      }
+      if (!replyMsg) {
+        isReply = "Reply to a message with a ROM/kernel/port name to use this\\.";
+      }
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, isReply, {
         replyToMessageId: msg.message_id,
       });
       return new Response("ok", { status: 200 });
