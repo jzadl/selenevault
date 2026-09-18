@@ -17,6 +17,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy to Cloudflare Workers
+        id: deploy
+        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -24,5 +26,15 @@ jobs:
           workingDirectory: bot
           secrets: |
             TELEGRAM_BOT_TOKEN
+          command: deploy --outdir=dist 2>&1 | tee /tmp/deploy_output.log; exit ${PIPESTATUS[0]}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: Report failure
+        if: steps.deploy.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=$(cat /tmp/deploy_output.log 2>/dev/null | tail -c 60000 || echo "no log captured")
+          gh issue create --repo "${{ github.repository }}" --title "deploy-failure-debug" --body "$BODY" --label "debug"
+          exit 1
