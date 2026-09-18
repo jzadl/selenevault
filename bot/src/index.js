@@ -4,26 +4,26 @@ import { cmdLatest, cmdStats, cmdSearch, cmdChannels } from "./commands.js";
 const HELP_TEXT = [
   "*svault bot commands:*",
   "",
-  "\\!latests \\[category\\] \\- newest addition",
-  "\\!statss \\[category\\] \\- entry counts",
-  "\\!searchs \\[category\\] query \\- find an entry",
-  "\\!channelss \\- community channels",
+  "/slatest \\[category\\] \\- newest addition",
+  "/sstats \\[category\\] \\- entry counts",
+  "/ssearch \\[category\\] query \\- find an entry",
+  "/schannels \\- community channels",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
 
 async function handleCommand(env, command, arg) {
   switch (command) {
-    case "!starts":
-    case "!helps":
+    case "/sstart":
+    case "/shelp":
       return HELP_TEXT;
-    case "!latests":
+    case "/slatest":
       return cmdLatest(env, arg ? arg.toLowerCase() : null);
-    case "!statss":
+    case "/sstats":
       return cmdStats(env, arg ? arg.toLowerCase() : null);
-    case "!searchs":
+    case "/ssearch":
       return cmdSearch(env, arg);
-    case "!channelss":
+    case "/schannels":
       return cmdChannels(env);
     default:
       return null;
@@ -65,7 +65,7 @@ export default {
     }
 
     const text = msg.text.trim();
-    if (!text.startsWith("!")) {
+    if (!text.startsWith("/s")) {
       return new Response("ok", { status: 200 });
     }
 
@@ -73,7 +73,7 @@ export default {
     let command = spaceIdx === -1 ? text : text.slice(0, spaceIdx);
     const arg = spaceIdx === -1 ? "" : text.slice(spaceIdx + 1).trim();
 
-    command = command.toLowerCase();
+    command = command.split("@")[0].toLowerCase();
 
     let reply;
     try {
