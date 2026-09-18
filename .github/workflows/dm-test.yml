@@ -1,0 +1,20 @@
+name: Send DM Test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Send test DM
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RESULT=$(curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=@xiaomiselene" \
+            -d "text=Test DM from svault bot")
+          gh issue create --repo "${{ github.repository }}" --title "dm-test-result" --body "$RESULT" --label "debug"
