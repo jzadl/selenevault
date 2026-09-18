@@ -385,3 +385,12 @@ date: 2026-09-18
 url: https://drive.google.com/file/d/1nXHEOHY1MNAtyUfvLkwa799phN5Yg9oT/view?pli=1
 note: Fixed vold encryption issue that caused the phone turn off. Deleted some unuseful system apps that was crashing/
 vendor: svendor
+
+name: HyperTW
+version: v3.0.302.0 WGTTWXM
+maintainer: zelsta7
+size: 2.8G
+date: 2026-09-18
+url: https://pixeldrain.com/u/wKVqU5rA
+note: Android 16, HyperOS 3 port from Xiaomi Lake. Pre-rooted with KSU-Next 3.3.0, debloated, Google services and Play Store included. Known bugs: Reading Mode/Color Schemes, AOD, stacked Recents, and some personalization/theme issues. Clean flash mandatory. Flash from MIUI 13 or MIUI 14.
+vendor: svendor
