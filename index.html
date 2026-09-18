@@ -85,11 +85,38 @@ input {
 .group .entry:first-child {
   border-color: #0aa;
 }
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+select {
+  background: #000;
+  color: #ddd;
+  border: 1px solid #444;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 14px;
+  flex: 1;
+  min-width: 140px;
+}
 </style>
 </head>
 <body>
 <h1>selenevault</h1>
 <input id="search" placeholder="search...">
+<div class="filters">
+  <select id="filter-category">
+    <option value="">All categories</option>
+  </select>
+  <select id="filter-creator">
+    <option value="">All creators</option>
+  </select>
+  <select id="filter-vendor">
+    <option value="">All vendors</option>
+  </select>
+</div>
 <div id="out">loading...</div>
 
 <script src="sman-parser.js"></script>
@@ -114,13 +141,17 @@ function groupKey(name) {
 
 function entryHtml(e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<div class="entry" data-search="${esc(search)}">
+  return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
     <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
     <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
     <div>${esc(e.note||"")}</div>
     ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
   </div>`;
 }
+
+const allCreators = new Set();
+const allVendors = new Set();
+const allCategories = [];
 
 async function load(){
   let html = "";
@@ -129,9 +160,13 @@ async function load(){
       const text = await (await fetch(f)).text();
       const {entries} = parseSman(text);
       html += `<h2>${f} (${entries.length})</h2>`;
+      allCategories.push(f);
 
       if (f === "channels.sman" || f === "guides.sman") {
-        entries.forEach(e => { html += entryHtml(e); });
+        entries.forEach(e => {
+          if (e.maintainer) allCreators.add(e.maintainer);
+          html += entryHtml(e);
+        });
         continue;
       }
 
@@ -140,19 +175,23 @@ async function load(){
         const key = groupKey(e.name);
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(e);
+        if (e.maintainer) allCreators.add(e.maintainer);
+        if (e.vendor) allVendors.add(e.vendor);
       });
 
       groups.forEach((groupEntries, key) => {
         groupEntries.sort((a, b) => (b.date||"").localeCompare(a.date||""));
 
         if (groupEntries.length === 1) {
-          html += entryHtml(groupEntries[0]);
+          html += `<div class="group-wrap" data-category="${esc(f)}">${entryHtml(groupEntries[0])}</div>`;
           return;
         }
 
         const displayName = groupEntries[0].name || key;
         const search = groupEntries.map(e => (e.name+" "+e.maintainer+" "+e.note).toLowerCase()).join(" ");
-        html += `<details class="group" data-search="${esc(search)}">
+        const creators = [...new Set(groupEntries.map(e => e.maintainer).filter(Boolean))].join(",");
+        const vendors = [...new Set(groupEntries.map(e => e.vendor).filter(Boolean))].join(",");
+        html += `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(creators)}" data-vendor="${esc(vendors)}">
           <summary>${esc(displayName)} <span class="count">(${groupEntries.length} builds)</span></summary>
           <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
         </details>`;
@@ -162,31 +201,92 @@ async function load(){
     }
   }
   document.getElementById("out").innerHTML = html;
+  populateFilters();
 }
 
-document.getElementById("search").addEventListener("input", e => {
-  const q = e.target.value.toLowerCase();
-  document.querySelectorAll(".entry, .group").forEach(el => {
-    const match = el.dataset.search.includes(q);
-    el.style.display = match ? "" : "none";
-    if (match && q && el.tagName === "DETAILS") el.open = true;
+function populateFilters(){
+  const categorySelect = document.getElementById("filter-category");
+  allCategories.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f;
+    opt.textContent = f;
+    categorySelect.appendChild(opt);
   });
+
+  const creatorSelect = document.getElementById("filter-creator");
+  [...allCreators].sort((a,b) => a.localeCompare(b)).forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    creatorSelect.appendChild(opt);
+  });
+
+  const vendorSelect = document.getElementById("filter-vendor");
+  [...allVendors].sort().forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    vendorSelect.appendChild(opt);
+  });
+}
+
+function applyFilters(){
+  const q = document.getElementById("search").value.toLowerCase();
+  const category = document.getElementById("filter-category").value;
+  const creator = document.getElementById("filter-creator").value;
+  const vendor = document.getElementById("filter-vendor").value;
+
+  document.querySelectorAll(".group-wrap > .entry, #out > .entry").forEach(el => {
+    const wrap = el.closest(".group-wrap") || el;
+    const cat = wrap.dataset.category || "";
+    const matchesSearch = !q || el.dataset.search.includes(q);
+    const matchesCategory = !category || cat === category;
+    const matchesCreator = !creator || (el.dataset.creator || "").split(",").includes(creator);
+    const matchesVendor = !vendor || (el.dataset.vendor || "").split(",").includes(vendor);
+    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
+    (wrap === el ? el : wrap).style.display = visible ? "" : "none";
+  });
+
+  document.querySelectorAll(".group").forEach(el => {
+    const matchesSearch = !q || el.dataset.search.includes(q);
+    const matchesCategory = !category || el.dataset.category === category;
+    const matchesCreator = !creator || el.dataset.creator.split(",").includes(creator);
+    const matchesVendor = !vendor || el.dataset.vendor.split(",").includes(vendor);
+    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
+    el.style.display = visible ? "" : "none";
+    if (visible && (q || creator || vendor) && el.tagName === "DETAILS") el.open = true;
+  });
+
   const url = new URL(window.location);
-  if (q) url.searchParams.set("q", e.target.value);
-  else url.searchParams.delete("q");
+  if (q) url.searchParams.set("q", document.getElementById("search").value); else url.searchParams.delete("q");
+  if (category) url.searchParams.set("category", category); else url.searchParams.delete("category");
+  if (creator) url.searchParams.set("creator", creator); else url.searchParams.delete("creator");
+  if (vendor) url.searchParams.set("vendor", vendor); else url.searchParams.delete("vendor");
   history.replaceState(null, "", url);
-});
+}
+
+document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("filter-category").addEventListener("change", applyFilters);
+document.getElementById("filter-creator").addEventListener("change", applyFilters);
+document.getElementById("filter-vendor").addEventListener("change", applyFilters);
 
 async function init(){
   await load();
   const params = new URLSearchParams(window.location.search);
   const q = params.get("q");
-  if (q) {
-    const input = document.getElementById("search");
-    input.value = q;
-    input.dispatchEvent(new Event("input"));
+  const category = params.get("category");
+  const creator = params.get("creator");
+  const vendor = params.get("vendor");
+
+  if (q) document.getElementById("search").value = q;
+  if (category) document.getElementById("filter-category").value = category;
+  if (creator) document.getElementById("filter-creator").value = creator;
+  if (vendor) document.getElementById("filter-vendor").value = vendor;
+
+  if (q || category || creator || vendor) {
+    applyFilters();
     setTimeout(() => {
-      const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
+      const firstVisible = [...document.querySelectorAll(".entry, .group, .group-wrap")].find(el => el.style.display !== "none");
       if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
   }
