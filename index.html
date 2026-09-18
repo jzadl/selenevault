@@ -204,6 +204,10 @@ async function load(){
   populateFilters();
 }
 
+function normalizeCreator(name) {
+  return (name || "").trim().toLowerCase();
+}
+
 function populateFilters(){
   const categorySelect = document.getElementById("filter-category");
   allCategories.forEach(f => {
@@ -214,10 +218,16 @@ function populateFilters(){
   });
 
   const creatorSelect = document.getElementById("filter-creator");
-  [...allCreators].sort((a,b) => a.localeCompare(b)).forEach(c => {
+  const creatorDisplay = new Map();
+  [...allCreators].forEach(c => {
+    const key = normalizeCreator(c);
+    const existing = creatorDisplay.get(key);
+    if (!existing || c.length < existing.length) creatorDisplay.set(key, c);
+  });
+  [...creatorDisplay.entries()].sort((a,b) => a[1].localeCompare(b[1])).forEach(([key, display]) => {
     const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
+    opt.value = key;
+    opt.textContent = display;
     creatorSelect.appendChild(opt);
   });
 
@@ -241,7 +251,8 @@ function applyFilters(){
     const cat = wrap.dataset.category || "";
     const matchesSearch = !q || el.dataset.search.includes(q);
     const matchesCategory = !category || cat === category;
-    const matchesCreator = !creator || (el.dataset.creator || "").split(",").includes(creator);
+    const entryCreators = (el.dataset.creator || "").split(",").map(normalizeCreator);
+    const matchesCreator = !creator || entryCreators.includes(creator);
     const matchesVendor = !vendor || (el.dataset.vendor || "").split(",").includes(vendor);
     const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
     (wrap === el ? el : wrap).style.display = visible ? "" : "none";
@@ -250,7 +261,8 @@ function applyFilters(){
   document.querySelectorAll(".group").forEach(el => {
     const matchesSearch = !q || el.dataset.search.includes(q);
     const matchesCategory = !category || el.dataset.category === category;
-    const matchesCreator = !creator || el.dataset.creator.split(",").includes(creator);
+    const groupCreators = el.dataset.creator.split(",").map(normalizeCreator);
+    const matchesCreator = !creator || groupCreators.includes(creator);
     const matchesVendor = !vendor || el.dataset.vendor.split(",").includes(vendor);
     const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
     el.style.display = visible ? "" : "none";
