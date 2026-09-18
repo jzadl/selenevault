@@ -1,0 +1,54 @@
+name: Parse Commit and Notify
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Parse commit messages and create notify issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '${{ toJSON(github.event.commits) }}' > /tmp/commits.json
+
+          python3 << 'PYEOF'
+          import json
+          import re
+          import subprocess
+          import os
+
+          with open("/tmp/commits.json") as f:
+              commits = json.load(f)
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+
+          def escape_md(text):
+              chars = r"_*[]()~`>#+-=|{}.!\\"
+              return "".join("\\" + c if c in chars else c for c in text)
+
+          for commit in commits:
+              message = commit["message"].split("\n")[0].strip()
+
+              add_match = re.match(r"^ADD:\s*(.+?)\s+by\s+(.+?)\s+to\s+(\S+\.sman)\s*$", message, re.IGNORECASE)
+              remove_match = re.match(r"^REMOVE:\s*(.+?)\s+by\s+(.+?)\s+from\s+(\S+\.sman)\s*$", message, re.IGNORECASE)
+
+              if add_match:
+                  name, maintainer, file = add_match.groups()
+                  text = f"*{escape_md(name)}* by {escape_md(maintainer)} was added to `{escape_md(file)}` and its live on svault\\.jzadl\\.xyz\\!"
+              elif remove_match:
+                  name, maintainer, file = remove_match.groups()
+                  text = f"*{escape_md(name)}* by {escape_md(maintainer)} was removed from `{escape_md(file)}`"
+              else:
+                  continue
+
+              subprocess.run(
+                  ["gh", "issue", "create", "--repo", repo,
+                   "--title", "notify", "--body", text, "--label", "svault-notify"],
+                  check=True,
+              )
+          PYEOF
