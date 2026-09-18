@@ -108,7 +108,8 @@ function groupKey(name) {
   base = base.replace(/\b\d{4}[.\-]\d{1,2}[.\-]\d{1,2}\b.*$/, "");
   base = base.replace(/\b\d{8}\b.*$/, "");
   base = base.trim();
-  return base || name.trim();
+  base = base || name.trim();
+  return base.toLowerCase().replace(/\s+/g, "");
 }
 
 function entryHtml(e) {
@@ -149,9 +150,10 @@ async function load(){
           return;
         }
 
+        const displayName = groupEntries[0].name || key;
         const search = groupEntries.map(e => (e.name+" "+e.maintainer+" "+e.note).toLowerCase()).join(" ");
         html += `<details class="group" data-search="${esc(search)}">
-          <summary>${esc(key)} <span class="count">(${groupEntries.length} builds)</span></summary>
+          <summary>${esc(displayName)} <span class="count">(${groupEntries.length} builds)</span></summary>
           <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
         </details>`;
       });
