@@ -75,6 +75,13 @@ export default {
 
     command = command.split("@")[0].toLowerCase();
 
+    if (command === "/sid") {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Your chat ID: \`${msg.chat.id}\``, {
+        replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
     let reply;
     try {
       reply = await handleCommand(env, command, arg);
