@@ -40,5 +40,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BODY=$(cat /tmp/deploy_output.log 2>/dev/null | tail -c 60000 || echo "no log captured")
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body "$BODY" --label "debug"
+          sed -i 's/\x1b\[[0-9;]*m//g' /tmp/deploy_output.log 2>/dev/null || true
+          tail -c 60000 /tmp/deploy_output.log > /tmp/deploy_output_clean.log 2>/dev/null || echo "no log captured" > /tmp/deploy_output_clean.log
+          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/deploy_output_clean.log --label "debug"
