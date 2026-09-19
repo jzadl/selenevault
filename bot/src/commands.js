@@ -170,3 +170,60 @@ export async function cmdChannels(env) {
   }
   return lines.join("\n");
 }
+
+export function extractQueryFromText(text) {
+  if (!text) return null;
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    if (line.startsWith("#")) continue;
+    if (/^(download|note|notes|changelog|by:|original post|device:|build date:)/i.test(line)) continue;
+    let candidate = line.split("|")[0].trim();
+    candidate = candidate.replace(/^[•\-\*]\s*/, "");
+    if (candidate.length >= 3) return candidate;
+  }
+  return null;
+}
+
+function dedupeLetters(s) {
+  return (s || "").replace(/([a-z])\1+/g, "$1");
+}
+
+export async function cmdIsThisOnSv(env, replyText) {
+  const query = extractQueryFromText(replyText);
+  if (!query) {
+    return "Couldn't figure out what to search for in that message\\.";
+  }
+
+  const categories = Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
+  const q = query.toLowerCase();
+  const qNorm = dedupeLetters(normalize(query));
+
+  const results = await Promise.all(
+    categories.map((cat) => fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
+  );
+
+  const matches = [];
+  for (const { cat, entries } of results) {
+    for (const entry of entries) {
+      const name = (entry.name || "").toLowerCase();
+      const nameNorm = dedupeLetters(normalize(entry.name));
+      if (name.includes(q) || qNorm.includes(nameNorm) || nameNorm.includes(qNorm) || q.includes(name)) {
+        matches.push({ cat, entry });
+      }
+    }
+  }
+
+  const escapedQuery = escapeMd(query);
+
+  if (matches.length === 0) {
+    return `No, there's no "${escapedQuery}" on Svault\\.`;
+  }
+
+  const verb = matches.length === 1 ? "is" : "are";
+  const lines = [`Yes, there ${verb} "${escapedQuery}" in Svault:`, ""];
+  for (const { cat, entry } of matches) {
+    lines.push(formatEntry(env.SITE_URL, cat, entry));
+    lines.push("");
+  }
+  return lines.join("\n").trim();
+}
