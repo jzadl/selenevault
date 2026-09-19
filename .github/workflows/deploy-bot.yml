@@ -40,6 +40,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sed -i 's/\x1b\[[0-9;]*m//g' /tmp/deploy_output.log 2>/dev/null || true
-          tail -c 60000 /tmp/deploy_output.log > /tmp/deploy_output_clean.log 2>/dev/null || echo "no log captured" > /tmp/deploy_output_clean.log
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/deploy_output_clean.log --label "debug"
+          set +e
+          echo "--- raw log size ---"
+          wc -c /tmp/deploy_output.log 2>&1 || echo "log file missing"
+          echo "--- first 2000 chars ---"
+          head -c 2000 /tmp/deploy_output.log 2>&1 > /tmp/short_log.txt || echo "no log" > /tmp/short_log.txt
+          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug" || echo "gh issue create failed with code $?"
