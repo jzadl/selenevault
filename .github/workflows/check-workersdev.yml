@@ -1,0 +1,17 @@
+name: Check workers.dev Version
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Check workers.dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RESULT=$(curl -s "https://svault-bot.felixzamoranoj.workers.dev/")
+          gh issue create --repo "${{ github.repository }}" --title "workersdev-version-check" --body "$RESULT" --label "debug"
