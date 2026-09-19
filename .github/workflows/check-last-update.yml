@@ -1,0 +1,17 @@
+name: Check Last Update Debug
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Fetch last update from KV via Worker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RESULT=$(curl -s "https://toelicking.selenevault.bot.jzadl.xyz/debug/last-update")
+          gh issue create --repo "${{ github.repository }}" --title "last-update-debug" --body "$RESULT" --label "debug"
