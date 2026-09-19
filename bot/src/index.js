@@ -65,7 +65,11 @@ export default {
     const callback = update.callback_query;
 
     if (callback) {
-      await handleCallback(env, callback);
+      try {
+        await handleCallback(env, callback);
+      } catch (err) {
+        await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callback.id, `Error: ${String(err.message || err).slice(0, 180)}`);
+      }
       return new Response("ok", { status: 200 });
     }
 
@@ -77,9 +81,20 @@ export default {
 
     if (msg.chat.type !== "private") {
       const pendingKey = `pending:${msg.chat.id}:${msg.from.id}`;
-      const pending = await env.SVM.get(pendingKey, "json");
+      let pending;
+      try {
+        pending = await env.SVM.get(pendingKey, "json");
+      } catch {
+        pending = null;
+      }
       if (pending && !text.startsWith("/")) {
-        await handleFollowUp(env, msg, pending, pendingKey);
+        try {
+          await handleFollowUp(env, msg, pending, pendingKey);
+        } catch (err) {
+          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Something broke: \`${String(err.message || err).slice(0, 200)}\``, {
+            replyToMessageId: msg.message_id,
+          });
+        }
         return new Response("ok", { status: 200 });
       }
     }
@@ -121,7 +136,13 @@ export default {
     }
 
     if (command === "/sadd") {
-      await handleAdd(env, msg);
+      try {
+        await handleAdd(env, msg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Something broke: \`${escapeMdSafe(String(err.message || err))}\``, {
+          replyToMessageId: msg.message_id,
+        });
+      }
       return new Response("ok", { status: 200 });
     }
 
