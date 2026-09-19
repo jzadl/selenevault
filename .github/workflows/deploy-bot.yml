@@ -10,6 +10,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     defaults:
       run:
         working-directory: bot
@@ -40,4 +42,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body "test body" --label "debug"
+          set +e
+          {
+            echo "--- raw log size ---"
+            wc -c /tmp/deploy_output.log
+            echo "--- first 2000 chars ---"
+            head -c 2000 /tmp/deploy_output.log
+          } > /tmp/short_log.txt 2>&1
+          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug"
