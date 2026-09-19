@@ -17,3 +17,10 @@ date: unknown
 url: https://xmfirmwareupdater.com/archive/miui/selene/
 note: Archive of MIUI firmware builds for selene.
 vendor: all
+
+name: HyperOS
+version: 2.0.209.0VMXMIXM
+maintainer: Farh4d979
+date: 2022-09-26
+note: Fixed vold encryption issue causing the phone to turn off and removed some unused system apps that were crashing.
+vendor: svendor
