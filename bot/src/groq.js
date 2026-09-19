@@ -28,12 +28,12 @@ const SYSTEM_PROMPT = `You extract structured data from Telegram posts about And
 Output ONLY a JSON object, no markdown, no explanation, no code fences. The JSON must have these exact keys:
 
 {
-  "category": one of "rom", "kernel", "recovery", "firmware", "port", "tool", "guide",
+  "category": one of "rom", "kernel", "recovery", "firmware", "port", "tool", "guide". "firmware" means raw baseband/modem/bootloader firmware files, NOT HyperOS or MIUI builds. Any HyperOS, MIUI, or other modified/reskinned Android OS build is "port", never "firmware". A from-source custom ROM (LineageOS, CherishOS, etc) is "rom". A standalone kernel release is "kernel".,
   "name": the release name, without version numbers or dates,
   "version": the version string as written in the post,
   "maintainer": the author's name or Telegram handle, without the @ symbol,
   "size": file size as written (e.g. "1.5G", "13.9mb"), or null if not mentioned,
-  "date": ISO format YYYY-MM-DD, converted from whatever date format the post uses,
+  "date": ISO format YYYY-MM-DD. If the post gives a date as DD/MM/YY (day/month/2-digit-year, common in these posts, e.g. "Build date:18/09/26"), convert it to 20YY-MM-DD, so "18/09/26" becomes "2026-09-18". Do not swap day and month, do not misread the year.,
   "url": the download link, or null if not present,
   "note": a short one or two sentence summary of the changelog or key details, plain text, no markdown,
   "vendor": "rvendor" for Android 11-12 / MIUI 12.5, "svendor" for Android 13+ / MIUI 13+ / HyperOS, or null if not determinable
