@@ -1,6 +1,6 @@
 import { sendMessage, answerCallbackQuery, editMessageText, isGroupAdmin, escapeMd } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv } from "./commands.js";
-import { parsePostWithGroq, mergeWithGroq, toSmanBlock } from "./groq.js";
+import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, createNotifyIssue } from "./github.js";
 
 const HELP_TEXT = [
@@ -307,7 +307,11 @@ async function handleCallback(env, callback) {
       await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, "This has expired, run /sadd again\\.", { replyMarkup: null });
       return;
     }
-    await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, "What's missing?", { replyMarkup: null });
+
+    const missingText = missingFieldsMessage(stored.parsed);
+    const prompt = missingText ? `> ${escapeMd(missingText)}` : "What's missing?";
+    await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, prompt, { replyMarkup: null });
+
     const pendingKey = `pending:${chatId}:${callback.from.id}`;
     await env.SVM.put(
       pendingKey,

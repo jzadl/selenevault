@@ -23,6 +23,37 @@ const CATEGORY_FIELD_ORDER = {
   channel: ["name", "url", "note"],
 };
 
+const REQUIRED_FIELDS = {
+  rom: ["name", "maintainer", "url", "size", "vendor"],
+  kernel: ["name", "maintainer", "url", "size", "vendor"],
+  recovery: ["name", "maintainer", "url", "size", "vendor"],
+  firmware: ["name", "maintainer", "url", "size", "vendor"],
+  port: ["name", "maintainer", "url", "size", "vendor"],
+  tool: ["name", "maintainer", "url"],
+  guide: ["name", "url"],
+  channel: ["name", "url"],
+};
+
+const FIELD_LABELS = {
+  name: "name",
+  version: "version",
+  maintainer: "maintainer",
+  size: "size",
+  date: "date",
+  url: "download link",
+  note: "note",
+  vendor: "vendor",
+};
+
+export function findMissingFields(parsed) {
+  const category = parsed.category || "rom";
+  const required = REQUIRED_FIELDS[category] || REQUIRED_FIELDS.rom;
+  return required.filter((field) => {
+    const value = parsed[field];
+    return value === null || value === undefined || value === "";
+  });
+}
+
 const SYSTEM_PROMPT = `You extract structured data from Telegram posts about Android ROM/kernel/port/recovery releases for the Xiaomi Redmi 10 (selene).
 
 Output ONLY a JSON object, no markdown, no explanation, no code fences. The JSON must have these exact keys:
@@ -97,4 +128,12 @@ export function toSmanBlock(parsed) {
 export function summarizeParsed(parsed) {
   const { file, block } = toSmanBlock(parsed);
   return `File: ${file}\n\n${block}`;
+}
+
+export function missingFieldsMessage(parsed) {
+  const missing = findMissingFields(parsed);
+  if (missing.length === 0) return null;
+  const labels = missing.map((f) => FIELD_LABELS[f] || f);
+  const joined = labels.length === 1 ? labels[0] : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
+  return `${joined} ${labels.length === 1 ? "is" : "are"} missing, please write ${labels.length === 1 ? "it" : "them"}!`;
 }
