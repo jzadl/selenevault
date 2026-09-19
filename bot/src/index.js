@@ -50,12 +50,6 @@ function splitMessage(text) {
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname.includes("debug")) {
-      const value = await env.SVM.get("debug:last_update");
-      return new Response(`path=${url.pathname}\n\n${value || "no data yet"}`, { status: 200 });
-    }
-
     if (request.method !== "POST") {
       return new Response("svault bot is alive v3", { status: 200 });
     }
@@ -69,27 +63,6 @@ export default {
 
     const msg = update.message;
     const callback = update.callback_query;
-
-    try {
-      await env.SVM.put(
-        "debug:last_update",
-        JSON.stringify({
-          time: new Date().toISOString(),
-          has_msg: !!msg,
-          text: msg ? msg.text : null,
-          chat_type: msg ? msg.chat.type : null,
-          has_callback: !!callback,
-        })
-      );
-    } catch {}
-
-    if (msg && msg.text && msg.text.trim().toLowerCase().startsWith("/sadd")) {
-      await sendMessage(
-        env.TELEGRAM_BOT_TOKEN,
-        "5722152704",
-        `DEBUG /sadd received\\. chat\\_type=${escapeMdSafe(msg.chat.type)} has\\_reply=${msg.reply_to_message ? "yes" : "no"} from\\_id=${msg.from.id}`
-      ).catch(() => {});
-    }
 
     if (callback) {
       try {
