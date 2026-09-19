@@ -31,6 +31,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           wrangler secret put TELEGRAM_BOT_TOKEN --name svault-bot 2>&1 | tee /tmp/secret_output.log <<< "${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          wrangler secret put GROQ_API_KEY --name svault-bot 2>&1 | tee -a /tmp/secret_output.log <<< "${{ secrets.GROQ_API_KEY }}"
+          wrangler secret put GITHUB_TOKEN --name svault-bot 2>&1 | tee -a /tmp/secret_output.log <<< "${{ secrets.PUSH_TOKEN }}"
           wrangler deploy 2>&1 | tee /tmp/deploy_output.log
 
       - name: Report failure

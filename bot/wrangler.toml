@@ -6,6 +6,10 @@ routes = [
   { pattern = "toelicking.selenevault.bot.jzadl.xyz", custom_domain = true }
 ]
 
+kv_namespaces = [
+  { binding = "SVM", id = "ca91e70387864329a4762a078848452f" }
+]
+
 [vars]
 CDN_BASE = "https://raw.githubusercontent.com/jzadl/selenevault/main"
 SITE_URL = "https://svault.jzadl.xyz"
