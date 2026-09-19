@@ -64,6 +64,14 @@ export default {
     const msg = update.message;
     const callback = update.callback_query;
 
+    if (msg && msg.text && msg.text.trim().toLowerCase().startsWith("/sadd")) {
+      await sendMessage(
+        env.TELEGRAM_BOT_TOKEN,
+        "5722152704",
+        `DEBUG /sadd received\\. chat\\_type=${escapeMdSafe(msg.chat.type)} has\\_reply=${msg.reply_to_message ? "yes" : "no"} from\\_id=${msg.from.id}`
+      ).catch(() => {});
+    }
+
     if (callback) {
       try {
         await handleCallback(env, callback);
