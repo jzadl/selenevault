@@ -50,6 +50,12 @@ function splitMessage(text) {
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/debug/last-update") {
+      const value = await env.SVM.get("debug:last_update");
+      return new Response(value || "no data yet", { status: 200 });
+    }
+
     if (request.method !== "POST") {
       return new Response("svault bot is alive", { status: 200 });
     }
@@ -63,6 +69,19 @@ export default {
 
     const msg = update.message;
     const callback = update.callback_query;
+
+    try {
+      await env.SVM.put(
+        "debug:last_update",
+        JSON.stringify({
+          time: new Date().toISOString(),
+          has_msg: !!msg,
+          text: msg ? msg.text : null,
+          chat_type: msg ? msg.chat.type : null,
+          has_callback: !!callback,
+        })
+      );
+    } catch {}
 
     if (msg && msg.text && msg.text.trim().toLowerCase().startsWith("/sadd")) {
       await sendMessage(
