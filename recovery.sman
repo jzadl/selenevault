@@ -107,3 +107,10 @@ date: 2024-03-23
 url: https://sourceforge.net/projects/pbrp/files/selene/PBRP-selene-4.0-20240323-0203-OFFICIAL.zip/download
 note: Official PBRP recovery for selene.
 vendor: unknown
+
+name: OrangeFox Recovery Project
+version: R12.0
+maintainer: sabrinium0
+url: https://t.me/sabris_selene_stuff/21
+note: Biggest visual overhaul yet, Material You Expressive UI, full SVG icon engine, Fox White/Dark themes, Inter font, swipe navigation. Addons for Magisk, KernelSU, KSU Next, SukiSU. A13-16 decryption incl. PIN/password, FBEv1+v2, EROFS. Known issue: flashlight not working. Do NOT fastboot boot (broken on selene), flash the zip instead. A12 and older unsupported.
+vendor: svendor
