@@ -40,9 +40,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set +e
           echo "--- raw log size ---"
           wc -c /tmp/deploy_output.log 2>&1 || echo "log file missing"
           echo "--- first 2000 chars ---"
           head -c 2000 /tmp/deploy_output.log 2>&1 > /tmp/short_log.txt || echo "no log" > /tmp/short_log.txt
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug" || echo "gh issue create failed with code $?"
+          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug"
