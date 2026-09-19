@@ -44,4 +44,7 @@ jobs:
           wc -c /tmp/deploy_output.log 2>&1 || echo "log file missing"
           echo "--- first 2000 chars ---"
           head -c 2000 /tmp/deploy_output.log 2>&1 > /tmp/short_log.txt || echo "no log" > /tmp/short_log.txt
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug"
+          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug" 2>/tmp/gh_error.txt
+          echo "=== gh exit code: $? ==="
+          cat /tmp/gh_error.txt
+          gh issue create --repo "${{ github.repository }}" --title "gh-error-debug" --body-file /tmp/gh_error.txt --label "debug" || true
