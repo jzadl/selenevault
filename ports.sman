@@ -368,15 +368,6 @@ url: https://mega.nz/file/1XtCkQgR#OcpzqYNZ8P1uioO5jtxanvoMqTZO6qbgTDVxv17t5jg
 note: HyperOS port. Mirror 2: https://drive.google.com/file/d/1NQd0BoAvWzW36Fyb81gu55hxHRKL1q-J/view?usp=sharing
 vendor: svendor
 
-name: HyperOS 2.0
-version: 2.0.209.0VMXMIXM
-maintainer: Farh4d979
-size: 2.4G
-date: 2026-09-17
-url: https://drive.google.com/file/d/1XQi043WV0BbwU80n6XxalZSB3U3uJmi1/view
-note: Android 15. Heavily debloated, HyperOS 3 icons, KSU kernel included, firmware included. Flash in fastboot, clean flash required. Known bugs: reading mode, occasional freeze in settings.
-vendor: svendor
-
 name: HyperOS 2.0 HF
 version: 2.0.209.0VMXMIXM
 maintainer: Farh4d979
