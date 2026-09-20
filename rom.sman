@@ -1079,3 +1079,11 @@ date: 2022-02-06
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220127-1437-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+
+name: TESTDROID
+version: 2026.6.7
+maintainer: JZDKL
+size: 4.5gb
+url: https://jzadl.xyz/roms/testdroid/testdroid26.6.7.zip
+note: Custom ROM with JZ Root Installer preinstalled, supports all root methods; based on MIUI 14 / Android 17 Beta 5.
+vendor: svendor

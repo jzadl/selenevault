@@ -394,11 +394,3 @@ date: 2026-09-18
 url: https://pixeldrain.com/u/wKVqU5rA
 note: Android 16, HyperOS 3 port from Xiaomi Lake. Pre-rooted with KSU-Next 3.3.0, debloated, Google services and Play Store included. Known bugs: Reading Mode/Color Schemes, AOD, stacked Recents, and some personalization/theme issues. Clean flash mandatory. Flash from MIUI 13 or MIUI 14.
 vendor: svendor
-
-name: TESTDROID
-version: 2026.6.7
-maintainer: JZDKL
-size: 4.5gb
-url: roms.sman
-note: Custom ROM with JZ Root Installer preinstalled, supports all root methods; based on MIUI 14 / Android 17 Beta 5.
-vendor: svendor
