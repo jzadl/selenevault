@@ -15,7 +15,7 @@ export async function sendMessage(token, chatId, text, options = {}) {
   if (options.replyMarkup) {
     body.reply_markup = options.replyMarkup;
   }
-  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -24,7 +24,7 @@ export async function sendMessage(token, chatId, text, options = {}) {
 }
 
 export async function answerCallbackQuery(token, callbackQueryId, text) {
-  const res = await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/answerCallbackQuery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ callback_query_id: callbackQueryId, text: text || undefined }),
@@ -42,7 +42,7 @@ export async function editMessageText(token, chatId, messageId, text, options = 
   if (options.replyMarkup !== undefined) {
     body.reply_markup = options.replyMarkup;
   }
-  const res = await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/editMessageText", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -52,7 +52,7 @@ export async function editMessageText(token, chatId, messageId, text, options = 
 
 export async function getChatMember(token, chatId, userId) {
   const res = await fetch(
-    `https://api.telegram.org/bot${token}/getChatMember?chat_id=${encodeURIComponent(chatId)}&user_id=${userId}`
+    "https://api.telegram.org/bot" + token + "/getChatMember?chat_id=" + encodeURIComponent(chatId) + "&user_id=" + userId
   );
   return res.json();
 }
@@ -62,6 +62,24 @@ export async function isGroupAdmin(token, chatId, userId) {
   if (!result.ok) return false;
   const status = result.result.status;
   return status === "administrator" || status === "creator";
+}
+
+export async function isBotAdmin(token, chatId, userId, ownerId) {
+  if (String(userId) === String(ownerId)) return true;
+  return isGroupAdmin(token, chatId, userId);
+}
+
+export async function setMessageReaction(token, chatId, messageId, emoji) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/setMessageReaction", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      message_id: messageId,
+      reaction: [{ type: "emoji", emoji }],
+    }),
+  });
+  return res.json();
 }
 
 export function replyToMessage(update) {

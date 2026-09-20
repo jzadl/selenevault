@@ -1,3 +1,5 @@
+import { CATEGORY_FILES, CATEGORY_LABELS } from "./categories.js";
+
 export function parseSman(text) {
   const lines = text.split("\n");
   let about = "";
@@ -49,24 +51,4 @@ export function parseSman(text) {
   return { about, entries };
 }
 
-export const CATEGORY_FILES = {
-  rom: "rom.sman",
-  kernel: "kernels.sman",
-  recovery: "recovery.sman",
-  firmware: "firmware.sman",
-  port: "ports.sman",
-  tool: "tools.sman",
-  guide: "guides.sman",
-  channel: "channels.sman",
-};
-
-export const CATEGORY_LABELS = {
-  rom: "ROM",
-  kernel: "Kernel",
-  recovery: "Recovery",
-  firmware: "Firmware",
-  port: "Port",
-  tool: "Tool",
-  guide: "Guide",
-  channel: "Channel",
-};
+export { CATEGORY_FILES, CATEGORY_LABELS };
