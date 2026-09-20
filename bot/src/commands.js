@@ -1,10 +1,34 @@
 import { parseSman, CATEGORY_FILES, CATEGORY_LABELS } from "./sman.js";
+import { CATEGORY_FIELDS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
+
+const HELP_TEXT = [
+  "*svault bot commands:*",
+  "",
+  "/slatest \\[category\\] \\- newest addition",
+  "/sstats \\[category\\] \\- entry counts",
+  "/ssearch \\[category\\] query \\- find an entry",
+  "/schannels \\- community channels",
+  "/sping \\- check bot responsiveness",
+  "",
+  "*Admin commands \\(group admins only\\):*",
+  "/sadd \\- add an entry \\(reply to a post\\)",
+  "/supdate \\[file\\] \\[name\\] \\- update an entry",
+  "/sremove \\[file\\] \\[name\\] \\[creator\\] \\- remove an entry",
+  "",
+  "Categories: rom, kernel, recovery, firmware, port, tool, guide",
+].join("\n");
 
 async function fetchSman(cdnBase, filename) {
   const res = await fetch(`${cdnBase}/${filename}?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
   if (!res.ok) return { about: "", entries: [] };
   return parseSman(await res.text());
+}
+
+export async function fetchRawSman(cdnBase, filename) {
+  const res = await fetch(`${cdnBase}/${filename}?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
+  if (!res.ok) return null;
+  return res.text();
 }
 
 function entryLink(siteUrl, category, entry) {
@@ -91,6 +115,10 @@ export async function cmdStats(env, arg) {
 
 function normalize(s) {
   return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function dedupeLetters(s) {
+  return (s || "").replace(/([a-z])\1+/g, "$1");
 }
 
 export async function cmdSearch(env, arg) {
@@ -184,10 +212,6 @@ export function extractQueryFromText(text) {
   return null;
 }
 
-function dedupeLetters(s) {
-  return (s || "").replace(/([a-z])\1+/g, "$1");
-}
-
 export async function cmdIsThisOnSv(env, replyText) {
   const query = extractQueryFromText(replyText);
   if (!query) {
@@ -226,4 +250,12 @@ export async function cmdIsThisOnSv(env, replyText) {
     lines.push("");
   }
   return lines.join("\n").trim();
+}
+
+export async function cmdPing(env, request) {
+  const start = Date.now();
+  const res = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/getMe");
+  const latency = Date.now() - start;
+  const colo = (request && request.cf && request.cf.colo) || "??";
+  return escapeMd(`Pong! from ${colo} - ${latency}ms`);
 }

@@ -11,4 +11,4 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
-          curl -s "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=https://toelicking.selenevault.bot.jzadl.xyz"
+          curl -s "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=https://toelicking.selenevault.bot.jzadl.xyz&allowed_updates=[\"message\",\"edited_message\",\"message_reaction\"]"

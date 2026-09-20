@@ -1,7 +1,11 @@
-import { sendMessage, answerCallbackQuery, editMessageText, isGroupAdmin, escapeMd } from "./telegram.js";
-import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv } from "./commands.js";
+import { sendMessage, isBotAdmin, escapeMd, setMessageReaction } from "./telegram.js";
+import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
-import { appendSmanEntry, createNotifyIssue } from "./github.js";
+import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, findEntryBlock, findEntryBlocks, entryToRawBlock } from "./github.js";
+import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./supabase.js";
+import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
+import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
+import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
 
 const HELP_TEXT = [
   "*svault bot commands:*",
@@ -10,29 +14,25 @@ const HELP_TEXT = [
   "/sstats \\[category\\] \\- entry counts",
   "/ssearch \\[category\\] query \\- find an entry",
   "/schannels \\- community channels",
+  "/sping \\- check bot responsiveness",
+  "",
+  "*Admin commands \\(group admins only\\):*",
+  "/sadd \\- add an entry \\(reply to a post\\)",
+  "/supdate \\[category\\] \\[name\\] \\- update an entry",
+  "/sremove \\[category\\] \\[name\\] \\[creator\\] \\- remove an entry",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
 
-async function handleCommand(env, command, arg) {
-  switch (command) {
-    case "/sstart":
-    case "/shelp":
-      return HELP_TEXT;
-    case "/slatest":
-      return cmdLatest(env, arg ? arg.toLowerCase() : null);
-    case "/sstats":
-      return cmdStats(env, arg ? arg.toLowerCase() : null);
-    case "/ssearch":
-      return cmdSearch(env, arg);
-    case "/schannels":
-      return cmdChannels(env);
-    default:
-      return null;
-  }
-}
-
 const TELEGRAM_MAX_LENGTH = 4096;
+
+const MENTION_RESPONSES = [
+  "Im alive!", "bruh", "asdaksdhqwiueb", "lmao what",
+  "hello there", "im busy", "ok", "no", "maybe", "...",
+  "hire me", "01001000", "ping?", "whomst",
+];
+
+const MENTION_EMOJIS = ["\ud83d\udc4d", "\ud83d\ude02", "\ud83d\udd25", "\ud83d\udc80", "\ud83d\udc40", "\ud83e\udd14", "\u2764\ufe0f", "\ud83e\udee1"];
 
 function splitMessage(text) {
   if (text.length <= TELEGRAM_MAX_LENGTH) return [text];
@@ -48,10 +48,15 @@ function splitMessage(text) {
   return chunks;
 }
 
+function escapeMdSafe(text) {
+  return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
+}
+
 export default {
   async fetch(request, env) {
+    try {
     if (request.method !== "POST") {
-      return new Response("svault bot is alive v3", { status: 200 });
+      return new Response("svault bot is alive v5", { status: 200 });
     }
 
     let update;
@@ -61,17 +66,14 @@ export default {
       return new Response("bad request", { status: 400 });
     }
 
-    const msg = update.message;
-    const callback = update.callback_query;
-
-    if (callback) {
+    if (update.message_reaction) {
       try {
-        await handleCallback(env, callback);
-      } catch (err) {
-        await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callback.id, `Error: ${String(err.message || err).slice(0, 180)}`);
-      }
+        await handleReaction(env, update.message_reaction);
+      } catch {}
       return new Response("ok", { status: 200 });
     }
+
+    const msg = update.message || update.edited_message;
 
     if (!msg || !msg.text) {
       return new Response("ok", { status: 200 });
@@ -79,28 +81,116 @@ export default {
 
     const text = msg.text.trim();
 
-    if (msg.chat.type !== "private") {
-      const pendingKey = `pending:${msg.chat.id}:${msg.from.id}`;
-      let pending;
-      try {
-        pending = await env.SVM.get(pendingKey, "json");
-      } catch {
-        pending = null;
-      }
-      if (pending && !text.startsWith("/")) {
-        try {
-          await handleFollowUp(env, msg, pending, pendingKey);
-        } catch (err) {
-          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Something broke: \`${String(err.message || err).slice(0, 200)}\``, {
-            replyToMessageId: msg.message_id,
-          });
+    try {
+      const addConfirmPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "add_confirm");
+        if (addConfirmPending && !text.startsWith("/")) {
+          try {
+            await handleAddConfirm(env, msg, addConfirmPending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
         }
+
+        const pending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "add_followup");
+        if (pending && !text.startsWith("/")) {
+          try {
+            await handleFollowUp(env, msg, pending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+
+        const updateValuePending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "update_value");
+        if (updateValuePending && !text.startsWith("/")) {
+          try {
+            await handleUpdateValue(env, msg, updateValuePending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+
+        const updateConfirmPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "update_confirm");
+        if (updateConfirmPending && !text.startsWith("/")) {
+          try {
+            await handleUpdateConfirm(env, msg, updateConfirmPending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+
+        const removeConfirmPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "remove_confirm");
+        if (removeConfirmPending && !text.startsWith("/")) {
+          try {
+            await handleRemoveConfirmText(env, msg, removeConfirmPending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+
+        const updateSelectPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "update_select");
+        if (updateSelectPending && !text.startsWith("/")) {
+          try {
+            await handleUpdateSelect(env, msg, updateSelectPending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+
+        const updateFieldSelectPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "update_field_select");
+        if (updateFieldSelectPending && !text.startsWith("/")) {
+          try {
+            await handleUpdateFieldSelect(env, msg, updateFieldSelectPending);
+          } catch (err) {
+            await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+              replyToMessageId: msg.message_id,
+            });
+          }
+          return new Response("ok", { status: 200 });
+        }
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
         return new Response("ok", { status: 200 });
       }
-    }
 
     const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv");
     if (!isCommand) {
+      if (msg.chat.type !== "private" && msg.text) {
+        const botUsername = env.BOT_USERNAME || "";
+        if (botUsername && text.includes("@" + botUsername)) {
+          const roll = Math.random();
+          if (roll < 0.2) {
+            if (roll < 0.1) {
+              const resp = MENTION_RESPONSES[Math.floor(Math.random() * MENTION_RESPONSES.length)];
+              await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, resp, {
+                replyToMessageId: msg.message_id,
+              });
+            } else {
+              const emoji = MENTION_EMOJIS[Math.floor(Math.random() * MENTION_EMOJIS.length)];
+              await setMessageReaction(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.message_id, emoji);
+            }
+          }
+        }
+      }
       return new Response("ok", { status: 200 });
     }
 
@@ -111,7 +201,20 @@ export default {
     command = command.split("@")[0].toLowerCase();
 
     if (command === "/sid") {
-      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Your chat ID: \`${msg.chat.id}\``, {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Your chat ID: `" + msg.chat.id + "`", {
+        replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/sping") {
+      let reply;
+      try {
+        reply = await cmdPing(env, request);
+      } catch (err) {
+        reply = "Pong! (could not measure latency)";
+      }
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, reply, {
         replyToMessageId: msg.message_id,
       });
       return new Response("ok", { status: 200 });
@@ -135,11 +238,51 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
+    const needsAdmin = ["/sadd", "/supdate", "/sremove"];
+    if (needsAdmin.includes(command)) {
+      try {
+        const admin = await isBotAdmin(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id, env.OWNER_ID);
+        if (!admin) {
+          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Only group admins can use this\\.", {
+            replyToMessageId: msg.message_id,
+          });
+          return new Response("ok", { status: 200 });
+        }
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Couldn't verify admin status\\.", {
+          replyToMessageId: msg.message_id,
+        });
+        return new Response("ok", { status: 200 });
+      }
+    }
+
     if (command === "/sadd") {
       try {
         await handleAdd(env, msg);
       } catch (err) {
-        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Something broke: \`${escapeMdSafe(String(err.message || err))}\``, {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/supdate") {
+      try {
+        await handleUpdateStart(env, msg, arg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/sremove") {
+      try {
+        await handleRemoveStart(env, msg, arg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
           replyToMessageId: msg.message_id,
         });
       }
@@ -150,7 +293,7 @@ export default {
     try {
       reply = await handleCommand(env, command, arg);
     } catch (err) {
-      reply = `Something broke on my end, try again in a bit\\.\n\`${escapeMdSafe(String(err))}\``;
+      reply = "Something broke on my end, try again in a bit\\.\n`" + escapeMdSafe(String(err)) + "`";
     }
 
     if (reply) {
@@ -169,14 +312,29 @@ export default {
     }
 
     return new Response("ok", { status: 200 });
+    } catch (err) {
+      return new Response("ok", { status: 200 });
+    }
   },
 };
 
-function escapeMdSafe(text) {
-  return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
+async function handleCommand(env, command, arg) {
+  switch (command) {
+    case "/sstart":
+    case "/shelp":
+      return HELP_TEXT;
+    case "/slatest":
+      return cmdLatest(env, arg ? arg.toLowerCase() : null);
+    case "/sstats":
+      return cmdStats(env, arg ? arg.toLowerCase() : null);
+    case "/ssearch":
+      return cmdSearch(env, arg);
+    case "/schannels":
+      return cmdChannels(env);
+    default:
+      return null;
+  }
 }
-
-const PENDING_TTL_SECONDS = 60 * 30;
 
 async function handleAdd(env, msg) {
   const chatId = msg.chat.id;
@@ -188,20 +346,18 @@ async function handleAdd(env, msg) {
     return;
   }
 
-  const admin = await isGroupAdmin(env.TELEGRAM_BOT_TOKEN, chatId, msg.from.id);
-  if (!admin) {
-    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Only group admins can use this\\.", {
-      replyToMessageId: msg.message_id,
-    });
-    return;
-  }
-
   const replyMsg = msg.reply_to_message;
   if (!replyMsg) {
     await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Reply to the post you want to add with /sadd\\.", {
       replyToMessageId: msg.message_id,
     });
     return;
+  }
+
+  for (const staleType of ["add_confirm", "add_followup", "remove_confirm", "update_select", "update_field_select", "update_value", "update_confirm"]) {
+    try {
+      await deletePendingByUser(env.SUPABASE_URL, env.SUPABASE_KEY, chatId, msg.from.id, staleType);
+    } catch {}
   }
 
   const postText = replyMsg.text || replyMsg.caption || "";
@@ -216,97 +372,144 @@ async function handleAdd(env, msg) {
   try {
     parsed = await parsePostWithGroq(env.GROQ_API_KEY, postText);
   } catch (err) {
-    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, `Couldn't parse that: ${escapeMdSafe(String(err.message || err))}`, {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Couldn't parse that: " + escapeMdSafe(String(err.message || err)), {
       replyToMessageId: msg.message_id,
     });
     return;
   }
 
   const { file, block } = toSmanBlock(parsed);
-  const confirmKey = `confirm:${chatId}:${msg.from.id}:${Date.now()}`;
-  await env.SVM.put(confirmKey, JSON.stringify({ parsed, file, block }), { expirationTtl: PENDING_TTL_SECONDS });
 
   const preview = [
     "Is this correct?:",
     "",
-    `File: \`${escapeMd(file)}\``,
+    "File: `" + escapeMd(file) + "`",
     "```",
     block,
     "```",
+    "",
+    "Reply *yes*, *no* \\(with missing fields\\), or *cancel*\\.",
   ].join("\n");
+
+  const result = await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "add_confirm",
+    file: file,
+    data: JSON.stringify({ parsed, file, block }),
+    expires_at: expiresAt(),
+  });
 
   await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, preview, {
     replyToMessageId: msg.message_id,
-    replyMarkup: {
-      inline_keyboard: [
-        [
-          { text: "Yes", callback_data: `sadd_yes:${confirmKey}` },
-          { text: "No", callback_data: `sadd_no:${confirmKey}` },
-        ],
-      ],
-    },
   });
 }
 
-async function handleCallback(env, callback) {
-  const data = callback.data || "";
-  const chatId = callback.message.chat.id;
-  const messageId = callback.message.message_id;
+async function handleAddConfirm(env, msg, pending) {
+  const text = msg.text.trim().toLowerCase();
+  const chatId = msg.chat.id;
+  const d = JSON.parse(pending.data);
 
-  const admin = await isGroupAdmin(env.TELEGRAM_BOT_TOKEN, chatId, callback.from.id);
-  if (!admin) {
-    await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callback.id, "Only group admins can do this.");
+  if (text === "yes") {
+    await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+    await pushEntry(env, chatId, msg.message_id, d.file, d.block, d.parsed);
     return;
   }
 
-  if (data.startsWith("sadd_no:")) {
-    const key = data.slice("sadd_no:".length);
-    const stored = await env.SVM.get(key, "json");
-    await env.SVM.delete(key);
-    await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callback.id);
-    if (!stored) {
-      await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, "This has expired, run /sadd again\\.", { replyMarkup: null });
-      return;
-    }
-    await pushEntry(env, chatId, messageId, stored.file, stored.block, stored.parsed);
-    return;
-  }
-
-  if (data.startsWith("sadd_yes:")) {
-    const key = data.slice("sadd_yes:".length);
-    const stored = await env.SVM.get(key, "json");
-    await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callback.id);
-    if (!stored) {
-      await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, "This has expired, run /sadd again\\.", { replyMarkup: null });
-      return;
-    }
-
-    const missingText = missingFieldsMessage(stored.parsed);
-    const prompt = missingText ? `> ${escapeMd(missingText)}` : "What's missing?";
-    await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, prompt, { replyMarkup: null });
-
-    const pendingKey = `pending:${chatId}:${callback.from.id}`;
-    await env.SVM.put(
-      pendingKey,
-      JSON.stringify({ confirmKey: key, parsed: stored.parsed, file: stored.file, chatId, sourceMessageId: messageId }),
-      { expirationTtl: PENDING_TTL_SECONDS }
-    );
-    await env.SVM.delete(key);
-    return;
-  }
-}
-
-async function handleFollowUp(env, msg, pending, pendingKey) {
-  await env.SVM.delete(pendingKey);
-
-  let merged;
-  try {
-    merged = await mergeWithGroq(env.GROQ_API_KEY, pending.parsed, msg.text);
-  } catch (err) {
-    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, `Couldn't merge that: ${escapeMdSafe(String(err.message || err))}`, {
+  if (text === "cancel") {
+    await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Cancelled\\.", {
       replyToMessageId: msg.message_id,
     });
     return;
+  }
+
+  if (text === "no") {
+    await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+    const missingText = missingFieldsMessage(d.parsed);
+    const prompt = missingText ? "> " + escapeMd(missingText) : "What's missing?";
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, prompt, {
+      replyToMessageId: msg.message_id,
+    });
+
+    await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+      chat_id: chatId,
+      user_id: msg.from.id,
+      op_type: "add_followup",
+      file: d.file,
+      data: JSON.stringify({ parsed: d.parsed, file: d.file, chatId, sourceMessageId: msg.message_id }),
+      expires_at: expiresAt(),
+    });
+    return;
+  }
+
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "That didn't match anything\\. I'm still waiting for your answer to /sadd\\.\nReply *yes*, *no* \\(with missing fields\\), or *cancel*\\.", {
+    replyToMessageId: msg.message_id,
+  });
+}
+
+async function handleUpdateFieldSelect(env, msg, pending) {
+  const chatId = msg.chat.id;
+  const d = JSON.parse(pending.data);
+  const field = msg.text.trim().toLowerCase();
+
+  if (field === "cancel") {
+    await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Cancelled\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const validFields = CATEGORY_FIELDS[d.category] || CATEGORY_FIELDS.rom;
+  if (!validFields.includes(field)) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Invalid field\\. Pick one of: " + validFields.map((f) => "`" + f + "`").join(", ") + "\nor reply *cancel*\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  const fields = parseEntryFields(d.entryRaw);
+  const label = field === "url" ? "download link" : field;
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+    "\u270f\ufe0f *Changing " + label + "*\n`" + escapeMd(fields[field] || "(empty)") + "`\n\nSend the new " + label + "\\, or reply *cancel*\\.",
+    { replyToMessageId: msg.message_id }
+  );
+
+  await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "update_value",
+    file: d.file,
+    data: JSON.stringify({ file: d.file, entry: d.entry, entryRaw: d.entryRaw, field, category: d.category }),
+    expires_at: expiresAt(),
+  });
+}
+
+
+
+async function handleFollowUp(env, msg, pending) {
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+  const d = JSON.parse(pending.data);
+
+  let merged;
+  try {
+    merged = await mergeWithGroq(env.GROQ_API_KEY, d.parsed, msg.text);
+  } catch (err) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Couldn't merge that: " + escapeMdSafe(String(err.message || err)), {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const categoryOverride = fileToCategory(msg.text);
+  if (categoryOverride) {
+    merged.category = categoryOverride;
+    if (!/^https?:\/\//i.test(merged.url || "") && d.parsed.url) {
+      merged.url = d.parsed.url;
+    }
   }
 
   const { file, block } = toSmanBlock(merged);
@@ -320,9 +523,9 @@ async function pushEntry(env, chatId, messageId, file, block, parsed, isNewMessa
   const maintainer = maintainerMatch ? maintainerMatch[1].trim() : "Unknown";
 
   try {
-    await appendSmanEntry(env, file, block, `ADD: ${name} by ${maintainer} to ${file}`);
+    await appendSmanEntry(env, file, block, "ADD: " + name + " by " + maintainer + " to " + file);
   } catch (err) {
-    const text = `Failed to push: ${escapeMdSafe(String(err.message || err))}`;
+    const text = "Failed to push: " + escapeMdSafe(String(err.message || err));
     if (isNewMessage) {
       await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, text, { replyToMessageId: messageId });
     } else {
@@ -331,17 +534,326 @@ async function pushEntry(env, chatId, messageId, file, block, parsed, isNewMessa
     return;
   }
 
-  const notifyText = `*${escapeMd(name)}* by ${escapeMd(maintainer)} was added to \`${escapeMd(file)}\` and its live on svault\\.jzadl\\.xyz\\!`;
+  const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was added to `" + escapeMd(file) + "` and its live on svault\\.jzadl\\.xyz\\!";
   try {
     await createNotifyIssue(env, notifyText);
-  } catch {
-    // notify failure is not critical, entry is already pushed
-  }
+  } catch {}
 
-  const doneText = `Added\\! ${escapeMd(name)} is live on svault\\.jzadl\\.xyz`;
+  const doneText = "Added\\! " + escapeMd(name) + " is live on svault\\.jzadl\\.xyz";
   if (isNewMessage) {
     await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, doneText, { replyToMessageId: messageId });
   } else {
     await editMessageText(env.TELEGRAM_BOT_TOKEN, chatId, messageId, doneText, { replyMarkup: null });
+  }
+}
+
+async function handleUpdateStart(env, msg, arg) {
+  const chatId = msg.chat.id;
+  if (!arg) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Usage: /supdate \\[category\\] \\[name\\]\nExample: /supdate port HyperOS", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const { file, query } = parseFileFromArgs(arg);
+  if (!file || !query) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Usage: /supdate \\[category\\] \\[name\\]\nExample: /supdate port HyperOS", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  for (const staleType of ["add_confirm", "add_followup", "remove_confirm", "update_select", "update_field_select", "update_value", "update_confirm"]) {
+    try {
+      await deletePendingByUser(env.SUPABASE_URL, env.SUPABASE_KEY, chatId, msg.from.id, staleType);
+    } catch {}
+  }
+
+  const matches = await findEntriesByFile(env.CDN_BASE, file, query);
+  if (matches.length === 0) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "No entries matching *" + escapeMd(query) + "* found in `" + escapeMd(file) + "`\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  if (matches.length === 1) {
+    const entryRaw = matches[0];
+    const fields = parseEntryFields(entryRaw);
+    const entry = { name: fields.name, version: fields.version, maintainer: fields.maintainer };
+    const cat = Object.entries(CATEGORY_FILES).find(([, v]) => v === file)?.[0] || "rom";
+
+    await sendEntryEditPrompt(env, chatId, msg.message_id, entryRaw, cat);
+
+    await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+      chat_id: chatId,
+      user_id: msg.from.id,
+      op_type: "update_field_select",
+      file: file,
+      data: JSON.stringify({ file, entry, entryRaw, category: cat }),
+      expires_at: expiresAt(),
+    });
+    return;
+  }
+
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, buildMatchList(matches) + "\n\nReply with the number\\.", {
+    replyToMessageId: msg.message_id,
+  });
+
+  await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "update_select",
+    file: file,
+    data: JSON.stringify({ file, query, matches }),
+    expires_at: expiresAt(),
+  });
+}
+
+function sendEntryEditPrompt(env, chatId, messageId, entryRaw, cat) {
+  const fieldList = (CATEGORY_FIELDS[cat] || CATEGORY_FIELDS.rom).map((f) => "`" + f + "`").join(", ");
+  const text = [
+    "\ud83d\udee0\ufe0f *Update entry:*",
+    "",
+    "```",
+    entryRaw,
+    "```",
+    "",
+    "Reply with a field to edit: ",
+    fieldList,
+    "",
+    "or reply *cancel*\\.",
+  ].join("\n");
+  return sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, text, {
+    replyToMessageId: messageId,
+  });
+}
+
+async function handleUpdateSelect(env, msg, pending) {
+  const chatId = msg.chat.id;
+  const d = JSON.parse(pending.data);
+  const text = msg.text.trim().toLowerCase();
+
+  if (text === "cancel") {
+    await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Cancelled\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const num = parseInt(text, 10);
+
+  if (isNaN(num) || num < 1 || num > d.matches.length) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Please reply with a number between 1 and " + d.matches.length + "\\, or *cancel*\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const entryRaw = d.matches[num - 1];
+  const fields = parseEntryFields(entryRaw);
+  const entry = { name: fields.name, version: fields.version, maintainer: fields.maintainer };
+  const cat = Object.entries(CATEGORY_FILES).find(([, v]) => v === d.file)?.[0] || "rom";
+
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  await sendEntryEditPrompt(env, chatId, msg.message_id, entryRaw, cat);
+
+  await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "update_field_select",
+    file: d.file,
+    data: JSON.stringify({ file: d.file, entry, entryRaw, category: cat }),
+    expires_at: expiresAt(),
+  });
+}
+
+async function handleUpdateValue(env, msg, pending) {
+  const chatId = msg.chat.id;
+  const d = JSON.parse(pending.data);
+  const newValue = msg.text.trim();
+
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  const fields = parseEntryFields(d.entryRaw);
+  const diff = buildDiff(fields, d.field, newValue);
+
+  const result = await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "update_confirm",
+    file: d.file,
+    data: JSON.stringify({ file: d.file, entry: d.entry, entryRaw: d.entryRaw, field: d.field, newValue, category: d.category }),
+    expires_at: expiresAt(),
+  });
+
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, diff + "\n\nReply *yes* to confirm or *no* to cancel\\.", {
+    replyToMessageId: msg.message_id,
+  });
+}
+
+async function handleUpdateConfirm(env, msg, pending) {
+  const text = msg.text.trim().toLowerCase();
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  if (text === "yes") {
+    const d = JSON.parse(pending.data);
+    const fields = parseEntryFields(d.entryRaw);
+    fields[d.field] = d.newValue;
+    const newBlock = entryToRawBlock(fields, CATEGORY_FIELDS[d.category] || CATEGORY_FIELDS.rom);
+
+    try {
+      await updateSmanEntry(env, d.file, d.entryRaw, newBlock, "UPDATE: " + (d.entry.name || "entry") + " " + d.field + " in " + d.file);
+    } catch (err) {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Failed to update: " + escapeMdSafe(String(err.message || err)), {
+        replyToMessageId: msg.message_id,
+      });
+      return;
+    }
+
+    const notifyText = "*" + escapeMd(d.entry.name || "entry") + "* was updated in `" + escapeMd(d.file) + "` and its live on svault\\.jzadl\\.xyz\\!";
+    try {
+      await createNotifyIssue(env, notifyText);
+    } catch {}
+
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Updated\\! " + escapeMd(d.entry.name || "Entry") + " is live on svault\\.jzadl\\.xyz", {
+      replyToMessageId: msg.message_id,
+    });
+  } else if (text === "no") {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Cancelled\\.", {
+      replyToMessageId: msg.message_id,
+    });
+  }
+}
+
+async function handleRemoveStart(env, msg, arg) {
+  const chatId = msg.chat.id;
+  if (!arg) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Usage: /sremove \\[category\\] \\[name\\] \\[creator\\]\nExample: /sremove port HyperOS zelsta7", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const { file, name, creator } = parseRemoveArgs(arg);
+  if (!file || !name) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Usage: /sremove \\[category\\] \\[name\\] \\[creator\\]\nExample: /sremove port HyperOS zelsta7", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  for (const staleType of ["add_confirm", "add_followup", "remove_confirm", "update_select", "update_field_select", "update_value", "update_confirm"]) {
+    try {
+      await deletePendingByUser(env.SUPABASE_URL, env.SUPABASE_KEY, chatId, msg.from.id, staleType);
+    } catch {}
+  }
+
+  const rawContent = await fetchRawSman(env.CDN_BASE, file);
+  const match = findEntryByCreator(rawContent, name, creator || "");
+
+  if (!match) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "No matching entry found\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  const emoji = generateRandomEmoji();
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, buildRemovePreview(match) + "\n\nReply *yes* to confirm deletion or *cancel*\\.", {
+    replyToMessageId: msg.message_id,
+  });
+
+  await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+    chat_id: chatId,
+    user_id: msg.from.id,
+    op_type: "remove_confirm",
+    file: file,
+    data: JSON.stringify({ file, entryRaw: match, emoji }),
+    expires_at: expiresAt(),
+  });
+}
+
+async function handleReaction(env, reaction) {
+  const chatId = reaction.chat.id;
+  const userId = reaction.user.id;
+  const emoji = reaction.new_reaction?.[0]?.emoji;
+  if (!emoji) return;
+
+  const pending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, chatId, userId, "remove_confirm");
+  if (!pending) return;
+
+  const d = JSON.parse(pending.data);
+  if (d.emoji !== emoji) return;
+
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  const fields = parseEntryFields(d.entryRaw);
+  const name = fields.name || "Unknown";
+  const maintainer = fields.maintainer || "Unknown";
+
+  try {
+    await removeSmanEntry(env, d.file, d.entryRaw, "REMOVE: " + name + " by " + maintainer + " from " + d.file);
+  } catch (err) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Failed to remove: " + escapeMdSafe(String(err.message || err)));
+    return;
+  }
+
+  const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was removed from `" + escapeMd(d.file) + "`";
+  try {
+    await createNotifyIssue(env, notifyText);
+  } catch {}
+
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Removed\\! " + escapeMd(name) + " is no longer on svault\\.jzadl\\.xyz");
+}
+
+async function handleRemoveConfirmText(env, msg, pending) {
+  const text = msg.text.trim().toLowerCase();
+  const chatId = msg.chat.id;
+  const d = JSON.parse(pending.data);
+
+  await deletePending(env.SUPABASE_URL, env.SUPABASE_KEY, pending.id);
+
+  if (text === "yes") {
+    const fields = parseEntryFields(d.entryRaw);
+    const name = fields.name || "Unknown";
+    const maintainer = fields.maintainer || "Unknown";
+
+    try {
+      await removeSmanEntry(env, d.file, d.entryRaw, "REMOVE: " + name + " by " + maintainer + " from " + d.file);
+    } catch (err) {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Failed to remove: " + escapeMdSafe(String(err.message || err)), {
+        replyToMessageId: msg.message_id,
+      });
+      return;
+    }
+
+    const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was removed from `" + escapeMd(d.file) + "`";
+    try {
+      await createNotifyIssue(env, notifyText);
+    } catch {}
+
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Removed\\! " + escapeMd(name) + " is no longer on svault\\.jzadl\\.xyz", {
+      replyToMessageId: msg.message_id,
+    });
+  } else if (text === "cancel") {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Cancelled\\.", {
+      replyToMessageId: msg.message_id,
+    });
+  } else {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, "Reply *yes* to confirm or *cancel*\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    await upsertPending(env.SUPABASE_URL, env.SUPABASE_KEY, {
+      chat_id: chatId,
+      user_id: msg.from.id,
+      op_type: "remove_confirm",
+      file: d.file,
+      data: JSON.stringify(d),
+      expires_at: expiresAt(),
+    });
   }
 }
