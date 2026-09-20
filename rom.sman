@@ -1088,3 +1088,12 @@ url: https://jzadl.xyz/roms/testdroid/testdroid26.6.7.zip
 note: Custom ROM with JZ Root Installer preinstalled, supports all root methods; based on MIUI 14 / Android 17 Beta 5.
 vendor: svendor
 
+name: TESTSMAN2
+version: v2.0
+maintainer: jzadl
+size: 2.0G
+date: 2026-09-19
+url: https://jzadl.xyz/roms/testsman2/test2.zip
+note: second test entry to verify the remove summary flow
+vendor: tvendor
+
