@@ -2,6 +2,7 @@ import { parseSman, CATEGORY_FILES, CATEGORY_LABELS } from "./sman.js";
 import { CATEGORY_FIELDS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
 import { getFileContent } from "./github.js";
+import { publishTelegraphPage } from "./telegraph.js";
 
 const HELP_TEXT = [
   "*svault bot commands:*",
@@ -129,6 +130,20 @@ function dedupeLetters(s) {
   return (s || "").replace(/([a-z])\1+/g, "$1");
 }
 
+function plainEntry(siteUrl, category, entry) {
+  const rawName = entry.name || "";
+  const labelText = CATEGORY_LABELS[category] || category;
+  const nameHasLabel = rawName.toLowerCase().includes(`(${labelText.toLowerCase()})`);
+  const label = nameHasLabel ? "" : ` - ${labelText}`;
+  const version = entry.version ? ` ${entry.version}` : "";
+  const maintainer = entry.maintainer ? ` by ${entry.maintainer}` : "";
+  const date = entry.date ? ` (${entry.date})` : "";
+  const link = entryLink(siteUrl, category, entry);
+  return `${rawName}${version}${label}${maintainer}${date}\n${link}`;
+}
+
+const TELEGRAPH_THRESHOLD = 8;
+
 export async function cmdSearch(env, arg) {
   if (!arg) return "Usage: /search \\[category\\] query";
 
@@ -171,6 +186,33 @@ export async function cmdSearch(env, arg) {
 
   if (direct.length === 0 && other.length === 0) {
     return `No results for *${escapeMd(query)}*\\.`;
+  }
+
+  const total = direct.length + other.length;
+
+  if (total > TELEGRAPH_THRESHOLD) {
+    const plainLines = [];
+    if (direct.length > 0) {
+      plainLines.push("[ RESULTS ]", "");
+      for (const { category: cat, entry } of direct) {
+        plainLines.push(plainEntry(env.SITE_URL, cat, entry));
+        plainLines.push("");
+      }
+    }
+    if (other.length > 0) {
+      plainLines.push("[ OTHER RESULTS ]", "");
+      for (const { category: cat, entry } of other) {
+        plainLines.push(plainEntry(env.SITE_URL, cat, entry));
+        plainLines.push("");
+      }
+    }
+
+    try {
+      const url = await publishTelegraphPage(env, `svault results for "${query}"`, plainLines.join("\n"));
+      return `*Results for* \`${escapeMd(query)}\`\\: ${total} matches\\.\n[View full results](${url})`;
+    } catch {
+      // fall through to inline results if telegraph fails
+    }
   }
 
   const lines = [`*Results for* \`${escapeMd(query)}\`:`];
