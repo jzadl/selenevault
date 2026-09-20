@@ -24,12 +24,25 @@ async function getAccessToken(env) {
   return cachedAccessToken;
 }
 
+function isUrl(line) {
+  return /^https?:\/\/\S+$/.test(line.trim());
+}
+
 function textToNodes(plainText) {
   const paragraphs = plainText.split("\n\n").map((p) => p.trim()).filter(Boolean);
-  return paragraphs.map((p) => ({
-    tag: "p",
-    children: p.split("\n"),
-  }));
+  return paragraphs.map((p) => {
+    const linesInParagraph = p.split("\n");
+    const children = [];
+    linesInParagraph.forEach((line, i) => {
+      if (i > 0) children.push({ tag: "br" });
+      if (isUrl(line)) {
+        children.push({ tag: "a", attrs: { href: line.trim() }, children: [line.trim()] });
+      } else {
+        children.push(line);
+      }
+    });
+    return { tag: "p", children };
+  });
 }
 
 export async function publishTelegraphPage(env, title, plainText) {
