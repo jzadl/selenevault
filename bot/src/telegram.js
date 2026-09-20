@@ -6,9 +6,11 @@ export async function sendMessage(token, chatId, text, options = {}) {
   const body = {
     chat_id: chatId,
     text,
-    parse_mode: options.parseMode || "MarkdownV2",
     disable_web_page_preview: options.disablePreview !== false,
   };
+  if (options.parseMode !== null) {
+    body.parse_mode = options.parseMode || "MarkdownV2";
+  }
   if (options.replyToMessageId) {
     body.reply_parameters = { message_id: options.replyToMessageId };
   }
@@ -67,6 +69,15 @@ export async function isGroupAdmin(token, chatId, userId) {
 export async function isBotAdmin(token, chatId, userId, ownerId) {
   if (String(userId) === String(ownerId)) return true;
   return isGroupAdmin(token, chatId, userId);
+}
+
+export async function deleteMessage(token, chatId, messageId) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/deleteMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, message_id: messageId }),
+  });
+  return res.json();
 }
 
 export async function setMessageReaction(token, chatId, messageId, emoji) {

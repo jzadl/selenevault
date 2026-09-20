@@ -1,5 +1,6 @@
 import { CATEGORY_FILES, CATEGORY_FIELDS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
+import { getFileContent } from "./github.js";
 
 function normalize(s) {
   return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -26,21 +27,13 @@ export function findEntries(content, nameQuery) {
   return matches;
 }
 
-export function findEntriesByFile(cdnBase, file, nameQuery) {
-  return fetch(cdnBase + "/" + file + "?t=" + Date.now(), { cf: { cacheTtl: 0 } })
-    .then((r) => r.text())
-    .then((text) => {
-      const blocks = text.split(/\n\n+/);
-      const q = nameQuery.trim().toLowerCase();
-      const matches = [];
-      for (const block of blocks) {
-        const nameMatch = block.match(/^name:\s*(.+)$/m);
-        if (nameMatch && nameMatch[1].trim().toLowerCase().includes(q)) {
-          matches.push(block.trim());
-        }
-      }
-      return matches;
-    });
+export async function findEntriesByFile(env, file, nameQuery) {
+  try {
+    const { content } = await getFileContent(env, file);
+    return findEntries(content, nameQuery);
+  } catch {
+    return [];
+  }
 }
 
 export function buildMatchList(matches) {

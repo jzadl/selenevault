@@ -54,9 +54,12 @@ export function buildRemovePreview(block) {
   const parts = ["Are you sure you want to remove this entry?", ""];
   parts.push("Entry: " + escapeMd(fields.name || "Unknown") + (fields.version ? " \\(" + escapeMd(fields.version) + "\\)" : ""));
   if (fields.maintainer) parts.push("By: " + escapeMd(fields.maintainer));
+  if (fields.size) parts.push("Size: " + escapeMd(fields.size));
   if (fields.date) parts.push("Date: " + escapeMd(fields.date));
+  if (fields.vendor) parts.push("Vendor: " + escapeMd(fields.vendor));
   if (fields.url) parts.push("URL: " + escapeMd(fields.url));
-  parts.push("", "Reply *yes* to proceed, or *no* to cancel.");
+  if (fields.note) parts.push(escapeMd(fields.note));
+  parts.push("", "_This will remove it from the site\\._");
   return parts.join("\n");
 }
 

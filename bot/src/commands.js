@@ -1,6 +1,7 @@
 import { parseSman, CATEGORY_FILES, CATEGORY_LABELS } from "./sman.js";
 import { CATEGORY_FIELDS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
+import { getFileContent } from "./github.js";
 
 const HELP_TEXT = [
   "*svault bot commands:*",
@@ -19,16 +20,23 @@ const HELP_TEXT = [
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
 
-async function fetchSman(cdnBase, filename) {
-  const res = await fetch(`${cdnBase}/${filename}?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
-  if (!res.ok) return { about: "", entries: [] };
-  return parseSman(await res.text());
+async function fetchRawViaGithub(env, filename) {
+  try {
+    const { content } = await getFileContent(env, filename);
+    return content;
+  } catch {
+    return null;
+  }
 }
 
-export async function fetchRawSman(cdnBase, filename) {
-  const res = await fetch(`${cdnBase}/${filename}?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
-  if (!res.ok) return null;
-  return res.text();
+async function fetchSman(env, filename) {
+  const text = await fetchRawViaGithub(env, filename);
+  if (text === null) return { about: "", entries: [] };
+  return parseSman(text);
+}
+
+export async function fetchRawSman(env, filename) {
+  return fetchRawViaGithub(env, filename);
 }
 
 function entryLink(siteUrl, category, entry) {
@@ -83,7 +91,7 @@ export async function cmdLatest(env, arg) {
 
   if (!newestCategory) return "No entries found\\.";
 
-  const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[newestCategory]);
+  const { entries } = await fetchSman(env, CATEGORY_FILES[newestCategory]);
   if (!entries.length) return "No entries found\\.";
 
   const last = entries[entries.length - 1];
@@ -92,14 +100,14 @@ export async function cmdLatest(env, arg) {
 
 export async function cmdStats(env, arg) {
   if (arg && CATEGORY_FILES[arg]) {
-    const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES[arg]);
+    const { entries } = await fetchSman(env, CATEGORY_FILES[arg]);
     const label = escapeMd(CATEGORY_LABELS[arg]);
     return `*${label}s on svault:* ${entries.length}`;
   }
 
   const categoryEntries = Object.entries(CATEGORY_FILES).filter(([cat]) => cat !== "channel");
   const counts = await Promise.all(
-    categoryEntries.map(([cat, file]) => fetchSman(env.CDN_BASE, file).then((r) => ({ cat, count: r.entries.length })))
+    categoryEntries.map(([cat, file]) => fetchSman(env, file).then((r) => ({ cat, count: r.entries.length })))
   );
 
   const lines = ["*svault stats:*", ""];
@@ -142,7 +150,7 @@ export async function cmdSearch(env, arg) {
   const qNorm = normalize(query);
 
   const results = await Promise.all(
-    categories.map((cat) => fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
+    categories.map((cat) => fetchSman(env, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
   );
 
   for (const { cat, entries } of results) {
@@ -187,7 +195,7 @@ export async function cmdSearch(env, arg) {
 }
 
 export async function cmdChannels(env) {
-  const { entries } = await fetchSman(env.CDN_BASE, CATEGORY_FILES.channel);
+  const { entries } = await fetchSman(env, CATEGORY_FILES.channel);
   if (entries.length === 0) return "No channels listed\\.";
 
   const lines = ["*Known community channels:*", ""];
@@ -223,7 +231,7 @@ export async function cmdIsThisOnSv(env, replyText) {
   const qNorm = dedupeLetters(normalize(query));
 
   const results = await Promise.all(
-    categories.map((cat) => fetchSman(env.CDN_BASE, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
+    categories.map((cat) => fetchSman(env, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
   );
 
   const matches = [];

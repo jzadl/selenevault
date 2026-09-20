@@ -22,7 +22,7 @@ async function githubFetch(env, path, options = {}) {
   return fetch(env.GITHUB_API_BASE + path, { ...options, headers });
 }
 
-async function getFileContent(env, file) {
+export async function getFileContent(env, file) {
   const res = await githubFetch(env, "/contents/" + file + "?ref=main");
   if (!res.ok) {
     const body = await res.text();
