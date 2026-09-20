@@ -37,7 +37,7 @@ export async function findEntriesByFile(env, file, nameQuery) {
 }
 
 export function buildMatchList(matches) {
-  const lines = ["Found multiple entries, reply with the number:", ""];
+  const lines = ["*Found multiple entries, reply with the number:*", ""];
   for (let i = 0; i < matches.length; i++) {
     const block = matches[i];
     const nameMatch = block.match(/^name:\s*(.+)$/m);
@@ -46,12 +46,13 @@ export function buildMatchList(matches) {
     const dateMatch = block.match(/^date:\s*(.+)$/m);
     const name = escapeMd(nameMatch ? nameMatch[1].trim() : "Unknown");
     const maint = escapeMd(maintMatch ? maintMatch[1].trim() : "Unknown");
-    const version = versionMatch ? " \\(" + escapeMd(versionMatch[1].trim()) + "\\)" : "";
-    const date = dateMatch ? " " + escapeMd(dateMatch[1].trim()) : "";
-    lines.push((i + 1) + "\\. " + name + version + " by " + maint + date);
+    const version = versionMatch ? " \`" + escapeMd(versionMatch[1].trim()) + "\`" : "";
+    const date = dateMatch ? " \\(" + escapeMd(dateMatch[1].trim()) + "\\)" : "";
+    lines.push(`*${i + 1}\\.* *${name}*${version} by ${maint}${date}`);
+    lines.push("");
   }
-  lines.push("", "Or reply *cancel*\\.");
-  return lines.join("\n");
+  lines.push("Or reply *cancel*\\.");
+  return lines.join("\n").trim();
 }
 
 export function getFieldButtons(category) {
@@ -85,12 +86,13 @@ export function buildDiff(oldFields, field, newValue) {
   const oldValue = oldFields[field] || "(empty)";
   const label = field === "url" ? "download link" : field;
   return [
-    "Confirm this change?",
+    "*Confirm this change?*",
     "",
-    "\ud83d\udd34 \u2014 " + escapeMd(label) + ": " + escapeMd(oldValue),
-    "\ud83d\udfe2 \u202b " + escapeMd(label) + ": " + escapeMd(newValue),
+    `${escapeMd(label)}:`,
+    `🔴 ${escapeMd(oldValue)}`,
+    `🟢 ${escapeMd(newValue)}`,
     "",
-    "Reply *yes* to confirm or *no* to cancel.",
+    "Reply *yes* to confirm or *no* to cancel\\.",
   ].join("\n");
 }
 
