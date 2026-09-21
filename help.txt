@@ -1,16 +1,16 @@
-svault bot commands
+*svault bot commands*
 
-/slatest [category] - newest addition
-/sstats [category] - entry counts
-/ssearch [category] query - find an entry
-/isthisonsv - is it in the vault?
-/schannels - community channels
-/sping - check responsiveness
+/slatest \[category\] \- newest addition
+/sstats \[category\] \- entry counts
+/ssearch \[category\] query \- find an entry
+/isthisonsv \- is it in the vault?
+/schannels \- community channels
+/sping \- check responsiveness
 
-Admin commands (group admins only)
+*Admin commands* \(group admins only\)
 
-/sadd - add an entry (reply to a post)
-/supdate [category] [name] - update an entry
-/sremove [category] [name] [creator] - remove an entry
+/sadd \- add an entry \(reply to a post\)
+/supdate \[category\] \[name\] \- update an entry
+/sremove \[category\] \[name\] \[creator\] \- remove an entry
 
 Categories: rom, kernel, recovery, firmware, port, tool, guide
