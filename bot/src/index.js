@@ -272,7 +272,7 @@ export default {
     if (command === "/sping") {
       let reply;
       try {
-        reply = await cmdPing(env, request);
+        reply = await cmdPing(env, request, msg);
       } catch (err) {
         reply = "Pong! (could not measure latency)";
       }

@@ -302,10 +302,17 @@ export async function cmdIsThisOnSv(env, replyText) {
   return lines.join("\n").trim();
 }
 
-export async function cmdPing(env, request) {
+export async function cmdPing(env, request, msg) {
   const start = Date.now();
   const res = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/getMe");
-  const latency = Date.now() - start;
+  const workerLatency = Date.now() - start;
   const colo = (request && request.cf && request.cf.colo) || "??";
-  return escapeMd(`Pong! from ${colo} - ${latency}ms`);
+
+  let telegramDelayText = "";
+  if (msg && msg.date) {
+    const telegramDelay = Date.now() - msg.date * 1000;
+    telegramDelayText = ` \\(${telegramDelay}ms delay from Telegram\\)`;
+  }
+
+  return escapeMd(`Pong! from ${colo} - ${workerLatency}ms`) + telegramDelayText;
 }
