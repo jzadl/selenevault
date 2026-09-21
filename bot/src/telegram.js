@@ -25,6 +25,110 @@ export async function sendMessage(token, chatId, text, options = {}) {
   return res.json();
 }
 
+export async function sendEphemeral(token, chatId, userId, text, options = {}) {
+  const body = {
+    chat_id: chatId,
+    text,
+    disable_web_page_preview: options.disablePreview !== false,
+  };
+  if (options.parseMode !== null) {
+    body.parse_mode = options.parseMode || "MarkdownV2";
+  }
+  if (options.replyToMessageId) {
+    body.reply_parameters = { message_id: options.replyToMessageId };
+  }
+  if (options.replyMarkup !== undefined) {
+    body.reply_markup = options.replyMarkup;
+  }
+  body.ephemeral_message_parameters = { receiver_user_id: userId };
+  let res = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  let json = await res.json();
+  if (!json.ok) {
+    delete body.ephemeral_message_parameters;
+    body.receiver_user_id = userId;
+    res = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    json = await res.json();
+  }
+  if (!json.ok && options.fallback) {
+    delete body.receiver_user_id;
+    res = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return res.json();
+  }
+  return json;
+}
+
+export async function deleteEphemeralMessage(token, chatId, userId, ephemeralMessageId) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/deleteEphemeralMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      receiver_user_id: userId,
+      ephemeral_message_id: ephemeralMessageId,
+    }),
+  });
+  return res.json();
+}
+
+export async function sendMessageDraft(token, chatId, draftId, text) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/sendMessageDraft", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, draft_id: draftId, text }),
+  });
+  return res.json();
+}
+
+export async function editEphemeralMessageText(token, chatId, userId, ephemeralMessageId, text, options = {}) {
+  const body = {
+    chat_id: chatId,
+    receiver_user_id: userId,
+    ephemeral_message_id: ephemeralMessageId,
+    text,
+  };
+  if (options.parseMode !== null) {
+    body.parse_mode = options.parseMode || "MarkdownV2";
+  }
+  const res = await fetch("https://api.telegram.org/bot" + token + "/editEphemeralMessageText", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+export async function setMyCommands(token, commands, scope) {
+  const body = { commands };
+  if (scope) body.scope = scope;
+  const res = await fetch("https://api.telegram.org/bot" + token + "/setMyCommands", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+export async function setChatMenuButton(token, menuButton) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/setChatMenuButton", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(menuButton || {}),
+  });
+  return res.json();
+}
+
 export async function answerCallbackQuery(token, callbackQueryId, text) {
   const res = await fetch("https://api.telegram.org/bot" + token + "/answerCallbackQuery", {
     method: "POST",
