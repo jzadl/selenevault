@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>svault</title>
+<meta name="description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: monospace;
+  background: #000;
+  color: #ddd;
+  padding: 12px;
+  padding-top: env(safe-area-inset-top, 12px);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+  display: flex;
+  flex-direction: column;
+}
+body.theme-dark {
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-text-color, #ddd);
+}
+body.theme-light {
+  background: var(--tg-theme-bg-color, #fff);
+  color: var(--tg-theme-text-color, #000);
+}
+h1 {
+  color: var(--tg-theme-hint-color, cyan);
+  margin: 8px 0;
+  font-size: 18px;
+}
+h2 {
+  border-bottom: 1px solid var(--tg-theme-hint-color, gray);
+  padding-bottom: 4px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, #aaa);
+}
+input {
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-text-color, #ddd);
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  padding: 10px;
+  width: 100%;
+  font-family: monospace;
+  font-size: 16px;
+  margin-bottom: 8px;
+  outline: none;
+}
+input:focus {
+  border-color: var(--tg-theme-button-color, cyan);
+}
+.entry {
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #333;
+  word-wrap: break-word;
+}
+.entry b { color: var(--tg-theme-text-color, #fff); }
+.entry .meta { color: var(--tg-theme-hint-color, #888); font-size: 12px; }
+.entry a { color: var(--tg-theme-button-color, cyan); }
+.group {
+  border: 1px solid #333;
+  margin: 8px 0;
+}
+.group summary {
+  cursor: pointer;
+  padding: 8px;
+  color: var(--tg-theme-text-color, #fff);
+  font-weight: bold;
+  list-style: none;
+}
+.group summary::-webkit-details-marker { display: none; }
+.group summary::before {
+  content: "\25B8 ";
+  color: var(--tg-theme-button-color, cyan);
+}
+.group[open] summary::before {
+  content: "\25BE ";
+}
+.group summary .count {
+  color: var(--tg-theme-hint-color, #888);
+  font-weight: normal;
+  font-size: 12px;
+}
+.group .entries {
+  padding: 0 8px 8px 8px;
+}
+.group .entry:first-child {
+  border-color: #0aa;
+}
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+select {
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-text-color, #ddd);
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  padding: 8px;
+  font-family: monospace;
+  font-size: 13px;
+  flex: 1;
+  min-width: 120px;
+  outline: none;
+}
+#out {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+</style>
+</head>
+<body>
+<h1>selenevault</h1>
+<input id="search" placeholder="search...">
+<div class="filters">
+  <select id="filter-category">
+    <option value="">All categories</option>
+  </select>
+  <select id="filter-creator">
+    <option value="">All creators</option>
+  </select>
+  <select id="filter-vendor">
+    <option value="">All vendors</option>
+  </select>
+</div>
+<div id="out">loading...</div>
+
+<script src="../sman-parser.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  document.body.classList.add(tg.colorScheme === "light" ? "theme-light" : "theme-dark");
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+const files = ["rom.sman","kernels.sman","recovery.sman","firmware.sman","ports.sman","tools.sman","guides.sman","channels.sman"];
+
+function stripVersion(name) {
+  let base = name;
+  base = base.replace(/\s*[\(\[][^)\]]*[\)\]]\s*/g, " ");
+  base = base.replace(/\bv?\d+(\.\d+){1,3}[a-z]?\b.*$/i, "");
+  base = base.replace(/\b\d{4}[.\-]\d{1,2}[.\-]\d{1,2}\b.*$/, "");
+  base = base.replace(/\b\d{8}\b.*$/, "");
+  return base.trim() || (name || "").trim();
+}
+
+function compact(name) {
+  return (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+const GENERIC_SUFFIXES = new Set(["project", "official", "unofficial", "edition", "release", "build"]);
+
+function namesMatch(nameA, nameB) {
+  const a = stripVersion(nameA);
+  const b = stripVersion(nameB);
+  const ca = compact(a);
+  const cb = compact(b);
+  if (!ca || !cb) return false;
+  if (ca === cb) return true;
+  const [shorter, longer] = ca.length <= cb.length ? [ca, cb] : [cb, ca];
+  const shorterOriginal = ca.length <= cb.length ? a : b;
+  const longerOriginal = ca.length <= cb.length ? b : a;
+  if (longer.startsWith(shorter)) {
+    const shorterWordCount = shorterOriginal.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean).length;
+    const longerWords = longerOriginal.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+    const extraWords = longerWords.slice(shorterWordCount);
+    if (extraWords.length > 0 && extraWords.every(w => GENERIC_SUFFIXES.has(w))) return true;
+  }
+  return false;
+}
+
+function clusterEntries(entries) {
+  const clusters = [];
+  entries.forEach(e => {
+    let best = null;
+    for (const cluster of clusters) {
+      if (namesMatch(e.name, cluster.representative)) { best = cluster; break; }
+    }
+    if (best) {
+      best.entries.push(e);
+    } else {
+      clusters.push({ representative: e.name, entries: [e] });
+    }
+  });
+  return clusters.map(c => c.entries);
+}
+
+function entryHtml(e) {
+  const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
+  return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
+    <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
+    <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
+    <div>${esc(e.note||"")}</div>
+    ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
+  </div>`;
+}
+
+const allCreators = new Set();
+const allVendors = new Set();
+const allCategories = [];
+
+async function load(){
+  let html = "";
+  for(const f of files){
+    try {
+      const text = await (await fetch("../" + f)).text();
+      const {entries} = parseSman(text);
+      html += `<h2>${f} (${entries.length})</h2>`;
+      allCategories.push(f);
+
+      if (f === "channels.sman" || f === "guides.sman") {
+        entries.forEach(e => {
+          if (e.maintainer) allCreators.add(e.maintainer);
+          html += entryHtml(e);
+        });
+        continue;
+      }
+
+      entries.forEach(e => {
+        if (e.maintainer) allCreators.add(e.maintainer);
+        if (e.vendor) allVendors.add(e.vendor);
+      });
+
+      const clusters = clusterEntries(entries);
+
+      clusters.forEach(groupEntries => {
+        groupEntries.sort((a, b) => (b.date||"").localeCompare(a.date||""));
+
+        if (groupEntries.length === 1) {
+          html += `<div class="group-wrap" data-category="${esc(f)}">${entryHtml(groupEntries[0])}</div>`;
+          return;
+        }
+
+        const displayName = groupEntries[0].name || "";
+        const search = groupEntries.map(e => (e.name+" "+e.maintainer+" "+e.note).toLowerCase()).join(" ");
+        const creators = [...new Set(groupEntries.map(e => e.maintainer).filter(Boolean))].join(",");
+        const vendors = [...new Set(groupEntries.map(e => e.vendor).filter(Boolean))].join(",");
+        html += `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(creators)}" data-vendor="${esc(vendors)}">
+          <summary>${esc(displayName)} <span class="count">(${groupEntries.length} builds)</span></summary>
+          <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
+        </details>`;
+      });
+    } catch(err) {
+      console.error("Error loading " + f, err);
+    }
+  }
+  document.getElementById("out").innerHTML = html;
+  populateFilters();
+}
+
+function normalizeCreator(name) {
+  return (name || "").trim().toLowerCase();
+}
+
+function splitCollaborators(name) {
+  return (name || "")
+    .split(/\s+(?:and|&|x)\s+/i)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function populateFilters(){
+  const categorySelect = document.getElementById("filter-category");
+  allCategories.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f;
+    opt.textContent = f;
+    categorySelect.appendChild(opt);
+  });
+
+  const creatorSelect = document.getElementById("filter-creator");
+  const creatorDisplay = new Map();
+  [...allCreators].forEach(c => {
+    splitCollaborators(c).forEach(individual => {
+      const key = normalizeCreator(individual);
+      const existing = creatorDisplay.get(key);
+      if (!existing || individual.length < existing.length) creatorDisplay.set(key, individual);
+    });
+  });
+  [...creatorDisplay.entries()].sort((a,b) => a[1].localeCompare(b[1])).forEach(([key, display]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = display;
+    creatorSelect.appendChild(opt);
+  });
+
+  const vendorSelect = document.getElementById("filter-vendor");
+  [...allVendors].sort().forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    vendorSelect.appendChild(opt);
+  });
+}
+
+function applyFilters(){
+  const q = document.getElementById("search").value.toLowerCase();
+  const category = document.getElementById("filter-category").value;
+  const creator = document.getElementById("filter-creator").value;
+  const vendor = document.getElementById("filter-vendor").value;
+
+  document.querySelectorAll(".group-wrap > .entry, #out > .entry").forEach(el => {
+    const wrap = el.closest(".group-wrap") || el;
+    const cat = wrap.dataset.category || "";
+    const matchesSearch = !q || el.dataset.search.includes(q);
+    const matchesCategory = !category || cat === category;
+    const entryCreators = (el.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
+    const matchesCreator = !creator || entryCreators.includes(creator);
+    const matchesVendor = !vendor || (el.dataset.vendor || "").split(",").includes(vendor);
+    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
+    (wrap === el ? el : wrap).style.display = visible ? "" : "none";
+  });
+
+  document.querySelectorAll(".group").forEach(el => {
+    const matchesSearch = !q || el.dataset.search.includes(q);
+    const matchesCategory = !category || el.dataset.category === category;
+    const groupCreators = el.dataset.creator.split(",").flatMap(splitCollaborators).map(normalizeCreator);
+    const matchesCreator = !creator || groupCreators.includes(creator);
+    const matchesVendor = !vendor || el.dataset.vendor.split(",").includes(vendor);
+    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
+    el.style.display = visible ? "" : "none";
+    if (visible && (q || creator || vendor) && el.tagName === "DETAILS") el.open = true;
+  });
+}
+
+document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("filter-category").addEventListener("change", applyFilters);
+document.getElementById("filter-creator").addEventListener("change", applyFilters);
+document.getElementById("filter-vendor").addEventListener("change", applyFilters);
+
+async function init(){
+  await load();
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("q");
+  const category = params.get("category");
+  const creator = params.get("creator");
+  const vendor = params.get("vendor");
+
+  if (q) document.getElementById("search").value = q;
+  if (category) document.getElementById("filter-category").value = category;
+  if (creator) document.getElementById("filter-creator").value = creator;
+  if (vendor) document.getElementById("filter-vendor").value = vendor;
+
+  if (q || category || creator || vendor) {
+    applyFilters();
+    setTimeout(() => {
+      const firstVisible = [...document.querySelectorAll(".entry, .group, .group-wrap")].find(el => el.style.display !== "none");
+      if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
