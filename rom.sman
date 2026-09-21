@@ -1088,3 +1088,11 @@ url: https://jzadl.xyz/roms/testdroid/testdroid26.6.7.zip
 note: Custom ROM with JZ Root Installer preinstalled, supports all root methods; based on MIUI 14 / Android 17 Beta 5.
 vendor: svendor
 
+name: Placeholder Test
+version: 9.0-20260501
+maintainer: dummydata
+size: 1.2G
+date: 2026-05-01
+url: https://example.com/fake/placeholder-pie-selene.zip
+note: Placeholder, never actually published
+vendor: rvendor
