@@ -1,7 +1,7 @@
 *svault bot commands*
 
 /slatest \[category\] \- newest addition
-/sstats \[category\] \- entry counts
+/sstats \[category\] \- entry counts \(or: by:name, vendor:x, date:2026\)
 /ssearch \[category\] query \- find an entry
 /isthisonsv \- is it in the vault?
 /schannels \- community channels
