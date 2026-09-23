@@ -1,4 +1,4 @@
-import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, escapeMd, setMessageReaction, deleteMessage } from "./telegram.js";
+import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, escapeMd, setMessageReaction, deleteMessage, sendPhoto } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, findEntryBlock, findEntryBlocks, entryToRawBlock } from "./github.js";
@@ -219,7 +219,7 @@ export default {
         return new Response("ok", { status: 200 });
       }
 
-    const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault");
+    const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault") || text.toLowerCase().startsWith("/p");
     if (!isCommand) {
       if (isGroupChat(msg.chat.type) && (msg.text || msg.caption)) {
         const postText = (msg.text || msg.caption || "").trim();
@@ -264,6 +264,14 @@ export default {
 
     if (command === "/sid") {
       await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Your chat ID: `" + msg.chat.id + "`", {
+        replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/p") {
+      const photoUrl = "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/p.jpg";
+      await sendPhoto(env.TELEGRAM_BOT_TOKEN, msg.chat.id, photoUrl, {
         replyToMessageId: msg.message_id,
       });
       return new Response("ok", { status: 200 });

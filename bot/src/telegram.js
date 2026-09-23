@@ -197,6 +197,23 @@ export async function setMessageReaction(token, chatId, messageId, emoji) {
   return res.json();
 }
 
+export async function sendPhoto(token, chatId, photoUrl, options = {}) {
+  const body = {
+    chat_id: chatId,
+    photo: photoUrl,
+  };
+  if (options.caption) body.caption = options.caption;
+  if (options.replyToMessageId) {
+    body.reply_parameters = { message_id: options.replyToMessageId };
+  }
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
 export function replyToMessage(update) {
   const msg = update.message;
   if (!msg) return null;
