@@ -14,7 +14,7 @@ const HELP_TEXT = [
   "/sstats \\[category\\] \\- entry counts",
   "/ssearch \\[category\\] query \\- find an entry",
   "/vault \\- open the vault browser",
-  "/isthisonsv \\- reply to a message \\(is it in the vault\\?)",
+  "/isthisonsv \\- reply to a message \\(is it in the vault?\\)",
   "/schannels \\- community channels",
   "/sping \\- check bot responsiveness",
   "",
