@@ -12,6 +12,7 @@ SITE_URL = "https://svault.jzadl.xyz"
 GITHUB_API_BASE = "https://api.github.com/repos/jzadl/selenevault"
 SUPABASE_URL = "https://anfxgpeuiuonvhwahata.supabase.co"
 OWNER_ID = "5722152704"
+BOT_USERNAME = "selenevaultbot"
 
 # Set with: wrangler secret put TELEGRAM_BOT_TOKEN
 # Set with: wrangler secret put GROQ_API_KEY

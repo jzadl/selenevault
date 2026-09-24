@@ -1,6 +1,7 @@
 *svault bot commands*
 
 /slatest \[category\] \- newest addition
+/snews \- latest update message
 /sstats \[category\] \- entry counts \(or: by:name, vendor:x, date:2026\)
 /ssearch \[category\] query \- find an entry
 /isthisonsv \- is it in the vault?

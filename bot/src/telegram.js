@@ -138,6 +138,32 @@ export async function answerCallbackQuery(token, callbackQueryId, text) {
   return res.json();
 }
 
+export async function answerInlineQuery(token, inlineQueryId, results) {
+  const body = {
+    inline_query_id: inlineQueryId,
+    results: results || [],
+  };
+  const res = await fetch("https://api.telegram.org/bot" + token + "/answerInlineQuery", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+export async function answerGuestQuery(token, guestQueryId, result) {
+  const body = {
+    guest_query_id: guestQueryId,
+    result: result || {},
+  };
+  const res = await fetch("https://api.telegram.org/bot" + token + "/answerGuestQuery", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
 export async function editMessageText(token, chatId, messageId, text, options = {}) {
   const body = {
     chat_id: chatId,

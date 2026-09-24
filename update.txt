@@ -1,0 +1,19 @@
+*Update \- Sep 23, 2026*
+
+*Selene Vault Bot got updated\!*
+
+*New*
+
+Guest mode \- summon the bot in any chat with `@selenevaultbot /shelp`, no need to add it first
+Inline mode \- type `@selenevaultbot <query>` anywhere to search the vault and send results
+/snews \- check the latest update message
+
+*Fixes*
+
+/sping \- now shows the real Telegram round\-trip delay instead of just Worker latency
+/ssearch \- long results \(8\+ matches\) now publish to a clean telegra\.ph page with clickable links
+/supdate \- match list and confirmation now use bold/mono formatting instead of a dense block of text
+
+svault\.jzadl\.xyz
+
+||do /p||

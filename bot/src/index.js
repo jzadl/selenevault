@@ -1,5 +1,5 @@
-import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, escapeMd, setMessageReaction, deleteMessage, sendPhoto } from "./telegram.js";
-import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman } from "./commands.js";
+import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerInlineQuery, answerGuestQuery } from "./telegram.js";
+import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, findEntryBlock, findEntryBlocks, entryToRawBlock } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./supabase.js";
@@ -8,17 +8,18 @@ import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFi
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
 
 const HELP_TEXT = [
-  "*svault bot commands:*",
+  "*svault bot commands*",
   "",
   "/slatest \\[category\\] \\- newest addition",
   "/sstats \\[category\\] \\- entry counts",
   "/ssearch \\[category\\] query \\- find an entry",
-  "/vault \\- open the vault browser",
+"/vault \\- open the vault browser",
   "/isthisonsv \\- reply to a message \\(is it in the vault?\\)",
   "/schannels \\- community channels",
-  "/sping \\- check bot responsiveness",
+  "/sping \\- check responsiveness",
   "",
-  "*Admin commands \\(group admins only\\):*",
+  "*Admin commands* \\(group admins only\\)",
+  "",
   "/sadd \\- add an entry \\(reply to a post\\)",
   "/supdate \\[category\\] \\[name\\] \\- update an entry",
   "/sremove \\[category\\] \\[name\\] \\[creator\\] \\- remove an entry",
@@ -67,10 +68,10 @@ async function replyTo(env, msg, text, options = {}) {
 
 const DEFAULT_COMMANDS = [
   { command: "shelp", description: "Show all bot commands" },
+  { command: "snews", description: "Latest update message" },
   { command: "slatest", description: "Newest addition to the vault" },
   { command: "sstats", description: "Entry counts per category" },
   { command: "ssearch", description: "Search entries: /ssearch [category] query" },
-  { command: "vault", description: "Open the vault browser" },
   { command: "schannels", description: "Community channels" },
   { command: "sping", description: "Check bot responsiveness" },
 ];
@@ -117,6 +118,32 @@ export default {
       try {
         await handleReaction(env, update.message_reaction);
       } catch {}
+      return new Response("ok", { status: 200 });
+    }
+
+    if (update.inline_query) {
+      try {
+        const results = await buildInlineResults(env, update.inline_query.query || "");
+        await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, results);
+      } catch {
+        await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, []);
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (update.guest_message) {
+      try {
+        await handleGuestMessage(env, update.guest_message);
+      } catch {
+        try {
+          await answerGuestQuery(env.TELEGRAM_BOT_TOKEN, update.guest_message.guest_query_id, {
+            type: "article",
+            id: "err",
+            title: "svault bot",
+            input_message_content: { message_text: "Something broke\\, try again in a bit\\." },
+          });
+        } catch {}
+      }
       return new Response("ok", { status: 200 });
     }
 
@@ -219,7 +246,7 @@ export default {
         return new Response("ok", { status: 200 });
       }
 
-    const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault") || text.toLowerCase().startsWith("/p");
+const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault") || text.toLowerCase().startsWith("/p");
     if (!isCommand) {
       if (isGroupChat(msg.chat.type) && (msg.text || msg.caption)) {
         const postText = (msg.text || msg.caption || "").trim();
@@ -239,9 +266,21 @@ export default {
       if (msg.chat.type !== "private" && msg.text) {
         const botUsername = env.BOT_USERNAME || "";
         if (botUsername && text.includes("@" + botUsername)) {
+          let isAdmin = false;
+          let isOwner = false;
+          if (String(msg.from.id) === String(env.OWNER_ID)) {
+            isAdmin = true;
+            isOwner = true;
+          } else {
+            try {
+              const member = await getChatMember(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id);
+              isAdmin = member.ok && (member.result.status === "administrator" || member.result.status === "creator");
+            } catch {}
+          }
+          const threshold = isOwner ? 0.85 : isAdmin ? 0.65 : 0.35;
           const roll = Math.random();
-          if (roll < 0.2) {
-            if (roll < 0.1) {
+          if (roll < threshold) {
+            if (roll < threshold / 2) {
               const resp = MENTION_RESPONSES[Math.floor(Math.random() * MENTION_RESPONSES.length)];
               await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, resp, {
                 replyToMessageId: msg.message_id,
@@ -290,12 +329,15 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
-    if (command === "/vault") {
-      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Open the vault browser:", {
+    if (command === "/shelp") {
+      let helpText;
+      try {
+        const res = await fetch(env.CDN_BASE + "/help.txt");
+        if (res.ok) helpText = await res.text();
+      } catch {}
+      helpText = helpText || HELP_TEXT;
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, helpText, {
         replyToMessageId: msg.message_id,
-        replyMarkup: {
-          inline_keyboard: [[{ text: "Open Vault", web_app: { url: "https://svault.jzadl.xyz/app" } }]],
-        },
       });
       return new Response("ok", { status: 200 });
     }
@@ -461,9 +503,15 @@ export default {
     if (reply) {
       const chunks = splitMessage(reply);
       for (let i = 0; i < chunks.length; i++) {
-        const result = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, chunks[i], {
+        let result = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, chunks[i], {
           replyToMessageId: i === 0 ? msg.message_id : undefined,
         });
+        if (!result.ok) {
+          result = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, chunks[i], {
+            replyToMessageId: i === 0 ? msg.message_id : undefined,
+            parseMode: null,
+          });
+        }
         if (!result.ok) {
           await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "I found something but could not send it properly\\.", {
             replyToMessageId: msg.message_id,
@@ -483,8 +531,20 @@ export default {
 async function handleCommand(env, command, arg) {
   switch (command) {
     case "/sstart":
-    case "/shelp":
+    case "/shelp": {
+      try {
+        const res = await fetch(env.CDN_BASE + "/help.txt");
+        if (res.ok) return await res.text();
+      } catch {}
       return HELP_TEXT;
+    }
+    case "/snews": {
+      try {
+        const res = await fetch(env.CDN_BASE + "/update.txt");
+        if (res.ok) return await res.text();
+      } catch {}
+      return "SNews cannot be reached, it might be the CDN lag\\.";
+    }
     case "/slatest":
       return cmdLatest(env, arg ? arg.toLowerCase() : null);
     case "/sstats":
@@ -496,6 +556,69 @@ async function handleCommand(env, command, arg) {
     default:
       return null;
   }
+}
+
+const GUEST_COMMANDS = ["/shelp", "/sstart", "/snews", "/slatest", "/sstats", "/ssearch", "/schannels", "/sping", "/isthisonsv"];
+
+async function handleGuestMessage(env, gmsg) {
+  const queryId = gmsg.guest_query_id;
+  if (!queryId) return;
+
+  let text = (gmsg.text || "").trim();
+  const mention = "@" + (env.BOT_USERNAME || "selenevaultbot");
+  if (text.toLowerCase().startsWith(mention.toLowerCase())) {
+    text = text.slice(mention.length).trim();
+  }
+
+  const tokens = text.split(/\s+/);
+  let command = (tokens[0] || "").split("@")[0].toLowerCase();
+  const arg = tokens.slice(1).join(" ");
+
+  const sendReply = async (reply) => {
+    const result = {
+      type: "article",
+      id: "guest",
+      title: command || "svault bot",
+      input_message_content: {
+        message_text: reply,
+        parse_mode: "MarkdownV2",
+      },
+    };
+    let res = await answerGuestQuery(env.TELEGRAM_BOT_TOKEN, queryId, result);
+    if (!res.ok) {
+      delete result.input_message_content.parse_mode;
+      res = await answerGuestQuery(env.TELEGRAM_BOT_TOKEN, queryId, result);
+    }
+    return res;
+  };
+
+  if (!command || !GUEST_COMMANDS.includes(command)) {
+    const lines = [];
+    if (!command) {
+      lines.push("Mention the bot with a command in any chat\\, e\\.g\\. `@selenevaultbot /slatest`\\.");
+    } else {
+      lines.push("`" + escapeMdSafe(command) + "` is not supported in guest chats\\.");
+    }
+    lines.push("", "Try: " + GUEST_COMMANDS.map((c) => "`" + c + "`").join(" "));
+    return sendReply(lines.join("\n"));
+  }
+
+  let reply;
+  try {
+    if (command === "/sping") {
+      reply = await cmdPing(env, null, gmsg);
+    } else if (command === "/isthisonsv") {
+      const replyMsg = gmsg.reply_to_message;
+      const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
+      reply = replyText ? await cmdIsThisOnSv(env, replyText) : "Reply to a message with a ROM\\/kernel\\/port name, then mention the bot: `@selenevaultbot /isthisonsv`\\.";
+    } else {
+      reply = await handleCommand(env, command, arg);
+    }
+  } catch (err) {
+    reply = "Something broke on my end, try again in a bit\\.";
+  }
+  if (!reply) return;
+  return sendReply(reply);
 }
 
 async function handleAdd(env, msg, arg) {

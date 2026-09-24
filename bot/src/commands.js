@@ -236,6 +236,69 @@ export async function cmdSearch(env, arg) {
   return lines.join("\n").trim();
 }
 
+export async function searchEntries(env, query) {
+  const categories = Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
+  const results = await Promise.all(
+    categories.map((cat) => fetchSman(env, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
+  );
+  const q = (query || "").trim().toLowerCase();
+  const qNorm = normalize(q);
+  if (!q) return [];
+
+  const direct = [];
+  const other = [];
+  for (const { cat, entries } of results) {
+    for (const entry of entries) {
+      const name = (entry.name || "").toLowerCase();
+      const nameNorm = normalize(entry.name);
+      if (name.includes(q) || nameNorm.includes(qNorm)) {
+        direct.push({ category: cat, entry });
+        continue;
+      }
+      const note = (entry.note || "").toLowerCase();
+      const version = (entry.version || "").toLowerCase();
+      if (note.includes(q) || version.includes(q)) {
+        other.push({ category: cat, entry });
+      }
+    }
+  }
+  return [...direct, ...other].slice(0, 50);
+}
+
+export async function buildInlineResults(env, query) {
+  if (!(query || "").trim()) {
+    return [{
+      type: "article",
+      id: "hint",
+      title: "Search the vault",
+      description: "Type a ROM, kernel, port, recovery, tool or guide name",
+      input_message_content: {
+        message_text: "*svault* \\- search any name in any chat with @selenevaultbot",
+        parse_mode: "MarkdownV2",
+      },
+    }];
+  }
+
+  const matches = await searchEntries(env, query);
+  return matches.map(({ category: cat, entry }, i) => {
+    const name = (entry.name || "svault entry") + (entry.version ? " " + entry.version : "");
+    const description = [CATEGORY_LABELS[cat], entry.maintainer, entry.date].filter(Boolean).join(" - ");
+    return {
+      type: "article",
+      id: "sv" + i,
+      title: name.slice(0, 64),
+      description: description.slice(0, 200),
+      input_message_content: {
+        message_text: formatEntry(env.SITE_URL, cat, entry),
+        parse_mode: "MarkdownV2",
+      },
+      reply_markup: {
+        inline_keyboard: [[{ text: "View on svault", url: entryLink(env.SITE_URL, cat, entry) }]],
+      },
+    };
+  });
+}
+
 export async function cmdChannels(env) {
   const { entries } = await fetchSman(env, CATEGORY_FILES.channel);
   if (entries.length === 0) return "No channels listed\\.";

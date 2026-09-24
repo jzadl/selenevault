@@ -7,20 +7,13 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Send message to all chats
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
-          MSG_TEXT: |
-            *Selene Vault Bot got updated\!*
-
-            *Fixes*
-
-            /ssearch \- long results \(8\+ matches\) now publish to a clean telegra\.ph page instead of a wall of text, with clickable links
-            /supdate \- match list and confirmation now use bold/mono formatting instead of a dense block of text
-
-            svault\.jzadl\.xyz
         run: |
+          MSG_TEXT=$(cat update.txt)
           IFS=',' read -ra IDS <<< "$CHAT_IDS"
           for ID in "${IDS[@]}"; do
             ID_TRIMMED=$(echo "$ID" | xargs)
