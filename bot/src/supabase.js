@@ -40,23 +40,6 @@ export async function getPending(supabaseUrl, supabaseKey, chatId, userId, opTyp
   return rows.length > 0 ? rows[0] : null;
 }
 
-export async function getPendingById(supabaseUrl, supabaseKey, id) {
-  const params = new URLSearchParams({
-    id: "eq." + id,
-    expires_at: "gt." + new Date().toISOString(),
-    limit: "1",
-  });
-  const res = await fetch(supabaseUrl + "/rest/v1/pending_ops?" + params, {
-    headers: headers(supabaseKey),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error("Supabase getById " + res.status + ": " + body.slice(0, 300));
-  }
-  const rows = await res.json();
-  return rows.length > 0 ? rows[0] : null;
-}
-
 export async function deletePending(supabaseUrl, supabaseKey, id) {
   const res = await fetch(supabaseUrl + "/rest/v1/pending_ops?id=eq." + id, {
     method: "DELETE",

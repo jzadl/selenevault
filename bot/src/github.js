@@ -100,32 +100,3 @@ export function entryToRawBlock(entry, fields) {
   }
   return lines.join("\n");
 }
-
-export function findEntryBlock(content, entryName, maintainer) {
-  const blocks = content.split(/\n\n+/);
-  for (const block of blocks) {
-    const nameMatch = block.match(/^name:\s*(.+)$/m);
-    const maintMatch = block.match(/^maintainer:\s*(.+)$/m);
-    if (nameMatch && maintMatch) {
-      if (
-        nameMatch[1].trim().toLowerCase() === entryName.trim().toLowerCase() &&
-        maintMatch[1].trim().toLowerCase() === maintainer.trim().toLowerCase()
-      ) {
-        return block.trim();
-      }
-    }
-  }
-  return null;
-}
-
-export function findEntryBlocks(content, entryName) {
-  const blocks = content.split(/\n\n+/);
-  const matches = [];
-  for (const block of blocks) {
-    const nameMatch = block.match(/^name:\s*(.+)$/m);
-    if (nameMatch && nameMatch[1].trim().toLowerCase().includes(entryName.trim().toLowerCase())) {
-      matches.push(block.trim());
-    }
-  }
-  return matches;
-}

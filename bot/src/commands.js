@@ -1,25 +1,8 @@
-import { parseSman, CATEGORY_FILES, CATEGORY_LABELS } from "./sman.js";
-import { CATEGORY_FIELDS } from "./categories.js";
+import { parseSman } from "./sman.js";
+import { CATEGORY_FILES, CATEGORY_FIELDS, CATEGORY_LABELS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
 import { getFileContent } from "./github.js";
 import { publishTelegraphPage } from "./telegraph.js";
-
-const HELP_TEXT = [
-  "*svault bot commands:*",
-  "",
-  "/slatest \\[category\\] \\- newest addition",
-  "/sstats \\[category\\] \\- entry counts",
-  "/ssearch \\[category\\] query \\- find an entry",
-  "/schannels \\- community channels",
-  "/sping \\- check bot responsiveness",
-  "",
-  "*Admin commands \\(group admins only\\):*",
-  "/sadd \\- add an entry \\(reply to a post\\)",
-  "/supdate \\[file\\] \\[name\\] \\- update an entry",
-  "/sremove \\[file\\] \\[name\\] \\[creator\\] \\- remove an entry",
-  "",
-  "Categories: rom, kernel, recovery, firmware, port, tool, guide",
-].join("\n");
 
 async function fetchRawViaGithub(env, filename) {
   try {
@@ -60,43 +43,44 @@ function formatEntry(siteUrl, category, entry) {
   return `*${name}*${version}${label}${maintainer}${date}\n[${linkLabel}](${link})`;
 }
 
-async function fetchLastCommitDate(githubApiBase, filename) {
-  const res = await fetch(
-    `${githubApiBase}/commits?path=${filename}&per_page=1`,
-    { headers: { "User-Agent": "svault-bot" }, cf: { cacheTtl: 60 } }
-  );
-  if (!res.ok) return null;
-  const commits = await res.json();
-  if (!commits.length) return null;
-  return commits[0].commit.committer.date;
-}
+const ADD_SUBJECT_RE = /^ADD:\s*(.+?)\s+by\s+(.+?)\s+to\s+(\S+\.sman)\s*$/i;
 
 export async function cmdLatest(env, arg) {
-  const categories = arg && CATEGORY_FILES[arg] ? [arg] : Object.keys(CATEGORY_FILES);
+  const wantFile = arg && CATEGORY_FILES[arg] ? CATEGORY_FILES[arg] : null;
 
-  const dates = await Promise.all(
-    categories.map((cat) =>
-      fetchLastCommitDate(env.GITHUB_API_BASE, CATEGORY_FILES[cat]).then((date) => ({ cat, date }))
-    )
-  );
+  // Which entry was actually added last, from commit subjects
+  const res = await fetch(env.GITHUB_API_BASE + "/commits?per_page=100", {
+    headers: { "User-Agent": "svault-bot" },
+    cf: { cacheTtl: 60 },
+  });
+  if (!res.ok) return "No entries found\\.";
+  const commits = await res.json();
 
-  let newestFileDate = null;
-  let newestCategory = null;
-  for (const { cat, date } of dates) {
-    if (!date) continue;
-    if (!newestFileDate || date > newestFileDate) {
-      newestFileDate = date;
-      newestCategory = cat;
+  const then = { latest: null };
+  const files = {};
+  // ponytail: 100-commit window, pages if the vault ever outgrows it
+  for (const c of commits) {
+    const mm = (c.commit.message || "").split("\n")[0].match(ADD_SUBJECT_RE);
+    if (!mm || (wantFile && mm[3] !== wantFile)) continue;
+
+    const name = mm[1].toString().toLowerCase();
+    const creator = mm[2].toString().toLowerCase();
+    if (!files[mm[3]]) files[mm[3]] = await fetchSman(env, mm[3]).then((r) => r.entries).catch(() => []);
+    const entry = files[mm[3]].find(
+      (e) =>
+        (e.name || "").toLowerCase().includes(name) &&
+        (e.maintainer || "").toLowerCase().includes(creator)
+    );
+    if (entry) {
+      then.latest = { file: mm[3], entry };
+      break;
     }
   }
 
-  if (!newestCategory) return "No entries found\\.";
+  if (!then.latest) return "No entries found\\.";
 
-  const { entries } = await fetchSman(env, CATEGORY_FILES[newestCategory]);
-  if (!entries.length) return "No entries found\\.";
-
-  const last = entries[entries.length - 1];
-  return `*Latest addition:*\n\n${formatEntry(env.SITE_URL, newestCategory, last)}`;
+  const category = Object.entries(CATEGORY_FILES).find(([, v]) => v === then.latest.file)?.[0] || "rom";
+  return `*Latest addition:*\n\n${formatEntry(env.SITE_URL, category, then.latest.entry)}`;
 }
 
 export async function cmdStats(env, arg) {

@@ -1,7 +1,7 @@
 import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
-import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, findEntryBlock, findEntryBlocks, entryToRawBlock } from "./github.js";
+import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, entryToRawBlock } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./supabase.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
@@ -246,7 +246,7 @@ export default {
         return new Response("ok", { status: 200 });
       }
 
-const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault") || text.toLowerCase().startsWith("/p");
+const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthisonsv") || text.toLowerCase().startsWith("/vault") || text.toLowerCase().startsWith("/p") || text.toLowerCase().startsWith("/c");
     if (!isCommand) {
       if (isGroupChat(msg.chat.type) && (msg.text || msg.caption)) {
         const postText = (msg.text || msg.caption || "").trim();
@@ -308,8 +308,11 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
       return new Response("ok", { status: 200 });
     }
 
-    if (command === "/p") {
-      const photoUrl = "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/p.jpg";
+    if (command === "/p" || command === "/c") {
+      const photoUrl =
+        command === "/p"
+          ? "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/p.jpg"
+          : "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/preview.webp";
       await sendPhoto(env.TELEGRAM_BOT_TOKEN, msg.chat.id, photoUrl, {
         replyToMessageId: msg.message_id,
       });
@@ -329,13 +332,12 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
       return new Response("ok", { status: 200 });
     }
 
-    if (command === "/shelp") {
+    if (command === "/shelp" || command === "/sstart") {
       let helpText;
       try {
-        const res = await fetch(env.CDN_BASE + "/help.txt");
-        if (res.ok) helpText = await res.text();
+        helpText = await handleCommand(env, command, "");
       } catch {}
-      helpText = helpText || HELP_TEXT;
+      helpText = helpText || "Something broke on my end, try again in a bit\\.";
       await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, helpText, {
         replyToMessageId: msg.message_id,
       });

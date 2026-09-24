@@ -25,25 +25,6 @@ export function findEntryByCreator(content, nameQuery, creatorQuery) {
   return null;
 }
 
-export function findEntriesByNameAndCreator(content, nameQuery, creatorQuery) {
-  const blocks = content.split(/\n\n+/);
-  const nameQ = nameQuery.trim().toLowerCase();
-  const creatorQ = creatorQuery.trim().toLowerCase();
-  const matches = [];
-  for (const block of blocks) {
-    const nameMatch = block.match(/^name:\s*(.+)$/m);
-    const maintMatch = block.match(/^maintainer:\s*(.+)$/m);
-    if (nameMatch && maintMatch) {
-      const name = nameMatch[1].trim().toLowerCase();
-      const maint = maintMatch[1].trim().toLowerCase();
-      if (name.includes(nameQ) && (creatorQ === "" || maint.includes(creatorQ))) {
-        matches.push(block.trim());
-      }
-    }
-  }
-  return matches;
-}
-
 export function buildRemovePreview(block) {
   const fields = {};
   const lines = block.split("\n");

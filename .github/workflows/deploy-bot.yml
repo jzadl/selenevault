@@ -32,21 +32,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          printf '%s' "${{ secrets.TELEGRAM_BOT_TOKEN }}" | wrangler secret put TELEGRAM_BOT_TOKEN --name svault-bot 2>&1 | tee /tmp/secret_output.log
-          printf '%s' "${{ secrets.GROQ_API_KEY }}" | wrangler secret put GROQ_API_KEY --name svault-bot 2>&1 | tee -a /tmp/secret_output.log
-          printf '%s' "${{ secrets.PUSH_TOKEN }}" | wrangler secret put GITHUB_TOKEN --name svault-bot 2>&1 | tee -a /tmp/secret_output.log
-          wrangler deploy 2>&1 | tee /tmp/deploy_output.log
-
-      - name: Report deploy output
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set +e
-          {
-            echo "--- raw log size ---"
-            wc -c /tmp/deploy_output.log
-            echo "--- first 2000 chars ---"
-            head -c 2000 /tmp/deploy_output.log
-          } > /tmp/short_log.txt 2>&1
-          gh issue create --repo "${{ github.repository }}" --title "deploy-output-debug" --body-file /tmp/short_log.txt --label "debug"
+          printf '%s' "${{ secrets.TELEGRAM_BOT_TOKEN }}" | wrangler secret put TELEGRAM_BOT_TOKEN --name svault-bot 2>&1
+          printf '%s' "${{ secrets.GROQ_API_KEY }}" | wrangler secret put GROQ_API_KEY --name svault-bot 2>&1
+          printf '%s' "${{ secrets.PUSH_TOKEN }}" | wrangler secret put GITHUB_TOKEN --name svault-bot 2>&1
+          wrangler deploy 2>&1

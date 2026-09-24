@@ -103,11 +103,6 @@ export function toSmanBlock(parsed) {
   return { category, file: CATEGORY_FILES[category] || "rom.sman", block: lines.join("\n") };
 }
 
-export function summarizeParsed(parsed) {
-  const { file, block } = toSmanBlock(parsed);
-  return "File: " + file + "\n\n" + block;
-}
-
 export function missingFieldsMessage(parsed) {
   const missing = findMissingFields(parsed);
   if (missing.length === 0) return null;

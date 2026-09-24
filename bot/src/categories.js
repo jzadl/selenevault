@@ -42,10 +42,6 @@ export const CATEGORY_REQUIRED = {
   channel: ["name", "url"],
 };
 
-export const CATEGORY_TARGET_FILES = { ...CATEGORY_FILES };
-
-export const FILE_LIST = Object.values(CATEGORY_FILES);
-
 const FILE_NAME_PATTERNS = [
   ["rom", /roms?\.sman|^\s*rom\s*$/i],
   ["kernel", /kernels?\.sman|^\s*kernel\s*$/i],

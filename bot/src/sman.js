@@ -1,5 +1,3 @@
-import { CATEGORY_FILES, CATEGORY_LABELS } from "./categories.js";
-
 export function parseSman(text) {
   const lines = text.split("\n");
   let about = "";
@@ -50,5 +48,3 @@ export function parseSman(text) {
   push();
   return { about, entries };
 }
-
-export { CATEGORY_FILES, CATEGORY_LABELS };

@@ -55,21 +55,6 @@ export function buildMatchList(matches) {
   return lines.join("\n").trim();
 }
 
-export function getFieldButtons(category) {
-  const fields = CATEGORY_FIELDS[category] || CATEGORY_FIELDS.rom;
-  const buttons = [];
-  const row = [];
-  for (const field of fields) {
-    row.push({ text: field, callback_data: "supdate_field:" + field });
-    if (row.length === 4) {
-      buttons.push(row);
-      row.length = 0;
-    }
-  }
-  if (row.length > 0) buttons.push(row);
-  return { inline_keyboard: buttons };
-}
-
 export function parseEntryFields(block) {
   const fields = {};
   const lines = block.split("\n");
@@ -94,14 +79,6 @@ export function buildDiff(oldFields, field, newValue) {
     "",
     "Reply *yes* to confirm or *no* to cancel\\.",
   ].join("\n");
-}
-
-export function buildUpdatePreview(fields) {
-  const lines = [];
-  for (const [key, value] of Object.entries(fields)) {
-    if (value) lines.push(key + ": " + value);
-  }
-  return lines.join("\n");
 }
 
 export function parseFileFromArgs(arg) {
