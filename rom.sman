@@ -342,15 +342,6 @@ url: https://hyp.sh/FaDlM0O
 note: Android 15 QPR2, R Vendor. Flash with provided boot.img, custom recoveries may not work. Screen recording dead.
 vendor: rvendor
 
-name: ArrowOS
-version: Unofficial (25/03/23)
-maintainer: stacz00
-size: unknown
-date: 2023-03-26
-url: https://drive.google.com/file/d/1Jbh5-ngJQSPzqmoqvWrCUBTH8P8MF4gt/view?usp=drivesdk
-note: Android 13, OSS_R, R Vendor. Vanilla, use NikGApps/Magisk GApps. Special devices need Yukina/Sea kernel.
-vendor: rvendor
-
 name: CherishOS
 version: Unofficial (26/03/23)
 maintainer: YudhoPatrianto
