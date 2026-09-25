@@ -13,7 +13,7 @@ const { Pool } = pg;
 
 let pool = null;
 
-function getPool() {
+export function getPool() {
   if (!pool) {
     if (!process.env.DATABASE_URL) {
       throw new Error("DATABASE_URL is not set (bot/.env)");

@@ -1,12 +1,13 @@
 import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
-import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, entryToRawBlock } from "./github.js";
+import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./db.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
-import { runLinkCheck, handleLinkCallback } from "./linkcheck.js";
+import { runLinkCheck, handleLinkCallback, probeUrl } from "./linkcheck.js";
+import { subAdd, subRemove, subList, subChats } from "./subscribe.js";
 
 const HELP_TEXT = [
   "*svault bot commands*",
@@ -14,6 +15,9 @@ const HELP_TEXT = [
   "/slatest \\[category\\] \\- newest addition",
   "/sstats \\[category\\] \\[filters\\] \\- entry counts",
   "/ssearch \\[category\\] \\[filters\\] query \\- find an entry",
+  "/ssubscribe \\[categories\\.\\.\\.\\] \\- new\\-build notifications",
+  "/ssubs \\- list subscriptions",
+  "/sunsub \\[categories\\.\\.\\.\\] \\- drop subscriptions",
   "",
   "Filters: by:name vendor:x date:2026 android:14 gapps:gapps",
 "/vault \\- open the vault browser",
@@ -59,6 +63,18 @@ function escapeMdSafe(text) {
   return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
 }
 
+// Direct channel notifications (replaces the GitHub-issues relay).
+// Sends MarkdownV2 to every TELEGRAM_CHAT_IDS entry, plain-text fallback.
+async function notifyChats(env, text) {
+  const ids = String(env.TELEGRAM_CHAT_IDS || "").split(",").map((s) => s.trim()).filter(Boolean);
+  for (const cid of ids) {
+    const res = await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, text).catch(() => null);
+    if (!res || !res.ok) {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, text, { parseMode: null }).catch(() => {});
+    }
+  }
+}
+
 // Local text files (help.txt / update.txt) live in the repo root on this server.
 async function readLocalText(env, file) {
   try {
@@ -95,6 +111,8 @@ const DEFAULT_COMMANDS = [
   { command: "slatest", description: "Newest addition to the vault" },
   { command: "sstats", description: "Entry counts per category" },
   { command: "ssearch", description: "Search entries: /ssearch [category] query" },
+  { command: "ssubscribe", description: "Get notified of new builds: /ssubscribe rom" },
+  { command: "ssubs", description: "List your subscriptions" },
   { command: "schannels", description: "Community channels" },
   { command: "sping", description: "Check bot responsiveness" },
 ];
@@ -457,7 +475,7 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
     }
 
     if (command === "/smessage") {
-      if (String(msg.from.id) !== String(env.OWNER_ID)) {
+      if (!isOwner(env, msg.from.id)) {
         await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Only the owner can use this\\.", {
           replyToMessageId: msg.message_id,
         });
@@ -499,6 +517,17 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
       const messageSend = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, arg);
       if (!messageSend.ok) {
         await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, arg, { parseMode: null });
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/ssubscribe" || command === "/sunsub" || command === "/ssubs") {
+      try {
+        await handleSubscribe(env, msg, command, arg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
       }
       return new Response("ok", { status: 200 });
     }
@@ -754,6 +783,18 @@ async function handleAddParse(env, msg, postText) {
 
   const { file, block } = toSmanBlock(parsed);
 
+  let linkVerdict = "";
+  if (parsed.url && /^https?:\/\//i.test(parsed.url)) {
+    try {
+      const probe = await probeUrl(parsed.url);
+      linkVerdict = probe.state === "alive"
+        ? "\nLink check: alive \\(HTTP " + escapeMd(probe.reason.replace(/^HTTP /, "")) + "\\)"
+        : "\nLink check: *" + escapeMd(probe.state === "dead" ? "DEAD" : "UNCLEAR") + "* \\(`" + escapeMd(probe.reason) + "`\\) — double\\-check the URL before confirming\\.";
+    } catch {
+      linkVerdict = "";
+    }
+  }
+
   const preview = [
     "Is this correct?:",
     "",
@@ -761,6 +802,7 @@ async function handleAddParse(env, msg, postText) {
     "```",
     block,
     "```",
+    linkVerdict,
     "",
     "Reply *yes*, *no* \\(with missing fields\\), or *cancel*\\.",
   ].join("\n");
@@ -904,12 +946,67 @@ async function pushEntry(env, msg, file, block, parsed, isNewMessage) {
   }
 
   const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was added to `" + escapeMd(file) + "` and its live on svault\\.jzadl\\.xyz\\!";
-  try {
-    await createNotifyIssue(env, notifyText);
-  } catch {}
+  await notifyChats(env, notifyText);
+  await announceToSubscribers(env, msg, file, notifyText);
 
   const doneText = "Added\\! " + escapeMd(name) + " is live on svault\\.jzadl\\.xyz";
   await replyTo(env, msg, doneText, { replyToMessageId: isNewMessage ? msg.message_id : undefined });
+}
+
+async function handleSubscribe(env, msg, command, arg) {
+  const chatId = msg.chat.id;
+  const validCats = Object.keys(CATEGORY_FILES);
+
+  if (command === "/ssubs") {
+    const subs = await subList(chatId).catch(() => []);
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+      subs.length
+        ? "Subscriptions in this chat:\n" + subs.map((c) => "`" + c + "`").join(" ")
+        : "No subscriptions in this chat\\. Use /ssubscribe \\[categories\\.\\.\\.\\] or /ssubscribe all\\.",
+      { replyToMessageId: msg.message_id });
+    return;
+  }
+
+  const wants = String(arg || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (command === "/sunsub" && wants.length === 0) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+      "Usage: /sunsub \\[category\\.\\.\\.\\] or /sunsub all",
+      { replyToMessageId: msg.message_id });
+    return;
+  }
+  const cats = (wants.length === 0 || wants.includes("all")) ? validCats : wants;
+  const unknown = cats.filter((c) => !CATEGORY_FILES[c]);
+  if (unknown.length > 0) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+      "Unknown categor" + (unknown.length > 1 ? "ies" : "y") + ": " + unknown.map((c) => "`" + escapeMdSafe(c) + "`").join(" ") +
+      "\nValid: " + validCats.join(" "),
+      { replyToMessageId: msg.message_id });
+    return;
+  }
+
+  for (const cat of cats) {
+    if (command === "/ssubscribe") await subAdd(chatId, cat).catch(() => {});
+    else await subRemove(chatId, cat).catch(() => {});
+  }
+  const verb = command === "/ssubscribe" ? "Subscribed" : "Unsubscribed";
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+    verb + ": " + cats.map((c) => "`" + c + "`").join(" "),
+    { replyToMessageId: msg.message_id });
+}
+
+// New-build announcements to subscribed chats (skips the origin chat and
+// the broadcast channels, which already got the message).
+async function announceToSubscribers(env, msg, file, text) {
+  try {
+    const cat = Object.entries(CATEGORY_FILES).find(([, v]) => v === file)?.[0];
+    if (!cat) return;
+    const channels = new Set(String(env.TELEGRAM_CHAT_IDS || "").split(",").map((s) => s.trim()).filter(Boolean));
+    const chats = await subChats(cat);
+    for (const cid of chats) {
+      if (String(cid) === String(msg.chat.id) || channels.has(String(cid))) continue;
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, text).catch(() => {});
+    }
+    } catch {}
 }
 
 async function handleUpdateStart(env, msg, arg) {
@@ -1062,9 +1159,7 @@ async function handleUpdateConfirm(env, msg, pending) {
     }
 
     const notifyText = "*" + escapeMd(d.entry.name || "entry") + "* was updated in `" + escapeMd(d.file) + "` and its live on svault\\.jzadl\\.xyz\\!";
-    try {
-      await createNotifyIssue(env, notifyText);
-    } catch {}
+    await notifyChats(env, notifyText);
 
     await replyTo(env, msg, "Updated\\! " + escapeMd(d.entry.name || "Entry") + " is live on svault\\.jzadl\\.xyz", { replyToMessageId: msg.message_id });
   } else if (text === "no") {
@@ -1148,9 +1243,7 @@ async function handleReaction(env, reaction) {
   }
 
   const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was removed from `" + escapeMd(d.file) + "`";
-  try {
-    await createNotifyIssue(env, notifyText);
-  } catch {}
+  await notifyChats(env, notifyText);
 
   const doneText = "Removed\\! " + escapeMd(name) + " is no longer on svault\\.jzadl\\.xyz";
   if (isGroupChat(reaction.chat.type)) {
@@ -1180,9 +1273,7 @@ async function handleRemoveConfirmText(env, msg, pending) {
     }
 
     const notifyText = "*" + escapeMd(name) + "* by " + escapeMd(maintainer) + " was removed from `" + escapeMd(d.file) + "`";
-    try {
-      await createNotifyIssue(env, notifyText);
-    } catch {}
+    await notifyChats(env, notifyText);
 
     const confirmText = "Removed\\! " + escapeMd(name) + " is no longer on svault\\.jzadl\\.xyz";
     let confirmSend = await replyTo(env, msg, confirmText, { replyToMessageId: msg.message_id });

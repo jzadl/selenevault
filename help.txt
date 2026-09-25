@@ -7,6 +7,9 @@
 
 Filters: by:name vendor:x date:2026 android:14 gapps:gapps
 Example: /ssearch rom by:hasan android:14 lineage
+/ssubscribe \[categories\.\.\.\] \- new\-build notifications
+/ssubs \- list subscriptions
+/sunsub \[categories\.\.\.\] \- drop subscriptions
 /isthisonsv \- is it in the vault?
 /schannels \- community channels
 /sping \- check responsiveness

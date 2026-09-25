@@ -1,6 +1,5 @@
-// Local-filesystem replacement for the GitHub Contents API.
-// Reads/writes .sman files directly in REPO_ROOT and commits via git.
-// createNotifyIssue still uses the GitHub Issues API (feeds notify-telegram.yml).
+// Local-filesystem .sman storage: reads/writes files directly in REPO_ROOT
+// and commits via git (auth via gh CLI).
 
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -104,26 +103,6 @@ export async function getRecentAdds(env, limit = 100) {
   } catch {
     return [];
   }
-}
-
-async function githubFetch(env, apiBase, apiPath, options = {}) {
-  const headers = {
-    Authorization: "token " + env.GITHUB_TOKEN,
-    "User-Agent": "svault-bot",
-    Accept: "application/vnd.github+json",
-    ...options.headers,
-  };
-  return fetch(apiBase + apiPath, { ...options, headers });
-}
-
-export async function createNotifyIssue(env, text) {
-  const apiBase = env.GITHUB_API_BASE || "https://api.github.com/repos/jzadl/selenevault";
-  const res = await githubFetch(env, apiBase, "/issues", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title: "notify", body: text, labels: ["svault-notify"] }),
-  });
-  return res.json();
 }
 
 export function entryToRawBlock(entry, fields) {
