@@ -98,15 +98,6 @@ url: https://drive.google.com/drive/folders/1NHQu5mzDDZOv_pp4V1cVONCL2MzRlG3i?us
 note: Android 13, all system partitions converted to R/W, system logging partially disabled, APK protection disabled, NikGapps, Leica cam, mi dialer, all vbmeta patched. Tags: #HyperOS #MIUI #T #Selene.
 vendor: svendor
 
-name: HyperOS Stardust
-version: Unofficial v21 Beta 2 (normal build)
-maintainer: Aibeto (TC_Aibeto)
-size: unknown
-date: 2024-05-04
-url: https://drive.google.com/file/d/1oZkBENeGsgCCYy5WGfIxK9mKa3o87ewm/view?usp=sharing
-note: HyperOS for Selene, T vendor, no gapps pre-installed. Fix charging animation, update desktop and theme manager. Known issue: lock screen edit triggers flashback. Tags: #selene #beta #HyperOS.
-vendor: svendor
-
 name: MIUI LITE
 version: Android 11 (22/05/2025)
 maintainer: sss1337771
