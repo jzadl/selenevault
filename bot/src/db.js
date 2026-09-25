@@ -90,6 +90,15 @@ export async function getPendingById(_url, _key, id) {
   return res.rows.length > 0 ? rowToPending(res.rows[0]) : null;
 }
 
+// URLs with an unexpired linkcheck report (already notified, awaiting action).
+export async function pendingLinkUrls(_url, _key) {
+  const res = await getPool().query(
+    `SELECT data ->> 'url' AS url FROM pending_ops
+     WHERE op_type = 'linkcheck' AND expires_at > NOW()`
+  );
+  return new Set(res.rows.map((r) => r.url).filter(Boolean));
+}
+
 // True while a "keep" verdict for this URL is still fresh (link checker).
 export async function hasLinkKeep(_url, _key, url) {
   const res = await getPool().query(

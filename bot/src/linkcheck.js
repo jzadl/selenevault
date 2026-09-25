@@ -6,11 +6,14 @@ import { parseSman } from "./sman.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS } from "./categories.js";
 import { getFileContent, removeSmanEntry } from "./github.js";
 import { sendMessage, editMessageText, escapeMd } from "./telegram.js";
-import { upsertPending, deletePending, hasLinkKeep, expiresAt } from "./db.js";
+import { upsertPending, deletePending, hasLinkKeep, pendingLinkUrls, expiresAt } from "./db.js";
 
 const PROBE_TIMEOUT_MS = 15000;
 const CONCURRENCY = 5;
 const KEEP_TTL_MS = 30 * 24 * 60 * 60 * 1000; // don't re-report kept links for 30d
+const DEAD_TTL_MS = 30 * 24 * 60 * 60 * 1000; // dead reports stay actionable 30d
+const UNKNOWN_TTL_MS = 3 * 24 * 60 * 60 * 1000; // unclear verdicts recheck in 3d
+const DIGEST_THRESHOLD = 10;
 
 export function ownerIds(env) {
   return String(env.OWNER_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -121,17 +124,40 @@ function reportText(item) {
   ].join("\n");
 }
 
-export async function runLinkCheck(env, onlyCategory) {
+export async function runLinkCheck(env, onlyCategory, hooks = {}) {
   const owners = ownerIds(env);
   if (owners.length === 0) throw new Error("OWNER_ID is not set");
   const items = await collectEntries(env, onlyCategory);
+  // Skip URLs with a live report (already notified, awaiting action).
+  const alreadyReported = await pendingLinkUrls(null, null).catch(() => new Set());
+  const fresh = items.filter((item) => !alreadyReported.has(item.url));
   const problems = [];
-  await mapPool(items, CONCURRENCY, async (item) => {
+  let done = 0;
+  await mapPool(fresh, CONCURRENCY, async (item) => {
     const res = await checkOne(env, item);
+    done++;
+    if (hooks.onProgress) {
+      try {
+        await hooks.onProgress(done, fresh.length);
+      } catch {}
+    }
     if (res.state === "dead" || res.state === "unknown") problems.push(res);
   });
 
+  if (problems.length > DIGEST_THRESHOLD) {
+    const lines = [`*Link check digest:* ${problems.length} of ${items.length} links need attention\\.`, ""];
+    for (const item of problems.slice(0, 30)) {
+      lines.push(`• *${escapeMdSafe(item.name)}* \\(${escapeMd(item.state)}\\: ${escapeMd(item.reason)}\\)`);
+    }
+    if (problems.length > 30) lines.push(`…and ${problems.length - 30} more below\\.`);
+    const digest = lines.join("\n");
+    for (const ownerId of owners) {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, ownerId, digest).catch(() => {});
+    }
+  }
+
   for (const item of problems) {
+    const ttl = item.state === "dead" ? DEAD_TTL_MS : UNKNOWN_TTL_MS;
     const row = await upsertPending(null, null, {
       chat_id: 0,
       user_id: 0,
@@ -144,7 +170,7 @@ export async function runLinkCheck(env, onlyCategory) {
         reason: item.reason,
         state: item.state,
       }),
-      expires_at: new Date(Date.now() + KEEP_TTL_MS).toISOString(),
+      expires_at: new Date(Date.now() + ttl).toISOString(),
     });
     const keyboard = {
       inline_keyboard: [[

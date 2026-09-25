@@ -1,4 +1,4 @@
-import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
+import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock } from "./github.js";
@@ -421,9 +421,33 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
       await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Checking all links, I'll report personally when done\\.", {
         replyToMessageId: msg.message_id,
       });
-      runLinkCheck(env, null).then(
-        (res) => console.log(`linkcheck done: ${res.checked} checked, ${res.problems} problems`),
-        (err) => console.error("linkcheck failed:", err?.message || err)
+      let statusId = null;
+      try {
+        const statusSend = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Checking links: starting…", { parseMode: null });
+        statusId = statusSend && statusSend.result ? statusSend.result.message_id : null;
+      } catch {}
+      let lastEdit = 0;
+      const onProgress = async (done, total) => {
+        const now = Date.now();
+        if (!statusId || now - lastEdit < 5000) return;
+        lastEdit = now;
+        await editMessageText(env.TELEGRAM_BOT_TOKEN, msg.chat.id, statusId,
+          `Checking links: ${done}/${total}…`, { parseMode: null }).catch(() => {});
+      };
+      runLinkCheck(env, null, { onProgress }).then(
+        (res) => {
+          console.log(`linkcheck done: ${res.checked} checked, ${res.problems} problems`);
+          const text = `Checked ${res.checked} links: ${res.problems} need attention.`;
+          if (statusId) {
+            editMessageText(env.TELEGRAM_BOT_TOKEN, msg.chat.id, statusId, text, { parseMode: null }).catch(() => {});
+          } else {
+            sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, text, { parseMode: null }).catch(() => {});
+          }
+        },
+        (err) => {
+          console.error("linkcheck failed:", err?.message || err);
+          sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Link check failed.", { parseMode: null }).catch(() => {});
+        }
       );
       return new Response("ok", { status: 200 });
     }
