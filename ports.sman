@@ -107,15 +107,6 @@ url: https://drive.google.com/file/d/1oZkBENeGsgCCYy5WGfIxK9mKa3o87ewm/view?usp=
 note: HyperOS for Selene, T vendor, no gapps pre-installed. Fix charging animation, update desktop and theme manager. Known issue: lock screen edit triggers flashback. Tags: #selene #beta #HyperOS.
 vendor: svendor
 
-name: HyperStardustRemodded
-version: 1.5
-maintainer: ManchesterUnited723
-size: unknown
-date: 2024-06-12
-url: https://drive.google.com/file/d/1DtFd6qRV0W-vdnYPOAxHkrlex6nMZTSY/view?usp=drive_link
-note: Based on Stardust Beta 3 (Aibeto). Full global languages, new kronos launcher, optimized and fix lags, fps unlock. Flash any MIUI 14 rom first, then run format data.bat.
-vendor: svendor
-
 name: MIUI LITE
 version: Android 11 (22/05/2025)
 maintainer: sss1337771
