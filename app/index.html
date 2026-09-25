@@ -85,6 +85,9 @@ input:focus {
   color: var(--tg-theme-text-color, #fff);
   font-weight: bold;
   list-style: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .group summary::-webkit-details-marker { display: none; }
 .group summary::before {
@@ -104,6 +107,30 @@ input:focus {
 }
 .group .entry:first-child {
   border-color: #0aa;
+}
+#totop {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 20;
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-button-color, cyan);
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  font-family: monospace;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+}
+.skel {
+  border: 1px solid #333;
+  margin: 8px 0;
+  padding: 16px 8px;
+  background: linear-gradient(90deg, #111 25%, #1a1a1a 50%, #111 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  to { background-position: -200% 0; }
 }
 .filters {
   display: flex;
@@ -243,9 +270,10 @@ footer a {
   </select>
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
 </div>
-<div id="out">loading...</div>
+<div id="out"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 <div id="empty" style="display:none">Nothing found. <button id="reset-filters">Reset filters</button></div>
 <footer>maintained by <a href="https://t.me/xiaomiselene" target="_blank">@xiaomiselene</a> &amp; <a href="https://t.me/gro0wl" target="_blank">gro0wl</a><span id="total-count"></span></footer>
+<button id="totop" style="display:none" title="Back to top">↑</button>
 
 <script src="../sman-parser.js"></script>
 <script>window.FRONT_OPTS = { fetchPrefix: "../", syncUrl: false };</script>

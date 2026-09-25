@@ -462,10 +462,41 @@ document.addEventListener("click", ev => {
   }
 });
 
+// Back-to-top floating button (works with page scroll and #out scroll).
+(function initToTop(){
+  const btn = document.getElementById("totop");
+  if (!btn) return;
+  const out = document.getElementById("out");
+  const onScroll = () => {
+    const y = window.scrollY || (out && out.scrollTop) || 0;
+    btn.style.display = y > 600 ? "" : "none";
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  if (out) out.addEventListener("scroll", onScroll, { passive: true });
+  btn.addEventListener("click", () => {
+    if (out && out.scrollTop) out.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+
+// Landing-only light theme toggle (Mini App follows Telegram theme).
+(function initTheme(){
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  try {
+    if (localStorage.getItem("svault-theme") === "light") document.body.classList.add("light");
+  } catch {}
+  btn.addEventListener("click", () => {
+    const light = document.body.classList.toggle("light");
+    try {
+      localStorage.setItem("svault-theme", light ? "light" : "dark");
+    } catch {}
+  });
+})();
+
 function revealHashTarget(){
   const hash = (window.location.hash || "").replace(/^#/, "");
-  if (!hash.startsWith("e-")) return false;
-  const target = document.getElementById(hash);
+  if (!hash.startsWith("e-")) return false;  const target = document.getElementById(hash);
   if (!target) return false;
   const group = target.closest(".group");
   if (group) {

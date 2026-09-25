@@ -79,6 +79,87 @@ input {
   font-weight: normal;
   font-size: 12px;
 }
+.group summary > * {
+  vertical-align: middle;
+}
+.group summary {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#totop {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  background: #000;
+  color: cyan;
+  border: 1px solid #444;
+  font-family: monospace;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.skel {
+  border: 1px solid #333;
+  margin: 10px 0;
+  padding: 18px 10px;
+  background: linear-gradient(90deg, #111 25%, #1a1a1a 50%, #111 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+.toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#theme-toggle {
+  background: #000;
+  color: #ddd;
+  border: 1px solid #444;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+body.light {
+  background: #fff;
+  color: #111;
+}
+body.light .topbar,
+body.light input,
+body.light select,
+body.light #theme-toggle,
+body.light #totop {
+  background: #fff;
+  color: #111;
+}
+body.light .entry b,
+body.light .group summary {
+  color: #000;
+}
+body.light .entry a,
+body.light .tabs button,
+body.light footer a,
+body.light #empty button {
+  color: #066;
+}
+body.light .tabs button.active {
+  background: #066;
+  border-color: #066;
+  color: #fff;
+}
+body.light .entry,
+body.light .group {
+  border-color: #ccc;
+}
+body.light h1 {
+  color: #066;
+}
 .group .entries {
   padding: 0 10px 10px 10px;
 }
@@ -207,7 +288,7 @@ footer a {
 </head>
 <body>
 <div class="topbar">
-<h1>selenevault</h1>
+<div class="toprow"><h1>selenevault</h1><button id="theme-toggle" title="Toggle theme">theme</button></div>
 <nav class="tabs" id="tabs"></nav>
 <input id="search" placeholder="search...">
 <div class="filters">
@@ -229,9 +310,10 @@ footer a {
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
 </div>
 </div>
-<div id="out">loading...</div>
+<div id="out"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 <div id="empty" style="display:none">Nothing found. <button id="reset-filters">Reset filters</button></div>
 <footer>maintained by <a href="https://t.me/xiaomiselene" target="_blank">@xiaomiselene</a> &amp; <a href="https://t.me/gro0wl" target="_blank">gro0wl</a><span id="total-count"></span></footer>
+<button id="totop" style="display:none" title="Back to top">↑</button>
 
 <script src="sman-parser.js"></script>
 <script>window.FRONT_OPTS = { fetchPrefix: "", syncUrl: true };</script>
