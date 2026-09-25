@@ -228,7 +228,14 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
-        const text = msg.text.trim();
+        let text = msg.text.trim();
+
+        // Group usage: "@selenevaultbot /sadd ..." — strip a leading mention
+        // of this bot so the rest parses as a normal command.
+        const selfMention = "@" + String(env.BOT_USERNAME || "").toLowerCase();
+        if (selfMention !== "@" && text.toLowerCase().startsWith(selfMention)) {
+          text = text.slice(selfMention.length).trim();
+        }
 
     try {
       const addConfirmPending = await getPending(env.SUPABASE_URL, env.SUPABASE_KEY, msg.chat.id, msg.from.id, "add_confirm");
