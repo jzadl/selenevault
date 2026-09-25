@@ -114,6 +114,48 @@ select {
   min-width: 120px;
   outline: none;
 }
+.chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0 10px;
+}
+.chips a {
+  color: var(--tg-theme-button-color, cyan);
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  padding: 4px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: normal;
+  border: 1px solid var(--tg-theme-button-color, #0aa);
+  color: var(--tg-theme-button-color, #0aa);
+  padding: 0 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.badge.warn {
+  border-color: #aa0;
+  color: #aa0;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 8px 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.check input {
+  width: auto;
+  margin: 0;
+}
 #out {
   flex: 1;
   overflow-y: auto;
@@ -145,6 +187,16 @@ select {
   </select>
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
 </div>
+<nav class="chips">
+  <a href="#cat-rom">ROMs</a>
+  <a href="#cat-kernels">Kernels</a>
+  <a href="#cat-recovery">Recovery</a>
+  <a href="#cat-firmware">Firmware</a>
+  <a href="#cat-ports">Ports</a>
+  <a href="#cat-tools">Tools</a>
+  <a href="#cat-guides">Guides</a>
+  <a href="#cat-channels">Channels</a>
+</nav>
 <div id="out">loading...</div>
 
 <script src="../sman-parser.js"></script>
@@ -251,6 +303,19 @@ function hasIssues(e) {
   return ISSUE_RE.test(e.note || "");
 }
 
+function badgesHtml(items) {
+  const arr = Array.isArray(items) ? items : [items];
+  const versions = [...new Set(arr.map(parseAndroid).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
+  const flavors = [...new Set(arr.map(parseGapps).filter(g => g === "gapps" || g === "vanilla"))];
+  const buggy = arr.some(hasIssues);
+  let s = "";
+  if (versions.length) s += ` <span class="badge">A${versions.join("/A")}</span>`;
+  if (flavors.length === 1) s += ` <span class="badge">${flavors[0] === "gapps" ? "GApps" : "Vanilla"}</span>`;
+  else if (flavors.length > 1) s += ` <span class="badge">GApps·Vanilla</span>`;
+  if (buggy) s += ` <span class="badge warn">issues</span>`;
+  return s;
+}
+
 function entryHtml(e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
   return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
@@ -264,7 +329,7 @@ function entryHtml(e) {
 function singleGroupHtml(f, e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
   return `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
-    <summary>${esc(e.name||"")} <span class="count">(1 build)</span></summary>
+    <summary>${esc(e.name||"")}${badgesHtml(e)} <span class="count">(1 build)</span></summary>
     <div class="entries">${entryHtml(e)}</div>
   </details>`;
 }
@@ -280,7 +345,7 @@ async function load(){
     try {
       const text = await (await fetch("../" + f)).text();
       const {entries} = parseSman(text);
-      html += `<h2>${categoryLabel(f)} (${entries.length})</h2>`;
+      html += `<h2 id="cat-${f.replace(".sman", "")}">${categoryLabel(f)} (${entries.length})</h2>`;
       allCategories.push(f);
 
       if (f === "channels.sman" || f === "guides.sman") {
@@ -316,7 +381,7 @@ async function load(){
         const creators = [...new Set(groupEntries.map(e => e.maintainer).filter(Boolean))].join(",");
         const vendors = [...new Set(groupEntries.map(e => e.vendor).filter(Boolean))].join(",");
         html += `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(creators)}" data-vendor="${esc(vendors)}">
-          <summary>${esc(displayName)} <span class="count">(${groupEntries.length} builds)</span></summary>
+          <summary>${esc(displayName)}${badgesHtml(groupEntries)} <span class="count">(${groupEntries.length} builds)</span></summary>
           <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
         </details>`;
       });
