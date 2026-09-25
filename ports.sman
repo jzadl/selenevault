@@ -36,15 +36,6 @@ note: Android 14, HyperOS port, fastboot ROM, clean flash recommended. Tags: #se
 vendor: svendor
 
 name: RUI
-version: 12.5 v1
-maintainer: TranKhanh
-size: unknown
-date: 2024-08-24
-url: https://drive.google.com/file/d/1aWEZcxTUrNE6o21DQG1BcLTu5pt-Dxij/view?usp=sharing
-note: Realme UI 12.5 port. Modded Powerkeeper, blur added, RealmeSearch, OS optimization. Tags: #MIUI #R #Selene #RUI.
-vendor: rvendor
-
-name: RUI
 version: Mix 14.0.4 | 14.0.2 v2
 maintainer: TranKhanh
 size: unknown
