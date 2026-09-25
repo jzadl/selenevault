@@ -125,15 +125,6 @@ url: https://drive.google.com/file/d/1DtFd6qRV0W-vdnYPOAxHkrlex6nMZTSY/view?usp=
 note: Based on Stardust Beta 3 (Aibeto). Full global languages, new kronos launcher, optimized and fix lags, fps unlock. Flash any MIUI 14 rom first, then run format data.bat.
 vendor: svendor
 
-name: PaperOS
-version: 3.5
-maintainer: TheRealAldehyde
-size: unknown
-date: 2024-07-29
-url: https://drive.google.com/drive/folders/1aIFeby0LvR0zZ2aWZid8KSnhIaDjIr4A?usp=sharing
-note: Android 14, HyperOS based mod, all vbmeta patched, safetynet passed, encrypted by default, needs 2 days to settle. Flash from MIUI 14 or HOS. Tags: #PaperOS #HyperOS #U #Selene #EOS.
-vendor: svendor
-
 name: MIUI LITE
 version: Android 11 (22/05/2025)
 maintainer: sss1337771
