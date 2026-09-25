@@ -197,15 +197,6 @@ url: https://drive.google.com/file/d/14i3sDYfkESjhy5Qsf-NQ4-73hwERD0z3/view?usp=
 note: MIUI 14 CN mod, modded apps, debloated, MiSoundMod, FPS unlock, core patch included, only Vietnamese lang, 90% notification fix. Clean flash recommended.
 vendor: svendor
 
-name: HyperZK
-version: V1 (OS1.0.4.0 UMXMIXM)
-maintainer: Zurimuka & KobbieMainoo93
-size: unknown
-date: 2024-07-31
-url: https://drive.google.com/uc?id=12ms4YvFSu4AmZbdbfrU5BzyNxmtJrKnf&export=download
-note: Android 13, HyperOS port, only for Redmi 10, flash via fastboot only. Tags: #HyperOS #U #Selene.
-vendor: svendor
-
 name: RemodUI
 version: V12.5.12.TKUCNXM
 maintainer: TranKhanh
