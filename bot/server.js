@@ -112,6 +112,7 @@ setInterval(async () => {
   if (linkcheckRunning) return;
   linkcheckRunning = true;
   try {
+    await webhookHealth(env);
     const res = await runLinkCheck(env, null);
     console.log(`scheduled linkcheck: ${res.checked} checked, ${res.problems} problems`);
   } catch (err) {
@@ -120,3 +121,14 @@ setInterval(async () => {
     linkcheckRunning = false;
   }
 }, LINKCHECK_INTERVAL_MS);
+
+// Daily webhook sanity check: surfaces delivery backlogs/errors in the log.
+async function webhookHealth(env) {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/getWebhookInfo`);
+    const info = (await res.json()).result || {};
+    console.log(`webhook health: pending=${info.pending_update_count ?? "?"} err=${info.last_error_message || "none"}`);
+  } catch (err) {
+    console.error("webhook health check failed:", err?.message || err);
+  }
+}

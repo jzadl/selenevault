@@ -1,19 +1,21 @@
-*Update \- Sep 23, 2026*
+*Update \- Sep 25, 2026*
 
-*Selene Vault Bot got updated\!*
+*Selene Vault moved to its own server\!*
+
+The vault now lives at svault\.jzadl\.xyz — same data, faster and independent\.
 
 *New*
 
-Guest mode \- summon the bot in any chat with `@selenevaultbot /shelp`, no need to add it first
-Inline mode \- type `@selenevaultbot <query>` anywhere to search the vault and send results
-/snews \- check the latest update message
+Mini App tabs \- ROMs, Kernels, Ports and the rest on separate tabs
+Android / GApps filters, Hide reported issues toggle, NEW badges
+Deep links to any build with a copy button
+/start \- opens the Mini App right from the chat
+/ssubscribe \- get notified of fresh builds in chosen categories
+/schecklinks \- the bot now hunts dead download links itself
 
 *Fixes*
 
-/sping \- now shows the real Telegram round\-trip delay instead of just Worker latency
-/ssearch \- long results \(8\+ matches\) now publish to a clean telegra\.ph page with clickable links
-/supdate \- match list and confirmation now use bold/mono formatting instead of a dense block of text
+Search and stats understand filters: by:name vendor:x date:2026 android:14 gapps:gapps
+Groups show every build, even single ones, with version badges
 
 svault\.jzadl\.xyz
-
-||do /p||
