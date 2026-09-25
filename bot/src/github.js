@@ -17,13 +17,17 @@ function gitEnv(env) {
   return {
     ...process.env,
     GITHUB_TOKEN: env.GITHUB_TOKEN || process.env.GITHUB_TOKEN || "",
-    GIT_ASKPASS: path.join(repoRoot(env), "bot", ".git-askpass.sh"),
     GIT_TERMINAL_PROMPT: "0",
   };
 }
 
 async function git(env, args) {
-  return execFileAsync("git", ["-C", repoRoot(env), ...args], { env: gitEnv(env), timeout: 60000 });
+  // Auth via gh CLI (logged in as a user with repo+workflow scopes).
+  // Absolute path: systemd services have a minimal PATH.
+  const helper = "/usr/bin/gh auth git-credential";
+  return execFileAsync("git",
+    ["-C", repoRoot(env), "-c", "credential.helper=", "-c", `credential.helper=${helper}`, ...args],
+    { env: gitEnv(env), timeout: 60000 });
 }
 
 async function commitAndPush(env, files, message) {
