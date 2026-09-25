@@ -229,7 +229,7 @@ export async function handleLinkCallback(env, query) {
       await removeSmanEntry(env, d.file, block,
         "REMOVE (dead link): " + (fields.name || d.name) + " by " + (fields.maintainer || "unknown") + " from " + d.file);
     } catch (err) {
-      await reply("Delete failed: " + String(err.message || err).slice(0, 100));
+      await reply("Delete failed: " + String(err.message || err).slice(0, 200));
       return;
     }
     await deletePending(null, null, pending.id).catch(() => {});

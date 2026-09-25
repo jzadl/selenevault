@@ -37,9 +37,26 @@ async function commitAndPush(env, files, message) {
   if (!status.trim()) return { pushed: false }; // nothing changed
   await git(env, ["-c", "user.name=svault-bot", "-c", "user.email=svault-bot@local",
     "commit", "-m", message, "--", ...files]);
-  await git(env, ["pull", "--ff-only", "origin", "main"]).catch(() => {});
-  await git(env, ["push", "origin", "main"]);
+  // Rebase onto remote first: plain push fails if origin moved meanwhile.
+  try {
+    await git(env, ["pull", "--rebase", "origin", "main"]);
+  } catch (err) {
+    try {
+      await git(env, ["rebase", "--abort"]);
+    } catch {}
+    throw new Error("remote changed under us, please retry (" + gitErrTail(err) + ")");
+  }
+  try {
+    await git(env, ["push", "origin", "main"]);
+  } catch (err) {
+    throw new Error("git push failed (" + gitErrTail(err) + ")");
+  }
   return { pushed: true };
+}
+
+function gitErrTail(err) {
+  const out = String((err && err.stderr) || (err && err.message) || err || "").trim();
+  return out.slice(-200) || "unknown git error";
 }
 
 export async function getFileContent(env, file) {
