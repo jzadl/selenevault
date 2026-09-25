@@ -1,49 +1,55 @@
 # AGENTS.md — selenevault
 
-## ОБЯЗАТЕЛЬНЫЙ РИТУАЛ (каждый раз, без исключений)
+## MANDATORY RITUAL (every time, no exceptions)
 
-Перед ЛЮБЫМ изменением кода/конфигов:
+Before ANY code/config change:
 
 ```bash
 git pull --rebase origin main
 ```
 
-После ЛЮБОГО изменения:
+After ANY change:
 
 ```bash
 git add -A
-git commit -m "<что сделано>"
+git commit -m "<what was done>"
 git push origin main
 ```
 
-Без «потом залью», без накопления изменений в worktree. Сделал → закоммитил → запушил → сообщил.
+No "I'll push later", no accumulating changes in the worktree.
+Did it → committed it → pushed it → reported it.
 
-## Что где лежит
+## Language
 
-* `/` — лендинг (`index.html`), `/app` — Telegram WebApp (`app/index.html`),
-  `*.sman` — данные (читаются обоими фронтами).
-* `bot/server.js` — Node-обёртка над webhook-хендлером (`src/index.js`).
-* `bot/src/db.js` — Postgres (`pending_ops`), замена Supabase.
-* `bot/src/github.js` — чтение/запись `.sman` + `git commit/push`.
-  Git-авторизация — через `gh auth git-credential` (не PAT!).
-* Секреты — ТОЛЬКО в `bot/.env` (gitignored). Никуда не копировать,
-  в код/коммиты/логи не печатать.
+All code comments and git commit messages — English only. No other languages
+in comments or commits.
 
-## Инфраструктура (этот сервер)
+## Layout
 
-* Caddy: `/etc/caddy/Caddyfile`, сайт `svault.jzadl.xyz`
-  (`/bot*` → `127.0.0.1:8087`, остальное — `file_server` из корня репо).
-  После правок: `caddy validate` + `systemctl reload caddy`.
-  Без `X-Frame-Options` — иначе Telegram WebApp не откроется во фрейме.
-* Бот: `svault-bot.service` (`EnvironmentFile=bot/.env`).
-  После правок кода бота: `systemctl restart svault-bot` + проверка
+* `/` — landing (`index.html`), `/app` — Telegram WebApp (`app/index.html`),
+  `*.sman` — data (read by both frontends).
+* `bot/server.js` — Node wrapper around the webhook handler (`src/index.js`).
+* `bot/src/db.js` — Postgres (`pending_ops`), Supabase replacement.
+* `bot/src/github.js` — `.sman` read/write + `git commit/push`.
+  Git auth — via `gh auth git-credential` (not PAT!).
+* Secrets — ONLY in `bot/.env` (gitignored). Never copy anywhere else,
+  never print into code/commits/logs.
+
+## Infrastructure (this server)
+
+* Caddy: `/etc/caddy/Caddyfile`, site `svault.jzadl.xyz`
+  (`/bot*` → `127.0.0.1:8087`, rest — `file_server` from repo root).
+  After edits: `caddy validate` + `systemctl reload caddy`.
+  No `X-Frame-Options` — otherwise the Telegram WebApp won't open in a frame.
+* Bot: `svault-bot.service` (`EnvironmentFile=bot/.env`).
+  After bot code edits: `systemctl restart svault-bot` + check
   `journalctl -u svault-bot`.
-* Postgres 17: БД `svault`, таблица `pending_ops` (см. `supabase-migrations/`).
-* Cloudflare Worker и Supabase НЕ используются. Workflow деплоя отключён
+* Postgres 17: DB `svault`, table `pending_ops` (see `supabase-migrations/`).
+* Cloudflare Worker and Supabase are NOT used. Deploy workflow is disabled
   (`deploy-bot.yml.disabled`).
 
-## Проверки после изменений
+## Checks after changes
 
-* Статика: `curl https://svault.jzadl.xyz/app/` → 200.
-* Бот: `curl https://svault.jzadl.xyz/bot` → `alive`, в Telegram — `/sping`.
-* Webhook: `getWebhookInfo` → `pending_update_count: 0`, без `last_error`.
+* Static: `curl https://svault.jzadl.xyz/app/` → 200.
+* Bot: `curl https://svault.jzadl.xyz/bot` → `alive`, in Telegram — `/sping`.
+* Webhook: `getWebhookInfo` → `pending_update_count: 0`, no `last_error`.
