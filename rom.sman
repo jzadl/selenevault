@@ -747,15 +747,6 @@ url: https://sourceforge.net/projects/fukiame-builds/files/matrixx/240111/Matrix
 note: Android 14, R Vendor, R_OSS. Vanilla only. Funky screen on some NVT devices with stock kernel.
 vendor: rvendor
 
-name: LineageOS 20
-version: Unofficial
-maintainer: atharv2951
-size: unknown
-date: 2024-01-16
-url: https://onedrive-vercel-index-kohl-eight-30.vercel.app//lineage%2d20%2e0%2d20240116%2dUNOFFICIAL%2dselene%2ezip
-note: Android 13. MIUI 13 based S Vendor, flash with provided boot.img. VoLTE dead.
-vendor: svendor
-
 name: crDroid
 version: v10.1 Unofficial
 maintainer: fukiame
