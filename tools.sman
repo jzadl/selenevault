@@ -1,14 +1,5 @@
 about: Tools and utilities for selene.
 
-name: Red Flower
-version: Pre-Release 1.0
-maintainer: stolefromcloudflare
-size: unknown
-date: 2024-07-19
-url: https://github.com/25freepb/redflower
-note: Command line tool for Windows (macOS/Linux coming soon) for Redmi 10/Prime/Note 11 4G (selene/selenes). Track logcat, show device info, download/flash custom MIUI, flash GSI, flash recoveries (TWRP/OFOX), manage packages, ADB and fastboot reboot menus, list partitions/baseband/IMEI, separate partition flashing, backup IMEI (nvram/nvdata), fix dm-verity. Uses Google platform-tools and aria2c. Use at your own risk.
-vendor: all
-
 name: Mediatek AIO Unbrick
 version: unknown
 maintainer: unknown
