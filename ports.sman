@@ -62,15 +62,6 @@ url: https://pixeldrain.com/u/EDSh7Fhb
 note: Android 13, most lightweight version of HyperOS, maximum debloat, launcher with animations, blur enabled, AOD enabled, custom oem logo. Install over any HyperOS port then run script. Tags: #UNOFFICIAL #PORT #firmware #android13.
 vendor: svendor
 
-name: HyperOS
-version: 2.0.6.0 China (Port)
-maintainer: Satvik090
-size: unknown
-date: 2025-09-21
-url: https://drive.google.com/file/d/1ivMlsASaW_SZk9qn-EnZbFjPvaqFyZhD/view?usp=drive_link
-note: Android 14, stable port based on China, fastboot flashable. Requires MIUI 14 China 14.0.5.0.TKUCNX base. Leica camera mod, unlimited GPhotos backup, HOS3 theme, debloated. Tags: #HyperOS #Selene #China #Port.
-vendor: svendor
-
 name: FlymeOS
 version: 10.2.0.0A (Port)
 maintainer: Satvik090
