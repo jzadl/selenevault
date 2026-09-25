@@ -534,7 +534,7 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
 
     if (command === "/isthisonsv") {
       const replyMsg = msg.reply_to_message;
-      const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
+      const replyText = replyQueryText(replyMsg);
       if (replyText) {
         if (msg.chat.type === "private") {
           try {
@@ -823,6 +823,16 @@ async function handleCommand(env, command, arg) {
 
 const GUEST_COMMANDS = ["/start", "/shelp", "/sstart", "/snews", "/slatest", "/sstats", "/ssearch", "/schannels", "/sping", "/isthisonsv"];
 
+function replyQueryText(replyMsg) {
+  if (!replyMsg) return "";
+  const text = replyMsg.text || replyMsg.caption || "";
+  const media = replyMsg.document || replyMsg.video || replyMsg.audio || replyMsg.animation;
+  if (media && media.file_name) {
+    return text ? media.file_name + "\n" + text : media.file_name;
+  }
+  return text;
+}
+
 async function replyForCommand(env, command, arg, ctxMsg) {
   if (command === "/start") {
     const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
@@ -833,7 +843,7 @@ async function replyForCommand(env, command, arg, ctxMsg) {
   }
   if (command === "/isthissonsv") {
     const replyMsg = ctxMsg ? ctxMsg.reply_to_message : null;
-    const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
+    const replyText = replyQueryText(replyMsg);
     return replyText ? await cmdIsThisOnSv(env, replyText) : "Reply to a message with a ROM\\/kernel\\/port name, then mention the bot: `@selenevaultbot /isthissonsv`\\.";
   }
   return handleCommand(env, command, arg);
