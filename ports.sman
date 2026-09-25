@@ -45,15 +45,6 @@ note: Realme UI 12.5 port. Modded Powerkeeper, blur added, RealmeSearch, OS opti
 vendor: rvendor
 
 name: RUI
-version: Mix v1.1
-maintainer: KobbieMainoo93
-size: unknown
-date: 2024-08-23
-url: https://drive.google.com/file/d/1LzDgmxdOXvOWYWIZ7LGGZ9rzEd0wK3ub/view?usp=sharing
-note: Realme UI port, new PkgInstaller mod, sound tweaks, added Xiaomi 13/14 wallpaper, fix lags.
-vendor: svendor
-
-name: RUI
 version: Mix 14.0.4 | 14.0.2 v2
 maintainer: TranKhanh
 size: unknown
