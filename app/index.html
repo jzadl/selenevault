@@ -221,7 +221,6 @@ footer a {
     <option value="unknown">Unknown</option>
   </select>
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
-  <label class="check"><input type="checkbox" id="sort-newest"> Newest first</label>
 </div>
 <div id="out">loading...</div>
 <footer>maintained by <a href="https://t.me/xiaomiselene" target="_blank">@xiaomiselene</a> &amp; <a href="https://t.me/gro0wl" target="_blank">gro0wl</a></footer>
@@ -531,6 +530,7 @@ function buildTabs(){
 function updateFilterVisibility(){
   const full = FULL_FILTER_CATS.includes(activeCategory);
   const withVendor = VENDOR_FILTER_CATS.includes(activeCategory);
+  document.querySelector(".filters").style.display = activeCategory === "firmware.sman" ? "none" : "";
   document.getElementById("filter-vendor").style.display = withVendor ? "" : "none";
   ["filter-android", "filter-gapps"].forEach(id => {
     document.getElementById(id).style.display = full ? "" : "none";
@@ -599,34 +599,6 @@ document.getElementById("filter-vendor").addEventListener("change", applyFilters
 document.getElementById("filter-android").addEventListener("change", applyFilters);
 document.getElementById("filter-gapps").addEventListener("change", applyFilters);
 document.getElementById("filter-noissues").addEventListener("change", applyFilters);
-document.getElementById("sort-newest").addEventListener("change", applySorting);
-
-function applySorting(){
-  const newest = document.getElementById("sort-newest").checked;
-  document.querySelectorAll("#out > h2").forEach(h => {
-    const groups = [];
-    let n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") {
-      const nx = n.nextElementSibling;
-      if (n.classList && n.classList.contains("group")) groups.push(n);
-      n = nx;
-    }
-    groups.sort((a, b) => {
-      if (newest) {
-        const ka = a.dataset.maxdate || "", kb = b.dataset.maxdate || "";
-        if (ka !== kb) {
-          if (!ka) return 1;
-          if (!kb) return -1;
-          return kb.localeCompare(ka);
-        }
-      }
-      return Number(a.dataset.ord || 0) - Number(b.dataset.ord || 0);
-    });
-    // Re-append in order right after the h2:
-    let anchor = h;
-    groups.forEach(g => { anchor.after(g); anchor = g; });
-  });
-}
 
 document.addEventListener("click", ev => {
   const btn = ev.target.closest ? ev.target.closest("[data-copy]") : null;
