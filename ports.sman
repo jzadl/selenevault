@@ -116,15 +116,6 @@ url: https://mega.nz/file/bXgAxTzQ#QV5FQWQsOIJzsLiWImOUn2hxbdqR5pvLrdsNIp097fw
 note: MIUI INT custom build, fastboot flashable. Make sure you are on MIUI 14 before flashing. Bug: GoogleServicesFramework/PlayServices/PlayStore, fix with LiteGApps Core Android 13 Magisk module. Flash via Termux fastboot scripts.
 vendor: svendor
 
-name: MemeUI Pure
-version: v1
-maintainer: ManchesterUnited723
-size: unknown
-date: 2024-06-09
-url: https://drive.google.com/file/d/15aOQcRGK4YfNQZozmA3UMviCwbp1YVKX/view?usp=drivesdk
-note: MIUI mod, fastboot flash, Gapps, modded CN launcher, debloated, via browser added. Known issues: theme reset, theme app settings crash. Not for eos (Nvdata error). Recommended to install TWRP.
-vendor: svendor
-
 name: MiuiTN
 version: V2.3
 maintainer: Nvthang2303
