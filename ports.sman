@@ -26,15 +26,6 @@ url: https://drive.google.com/drive/folders/1UZgEn_HtZTkzGKoY17gPezkIfPBzyqKu?us
 note: Android 14, ported (fleur), Global based for selene/eos. Mods: launcher, Leica cam, file explorer, SystemUI-plugin, Miui dialer and MMS. No blur, account activation takes a bit.
 vendor: svendor
 
-name: NothingOS
-version: v1 OEM-Port
-maintainer: TheRealAldehyde
-size: unknown
-date: 2024-07-26
-url: https://drive.google.com/drive/folders/1YI0iJeBry-4zNxM4EE_9M7slhDhSWcjd?usp=sharing
-note: Android 14, Nothing OS 2.5 port from Nothing 2a (Pacman). All vbmeta patched, SELinux permissive. Known bugs: face unlock, adaptive brightness, brightness slider. Flash from MIUI 14 or HOS.
-vendor: svendor
-
 name: HyperRemodUI
 version: 1.0.5.UMOCNXM (Port)
 maintainer: TranKhanh
