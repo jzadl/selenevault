@@ -1,0 +1,92 @@
+// Local Postgres replacement for supabase.js (same table: pending_ops).
+// Signatures are intentionally identical to the old Supabase helpers so that
+// index.js call sites stay untouched; the first two args are ignored.
+// Uses DATABASE_URL from process env (loaded from bot/.env by server.js).
+//
+// Data convention (preserved from Supabase days):
+//   - most ops store JSON.stringify(obj) -> returned as string for JSON.parse
+//   - "__last_entry" cache stores raw post text -> returned as-is
+
+import pg from "pg";
+
+const { Pool } = pg;
+
+let pool = null;
+
+function getPool() {
+  if (!pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is not set (bot/.env)");
+    }
+    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    pool.on("error", (err) => console.error("pg pool error:", err.message));
+  }
+  return pool;
+}
+
+// Normalize outgoing data: callers expect pending.data to be a string
+// (JSON.parse(pending.data) for flows, raw text for __last_entry cache).
+function dataToString(data) {
+  if (data === null || data === undefined) return "{}";
+  if (typeof data === "string") return data;
+  return JSON.stringify(data);
+}
+
+// Normalize incoming data for a JSONB column: raw non-JSON strings are
+// wrapped as JSON strings so the INSERT never fails (old REST code just
+// swallowed that error and the cache silently never worked).
+function dataToJsonb(data) {
+  if (data === null || data === undefined) return {};
+  if (typeof data === "object") return data;
+  try {
+    JSON.parse(data);
+    return data;
+  } catch {
+    return JSON.stringify(data); // wrap raw text as a JSON string value
+  }
+}
+
+function rowToPending(row) {
+  if (!row) return null;
+  return { ...row, data: dataToString(row.data) };
+}
+
+export async function upsertPending(_url, _key, row) {
+  const cols = ["chat_id", "user_id", "op_type", "file", "data", "expires_at"];
+  const vals = [row.chat_id, row.user_id, row.op_type, row.file, dataToJsonb(row.data), row.expires_at];
+  if (row.message_id !== undefined && row.message_id !== null) {
+    cols.push("message_id");
+    vals.push(row.message_id);
+  }
+  const placeholders = vals.map((_, i) => `$${i + 1}`).join(", ");
+  const sql = `INSERT INTO pending_ops (${cols.join(", ")}) VALUES (${placeholders}) RETURNING *`;
+  const res = await getPool().query(sql, vals);
+  return rowToPending(res.rows[0]);
+}
+
+export async function getPending(_url, _key, chatId, userId, opType) {
+  const res = await getPool().query(
+    `SELECT * FROM pending_ops
+     WHERE chat_id = $1 AND user_id = $2 AND op_type = $3 AND expires_at > NOW()
+     ORDER BY created_at DESC LIMIT 1`,
+    [chatId, userId, opType]
+  );
+  return res.rows.length > 0 ? rowToPending(res.rows[0]) : null;
+}
+
+export async function deletePending(_url, _key, id) {
+  await getPool().query(`DELETE FROM pending_ops WHERE id = $1`, [id]);
+}
+
+export async function deletePendingByUser(_url, _key, chatId, userId, opType) {
+  await getPool().query(
+    `DELETE FROM pending_ops WHERE chat_id = $1 AND user_id = $2 AND op_type = $3`,
+    [chatId, userId, opType]
+  );
+}
+
+const PENDING_TTL_SECONDS = 60 * 30;
+
+export function expiresAt() {
+  return new Date(Date.now() + PENDING_TTL_SECONDS * 1000).toISOString();
+}

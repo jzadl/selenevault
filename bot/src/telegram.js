@@ -124,7 +124,7 @@ export async function setChatMenuButton(token, menuButton) {
   const res = await fetch("https://api.telegram.org/bot" + token + "/setChatMenuButton", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(menuButton || {}),
+    body: JSON.stringify({ menu_button: menuButton || { type: "commands" } }),
   });
   return res.json();
 }
@@ -197,7 +197,8 @@ export async function isGroupAdmin(token, chatId, userId) {
 }
 
 export async function isBotAdmin(token, chatId, userId, ownerId) {
-  if (String(userId) === String(ownerId)) return true;
+  const owners = String(ownerId || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (owners.includes(String(userId))) return true;
   return isGroupAdmin(token, chatId, userId);
 }
 

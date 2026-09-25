@@ -1,75 +1,67 @@
-function decodeBase64(b64) {
-  const binary = atob(b64.replace(/\n/g, ""));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
+// Local-filesystem replacement for the GitHub Contents API.
+// Reads/writes .sman files directly in REPO_ROOT and commits via git.
+// createNotifyIssue still uses the GitHub Issues API (feeds notify-telegram.yml).
+
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
+
+function repoRoot(env) {
+  return env.REPO_ROOT || "/home/main/projects/selenevault";
 }
 
-function encodeBase64(str) {
-  const bytes = new TextEncoder().encode(str);
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
-async function githubFetch(env, path, options = {}) {
-  const headers = {
-    Authorization: "token " + env.GITHUB_TOKEN,
-    "User-Agent": "svault-bot",
-    Accept: "application/vnd.github+json",
-    ...options.headers,
+function gitEnv(env) {
+  return {
+    ...process.env,
+    GITHUB_TOKEN: env.GITHUB_TOKEN || process.env.GITHUB_TOKEN || "",
+    GIT_ASKPASS: path.join(repoRoot(env), "bot", ".git-askpass.sh"),
+    GIT_TERMINAL_PROMPT: "0",
   };
-  return fetch(env.GITHUB_API_BASE + path, { ...options, headers });
+}
+
+async function git(env, args) {
+  return execFileAsync("git", ["-C", repoRoot(env), ...args], { env: gitEnv(env), timeout: 60000 });
+}
+
+async function commitAndPush(env, files, message) {
+  await git(env, ["-c", "user.name=svault-bot", "-c", "user.email=svault-bot@local",
+    "add", "--", ...files]);
+  const { stdout: status } = await git(env, ["status", "--porcelain", "--", ...files]);
+  if (!status.trim()) return { pushed: false }; // nothing changed
+  await git(env, ["-c", "user.name=svault-bot", "-c", "user.email=svault-bot@local",
+    "commit", "-m", message, "--", ...files]);
+  await git(env, ["pull", "--ff-only", "origin", "main"]).catch(() => {});
+  await git(env, ["push", "origin", "main"]);
+  return { pushed: true };
 }
 
 export async function getFileContent(env, file) {
-  const res = await githubFetch(env, "/contents/" + file + "?ref=main");
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error("GitHub GET " + res.status + ": " + body.slice(0, 300));
-  }
-  const data = await res.json();
-  return {
-    content: decodeBase64(data.content),
-    sha: data.sha,
-  };
-}
-
-async function putFileContent(env, file, content, sha, commitMessage) {
-  const res = await githubFetch(env, "/contents/" + file, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: commitMessage,
-      content: encodeBase64(content),
-      sha,
-      branch: "main",
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error("GitHub PUT " + res.status + ": " + body.slice(0, 300));
-  }
-  return res.json();
+  const content = await readFile(path.join(repoRoot(env), file), "utf-8");
+  return { content, sha: null };
 }
 
 export async function appendSmanEntry(env, file, block, commitMessage) {
-  const { content, sha } = await getFileContent(env, file);
+  const { content } = await getFileContent(env, file);
   const newContent = content.replace(/\s*$/, "") + "\n\n" + block + "\n";
-  return putFileContent(env, file, newContent, sha, commitMessage);
+  await writeFile(path.join(repoRoot(env), file), newContent, "utf-8");
+  return commitAndPush(env, [file], commitMessage);
 }
 
 export async function updateSmanEntry(env, file, oldBlock, newBlock, commitMessage) {
-  const { content, sha } = await getFileContent(env, file);
+  const { content } = await getFileContent(env, file);
   const newContent = content.replace(oldBlock, newBlock);
   if (newContent === content) {
     throw new Error("Entry not found in file content");
   }
-  return putFileContent(env, file, newContent, sha, commitMessage);
+  await writeFile(path.join(repoRoot(env), file), newContent, "utf-8");
+  return commitAndPush(env, [file], commitMessage);
 }
 
 export async function removeSmanEntry(env, file, oldBlock, commitMessage) {
-  const { content, sha } = await getFileContent(env, file);
+  const { content } = await getFileContent(env, file);
   const pattern = oldBlock + "\n";
   let newContent = content.replace(pattern, "");
   if (newContent === content) {
@@ -79,11 +71,33 @@ export async function removeSmanEntry(env, file, oldBlock, commitMessage) {
     throw new Error("Entry not found in file content");
   }
   newContent = newContent.replace(/\n{3,}/g, "\n\n");
-  return putFileContent(env, file, newContent, sha, commitMessage);
+  await writeFile(path.join(repoRoot(env), file), newContent, "utf-8");
+  return commitAndPush(env, [file], commitMessage);
+}
+
+// Recent "ADD: <name> by <creator> to <file>" commit subjects (for /slatest).
+export async function getRecentAdds(env, limit = 100) {
+  try {
+    const { stdout } = await git(env, ["log", `--max-count=${limit}`, "--format=%s"]);
+    return stdout.split("\n").map((s) => s.trim()).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+async function githubFetch(env, apiBase, apiPath, options = {}) {
+  const headers = {
+    Authorization: "token " + env.GITHUB_TOKEN,
+    "User-Agent": "svault-bot",
+    Accept: "application/vnd.github+json",
+    ...options.headers,
+  };
+  return fetch(apiBase + apiPath, { ...options, headers });
 }
 
 export async function createNotifyIssue(env, text) {
-  const res = await githubFetch(env, "/issues", {
+  const apiBase = env.GITHUB_API_BASE || "https://api.github.com/repos/jzadl/selenevault";
+  const res = await githubFetch(env, apiBase, "/issues", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title: "notify", body: text, labels: ["svault-notify"] }),

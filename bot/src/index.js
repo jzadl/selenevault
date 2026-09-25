@@ -2,7 +2,7 @@ import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, s
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, entryToRawBlock } from "./github.js";
-import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./supabase.js";
+import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./db.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
@@ -55,8 +55,26 @@ function escapeMdSafe(text) {
   return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
 }
 
+// Local text files (help.txt / update.txt) live in the repo root on this server.
+async function readLocalText(env, file) {
+  try {
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    const root = env.REPO_ROOT || "/home/main/projects/selenevault";
+    return await readFile(join(root, file), "utf-8");
+  } catch {
+    return null;
+  }
+}
+
 function isGroupChat(chatType) {
   return chatType === "group" || chatType === "supergroup";
+}
+
+// OWNER_ID may hold a comma-separated list (multi-owner).
+function isOwner(env, userId) {
+  const ids = String(env.OWNER_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
+  return ids.includes(String(userId));
 }
 
 async function replyTo(env, msg, text, options = {}) {
@@ -68,6 +86,7 @@ async function replyTo(env, msg, text, options = {}) {
 
 const DEFAULT_COMMANDS = [
   { command: "shelp", description: "Show all bot commands" },
+  { command: "vault", description: "Open the vault mini app" },
   { command: "snews", description: "Latest update message" },
   { command: "slatest", description: "Newest addition to the vault" },
   { command: "sstats", description: "Entry counts per category" },
@@ -267,17 +286,17 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
         const botUsername = env.BOT_USERNAME || "";
         if (botUsername && text.includes("@" + botUsername)) {
           let isAdmin = false;
-          let isOwner = false;
-          if (String(msg.from.id) === String(env.OWNER_ID)) {
+          let ownerFlag = false;
+          if (isOwner(env, msg.from.id)) {
             isAdmin = true;
-            isOwner = true;
+            ownerFlag = true;
           } else {
             try {
               const member = await getChatMember(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id);
               isAdmin = member.ok && (member.result.status === "administrator" || member.result.status === "creator");
             } catch {}
           }
-          const threshold = isOwner ? 0.85 : isAdmin ? 0.65 : 0.35;
+          const threshold = ownerFlag ? 0.85 : isAdmin ? 0.65 : 0.35;
           const roll = Math.random();
           if (roll < threshold) {
             if (roll < threshold / 2) {
@@ -315,6 +334,15 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
           : "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/preview.webp";
       await sendPhoto(env.TELEGRAM_BOT_TOKEN, msg.chat.id, photoUrl, {
         replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/vault") {
+      const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Tap below to open the vault mini app\\.", {
+        replyToMessageId: msg.message_id,
+        replyMarkup: { inline_keyboard: [[{ text: "Open Vault", web_app: { url: vaultUrl } }]] },
       });
       return new Response("ok", { status: 200 });
     }
@@ -368,7 +396,7 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
     }
 
     if (command === "/sdel") {
-      if (String(msg.from.id) !== String(env.OWNER_ID)) {
+      if (!isOwner(env, msg.from.id)) {
         await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Only the owner can use this\\.", {
           replyToMessageId: msg.message_id,
         });
@@ -535,6 +563,8 @@ async function handleCommand(env, command, arg) {
     case "/sstart":
     case "/shelp": {
       try {
+        const local = await readLocalText(env, "help.txt");
+        if (local) return local;
         const res = await fetch(env.CDN_BASE + "/help.txt");
         if (res.ok) return await res.text();
       } catch {}
@@ -542,6 +572,8 @@ async function handleCommand(env, command, arg) {
     }
     case "/snews": {
       try {
+        const local = await readLocalText(env, "update.txt");
+        if (local) return local;
         const res = await fetch(env.CDN_BASE + "/update.txt");
         if (res.ok) return await res.text();
       } catch {}

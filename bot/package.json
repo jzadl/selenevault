@@ -1,0 +1,16 @@
+{
+  "name": "svault-bot",
+  "version": "5.0.0",
+  "type": "module",
+  "description": "svault Telegram bot — Node server (migrated from Cloudflare Worker)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

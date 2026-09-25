@@ -1,0 +1,25 @@
+# Пример systemd-юнита для svault-bot.
+# Установка на сервере:
+#   sudo cp bot/svault-bot.service.example /etc/systemd/system/svault-bot.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now svault-bot
+#
+# Секреты живут ТОЛЬКО в bot/.env (EnvironmentFile ниже) — никуда не копировать.
+# В самом юните секретов нет.
+
+[Unit]
+Description=svault Telegram bot (Node)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=main
+WorkingDirectory=/home/main/projects/selenevault/bot
+EnvironmentFile=/home/main/projects/selenevault/bot/.env
+ExecStart=/home/main/.nvm/versions/node/v24.20.0/bin/node server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

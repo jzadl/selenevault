@@ -1,7 +1,7 @@
 import { parseSman } from "./sman.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, CATEGORY_LABELS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
-import { getFileContent } from "./github.js";
+import { getFileContent, getRecentAdds } from "./github.js";
 import { publishTelegraphPage } from "./telegraph.js";
 
 async function fetchRawViaGithub(env, filename) {
@@ -48,19 +48,15 @@ const ADD_SUBJECT_RE = /^ADD:\s*(.+?)\s+by\s+(.+?)\s+to\s+(\S+\.sman)\s*$/i;
 export async function cmdLatest(env, arg) {
   const wantFile = arg && CATEGORY_FILES[arg] ? CATEGORY_FILES[arg] : null;
 
-  // Which entry was actually added last, from commit subjects
-  const res = await fetch(env.GITHUB_API_BASE + "/commits?per_page=100", {
-    headers: { "User-Agent": "svault-bot" },
-    cf: { cacheTtl: 60 },
-  });
-  if (!res.ok) return "No entries found\\.";
-  const commits = await res.json();
+  // Which entry was actually added last, from commit subjects (local git log)
+  const subjects = await getRecentAdds(env, 100);
+  if (subjects.length === 0) return "No entries found\\.";
 
   const then = { latest: null };
   const files = {};
-  // ponytail: 100-commit window, pages if the vault ever outgrows it
-  for (const c of commits) {
-    const mm = (c.commit.message || "").split("\n")[0].match(ADD_SUBJECT_RE);
+  // ponytail: 100-commit window
+  for (const subject of subjects) {
+    const mm = subject.split("\n")[0].match(ADD_SUBJECT_RE);
     if (!mm || (wantFile && mm[3] !== wantFile)) continue;
 
     const name = mm[1].toString().toLowerCase();
@@ -353,7 +349,7 @@ export async function cmdPing(env, request, msg) {
   const start = Date.now();
   const res = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/getMe");
   const workerLatency = Date.now() - start;
-  const colo = (request && request.cf && request.cf.colo) || "??";
+  const colo = (request && request.cf && request.cf.colo) || process.env.HOSTNAME || "srv";
 
   let telegramDelayText = "";
   if (msg && msg.date) {
