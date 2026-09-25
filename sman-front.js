@@ -177,10 +177,12 @@ const fileCounts = {};
 
 async function load(){
   let html = "";
+  let totalEntries = 0;
   for(const f of files){
     try {
       const text = await (await fetch(FETCH_PREFIX + f)).text();
       const {entries} = parseSman(text);
+      totalEntries += entries.length;
       html += `<h2 id="cat-${f.replace(".sman", "")}">${categoryLabel(f)} (${entries.length})</h2>`;
       allCategories.push(f);
       fileCounts[f] = entries.length;
@@ -235,6 +237,8 @@ async function load(){
   }
   document.getElementById("out").innerHTML = html;
   populateFilters();
+  const totalEl = document.getElementById("total-count");
+  if (totalEl) totalEl.textContent = ` · ${totalEntries} builds`;
 }
 
 function normalizeCreator(name) {

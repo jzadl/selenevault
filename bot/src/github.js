@@ -1,7 +1,7 @@
 // Local-filesystem .sman storage: reads/writes files directly in REPO_ROOT
 // and commits via git (auth via gh CLI).
 
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -43,7 +43,7 @@ async function commitAndPush(env, files, message) {
     try {
       await git(env, ["rebase", "--abort"]);
     } catch {}
-    throw new Error("remote changed under us, please retry (" + gitErrTail(err) + ")");
+    throw new Error("could not sync with origin, please retry (" + gitErrTail(err) + ")");
   }
   try {
     await git(env, ["push", "origin", "main"]);
@@ -92,7 +92,17 @@ export async function removeSmanEntry(env, file, oldBlock, commitMessage) {
   }
   newContent = newContent.replace(/\n{3,}/g, "\n\n");
   await writeFile(path.join(repoRoot(env), file), newContent, "utf-8");
-  return commitAndPush(env, [file], commitMessage);
+  // Trash backup: removed blocks accumulate in trash/<file>, same commit.
+  const trashFile = "trash/" + file;
+  const stamp = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC";
+  let trash = "";
+  try {
+    trash = await readFile(path.join(repoRoot(env), trashFile), "utf-8");
+  } catch {}
+  trash = trash.replace(/\s*$/, "") + "\n\n# removed " + stamp + "\n" + oldBlock.trim() + "\n";
+  await mkdir(path.join(repoRoot(env), "trash"), { recursive: true });
+  await writeFile(path.join(repoRoot(env), trashFile), trash, "utf-8");
+  return commitAndPush(env, [file, trashFile], commitMessage);
 }
 
 // Recent "ADD: <name> by <creator> to <file>" commit subjects (for /slatest).
