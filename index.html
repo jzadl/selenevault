@@ -127,6 +127,21 @@ function esc(str) {
 
 const files = ["rom.sman","kernels.sman","recovery.sman","firmware.sman","ports.sman","tools.sman","guides.sman","channels.sman"];
 
+const CATEGORY_LABELS = {
+  "rom.sman": "ROMs",
+  "kernels.sman": "Kernels",
+  "recovery.sman": "Recovery",
+  "firmware.sman": "Firmware",
+  "ports.sman": "Ports",
+  "tools.sman": "Tools",
+  "guides.sman": "Guides",
+  "channels.sman": "Channels",
+};
+
+function categoryLabel(f) {
+  return CATEGORY_LABELS[f] || f;
+}
+
 function stripVersion(name) {
   let base = name;
   base = base.replace(/\s*[\(\[][^)\]]*[\)\]]\s*/g, " ");
@@ -209,7 +224,7 @@ async function load(){
     try {
       const text = await (await fetch(f)).text();
       const {entries} = parseSman(text);
-      html += `<h2>${f} (${entries.length})</h2>`;
+      html += `<h2>${categoryLabel(f)} (${entries.length})</h2>`;
       allCategories.push(f);
 
       if (f === "channels.sman" || f === "guides.sman") {
@@ -269,7 +284,7 @@ function populateFilters(){
   allCategories.forEach(f => {
     const opt = document.createElement("option");
     opt.value = f;
-    opt.textContent = f;
+    opt.textContent = categoryLabel(f);
     categorySelect.appendChild(opt);
   });
 
