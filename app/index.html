@@ -318,19 +318,21 @@ function badgesHtml(items) {
   const arr = Array.isArray(items) ? items : [items];
   const versions = [...new Set(arr.map(parseAndroid).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
   const flavors = [...new Set(arr.map(parseGapps).filter(g => g === "gapps" || g === "vanilla"))];
-  const buggy = arr.some(hasIssues);
   let s = "";
   if (versions.length) s += ` <span class="badge">A${versions.join("/A")}</span>`;
   if (flavors.length === 1) s += ` <span class="badge">${flavors[0] === "gapps" ? "GApps" : "Vanilla"}</span>`;
   else if (flavors.length > 1) s += ` <span class="badge">GApps·Vanilla</span>`;
-  if (buggy) s += ` <span class="badge warn">issues</span>`;
   return s;
+}
+
+function issuesBadge(e) {
+  return hasIssues(e) ? ` <span class="badge warn">issues</span>` : "";
 }
 
 function entryHtml(e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
   return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
-    <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
+    <b>${esc(e.name||"")}</b>${issuesBadge(e)} ${esc(e.version||"")}
     <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
     <div>${esc(e.note||"")}</div>
     ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
