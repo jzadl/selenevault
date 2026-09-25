@@ -173,6 +173,7 @@ const allCreators = new Set();
 const allVendors = new Set();
 const allAndroids = new Set();
 const allCategories = [];
+const fileCounts = {};
 
 async function load(){
   let html = "";
@@ -182,6 +183,7 @@ async function load(){
       const {entries} = parseSman(text);
       html += `<h2 id="cat-${f.replace(".sman", "")}">${categoryLabel(f)} (${entries.length})</h2>`;
       allCategories.push(f);
+      fileCounts[f] = entries.length;
 
       const fbase = f.replace(".sman", "");
       let eidx = 0;
@@ -292,7 +294,7 @@ function buildTabs(){
   allCategories.forEach(f => {
     const b = document.createElement("button");
     b.dataset.cat = f;
-    b.textContent = categoryLabel(f);
+    b.textContent = `${categoryLabel(f)} (${fileCounts[f] || 0})`;
     b.addEventListener("click", () => selectCategory(f));
     nav.appendChild(b);
   });
@@ -348,6 +350,7 @@ function applyFilters(){
 
   // Every entry lives inside a .group now, so filters apply per entry:
   // non-matching entries hide even inside a matching group.
+  let visibleGroups = 0;
   document.querySelectorAll(".group").forEach(el => {
     if (category && el.dataset.category !== category) {
       el.style.display = "none";
@@ -360,8 +363,12 @@ function applyFilters(){
       if (visible) anyVisible = true;
     });
     el.style.display = anyVisible ? "" : "none";
+    if (anyVisible) visibleGroups++;
     if (anyVisible && (q || creator || vendor || android || gapps || noissues) && el.tagName === "DETAILS") el.open = true;
   });
+
+  const emptyEl = document.getElementById("empty");
+  if (emptyEl) emptyEl.style.display = visibleGroups ? "none" : "";
 
   if (!SYNC_URL) return;
   const url = new URL(window.location);
@@ -381,6 +388,25 @@ document.getElementById("filter-vendor").addEventListener("change", applyFilters
 document.getElementById("filter-android").addEventListener("change", applyFilters);
 document.getElementById("filter-gapps").addEventListener("change", applyFilters);
 document.getElementById("filter-noissues").addEventListener("change", applyFilters);
+
+const resetBtn = document.getElementById("reset-filters");
+if (resetBtn) resetBtn.addEventListener("click", () => {
+  document.getElementById("search").value = "";
+  ["filter-creator", "filter-vendor", "filter-android", "filter-gapps"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("filter-noissues").checked = false;
+  applyFilters();
+});
+
+// "/" focuses search (desktop convenience, ignored while typing).
+document.addEventListener("keydown", ev => {
+  if (ev.key !== "/" || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const t = ev.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA")) return;
+  ev.preventDefault();
+  document.getElementById("search").focus();
+});
 
 document.addEventListener("click", ev => {
   const btn = ev.target.closest ? ev.target.closest("[data-copy]") : null;

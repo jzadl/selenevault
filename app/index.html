@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>svault</title>
 <meta name="description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://svault.jzadl.xyz/app">
+<meta property="og:title" content="svault">
+<meta property="og:description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
+<meta property="og:image" content="https://cdn.jzadl.xyz/svault/logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="svault">
+<meta name="twitter:description" content="Index of ROMs, kernels, recoveries, firmware, ports, tools, guides and channels for the Xiaomi Redmi 10 (selene).">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 * { box-sizing: border-box; }
@@ -193,6 +201,19 @@ footer a {
   color: var(--tg-theme-button-color, cyan);
   text-decoration: none;
 }
+#empty {
+  text-align: center;
+  color: var(--tg-theme-hint-color, #888);
+  padding: 30px 0;
+}
+#empty button {
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-button-color, cyan);
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  padding: 6px 12px;
+  font-family: monospace;
+  cursor: pointer;
+}
 #out {
   flex: 1;
   overflow-y: auto;
@@ -223,6 +244,7 @@ footer a {
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
 </div>
 <div id="out">loading...</div>
+<div id="empty" style="display:none">Nothing found. <button id="reset-filters">Reset filters</button></div>
 <footer>maintained by <a href="https://t.me/xiaomiselene" target="_blank">@xiaomiselene</a> &amp; <a href="https://t.me/gro0wl" target="_blank">gro0wl</a></footer>
 
 <script src="../sman-parser.js"></script>
