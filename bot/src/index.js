@@ -1,8 +1,8 @@
-import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
+import { sendMessage, sendEphemeral, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock, listTrash, restoreTrashEntry, getFileContent } from "./github.js";
-import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./db.js";
+import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt, rememberChat, knownChatIds } from "./db.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
@@ -110,6 +110,19 @@ async function readLocalText(env, file) {
 
 function isGroupChat(chatType) {
   return chatType === "group" || chatType === "supergroup";
+}
+
+// Deletes a "status" message (Parsing/Merging with Groq...). sendEphemeral
+// falls back to a normal message when Telegram rejects ephemeral params, so
+// the id may be ephemeral_message_id (ephemeral) or message_id (fallback).
+async function deleteStatus(env, chatId, userId, status) {
+  if (!status || !status.ok || !status.result) return;
+  const r = status.result;
+  if (r.ephemeral_message_id) {
+    await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, chatId, userId, r.ephemeral_message_id).catch(() => {});
+  } else if (r.message_id) {
+    await deleteMessage(env.TELEGRAM_BOT_TOKEN, chatId, r.message_id).catch(() => {});
+  }
 }
 
 // OWNER_ID may hold a comma-separated list (multi-owner).
@@ -247,6 +260,12 @@ export default {
     }
 
         let text = msg.text.trim();
+
+        // Remember every chat the bot sees, so the owner can DM /smessage -all
+        // and reach all groups this bot is a member of.
+        try {
+          await rememberChat(msg.chat.id, msg.chat.type, msg.chat.title);
+        } catch {}
 
         // Group usage: "@selenevaultbot /sadd ..." — strip a leading mention
         // of this bot so the rest parses as a normal command.
@@ -569,23 +588,34 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
           });
           return new Response("ok", { status: 200 });
         }
-        const rawIds = (env.TELEGRAM_CHAT_IDS || "").split(",").map((s) => s.trim()).filter(Boolean);
-        const ids = rawIds.length ? [...new Set(rawIds)] : [String(msg.chat.id)];
+        // Every group/channel the bot has seen, plus any explicit IDs in env.
+        let known = [];
+        try {
+          known = await knownChatIds();
+        } catch {}
+        const envIds = String(env.TELEGRAM_CHAT_IDS || "").split(",").map((s) => s.trim()).filter(Boolean);
+        const ids = [...new Set([...known.map(String), ...envIds])];
+        if (ids.length === 0) {
+          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id,
+            "I haven't seen any group chats yet, so `-all` has nowhere to send\\. Use the bot in a group once, or set `TELEGRAM_CHAT_IDS`\\.", {
+              replyToMessageId: msg.message_id,
+            });
+          return new Response("ok", { status: 200 });
+        }
         let sent = 0;
         for (const cid of ids) {
-          const res = await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, rest);
-          if (res.ok) {
+          const res = await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, rest).catch(() => null);
+          if (res && res.ok) {
             sent++;
           } else {
-            const retry = await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, rest, { parseMode: null });
-            if (retry.ok) sent++;
+            const retry = await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, rest, { parseMode: null }).catch(() => null);
+            if (retry && retry.ok) sent++;
           }
         }
-        if (ids.length > 1) {
-          await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Sent to " + sent + " chats\\.", {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id,
+          "Sent to " + sent + "/" + ids.length + " chats\\.", {
             replyToMessageId: msg.message_id,
           });
-        }
         return new Response("ok", { status: 200 });
       }
       const messageSend = await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, arg);
@@ -877,11 +907,7 @@ async function handleAddParse(env, msg, postText) {
   try {
     parsed = await parsePostWithGroq(env.GROQ_API_KEY, postText);
   } catch (err) {
-    try {
-      if (status && status.ok && status.result && status.result.ephemeral_message_id) {
-        await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, chatId, msg.from.id, status.result.ephemeral_message_id);
-      }
-    } catch {}
+    await deleteStatus(env, chatId, msg.from.id, status);
     await replyTo(env, msg, "Couldn't parse that: " + escapeMdSafe(String(err.message || err)), { replyToMessageId: msg.message_id });
     return;
   }
@@ -889,11 +915,7 @@ async function handleAddParse(env, msg, postText) {
     const fallback = msgDateStr(msg);
     if (fallback) parsed.date = fallback;
   }
-  try {
-    if (status && status.ok && status.result && status.result.ephemeral_message_id) {
-      await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, chatId, msg.from.id, status.result.ephemeral_message_id);
-    }
-  } catch {}
+  await deleteStatus(env, chatId, msg.from.id, status);
 
   const { file, block } = toSmanBlock(parsed);
 
@@ -1024,11 +1046,7 @@ async function handleFollowUp(env, msg, pending) {
   try {
     merged = await mergeWithGroq(env.GROQ_API_KEY, d.parsed, msg.text);
   } catch (err) {
-    try {
-      if (status && status.ok && status.result && status.result.ephemeral_message_id) {
-        await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id, status.result.ephemeral_message_id);
-      }
-    } catch {}
+    await deleteStatus(env, msg.chat.id, msg.from.id, status);
     await replyTo(env, msg, "Couldn't merge that: " + escapeMdSafe(String(err.message || err)), { replyToMessageId: msg.message_id });
     return;
   }
@@ -1036,11 +1054,7 @@ async function handleFollowUp(env, msg, pending) {
     const fallback = msgDateStr(msg);
     if (fallback) merged.date = fallback;
   }
-  try {
-    if (status && status.ok && status.result && status.result.ephemeral_message_id) {
-      await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id, status.result.ephemeral_message_id);
-    }
-  } catch {}
+  await deleteStatus(env, msg.chat.id, msg.from.id, status);
 
   const categoryOverride = fileToCategory(msg.text);
   if (categoryOverride) {

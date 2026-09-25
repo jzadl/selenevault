@@ -123,3 +123,19 @@ const PENDING_TTL_SECONDS = 60 * 30;
 export function expiresAt() {
   return new Date(Date.now() + PENDING_TTL_SECONDS * 1000).toISOString();
 }
+
+// Known chats: every group/channel the bot has seen, for /smessage -all.
+export async function rememberChat(chatId, chatType, title) {
+  await getPool().query(
+    `INSERT INTO known_chats (chat_id, chat_type, title) VALUES ($1, $2, $3)
+     ON CONFLICT (chat_id) DO UPDATE SET chat_type = EXCLUDED.chat_type, title = EXCLUDED.title, last_seen = NOW()`,
+    [String(chatId), chatType || "group", title || null]
+  );
+}
+
+export async function knownChatIds() {
+  const res = await getPool().query(
+    `SELECT chat_id FROM known_chats WHERE chat_type <> 'private' ORDER BY last_seen`
+  );
+  return res.rows.map((r) => r.chat_id);
+}
