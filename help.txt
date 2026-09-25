@@ -2,8 +2,11 @@
 
 /slatest \[category\] \- newest addition
 /snews \- latest update message
-/sstats \[category\] \- entry counts \(or: by:name, vendor:x, date:2026\)
-/ssearch \[category\] query \- find an entry
+/sstats \[category\] \[filters\] \- entry counts
+/ssearch \[category\] \[filters\] query \- find an entry
+
+Filters: by:name vendor:x date:2026 android:14 gapps:gapps
+Example: /ssearch rom by:hasan android:14 lineage
 /isthisonsv \- is it in the vault?
 /schannels \- community channels
 /sping \- check responsiveness

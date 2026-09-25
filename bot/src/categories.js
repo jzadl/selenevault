@@ -20,6 +20,17 @@ export const CATEGORY_LABELS = {
   channel: "Channel",
 };
 
+export const CATEGORY_PLURALS = {
+  rom: "ROMs",
+  kernel: "Kernels",
+  recovery: "Recoveries",
+  firmware: "Firmware",
+  port: "Ports",
+  tool: "Tools",
+  guide: "Guides",
+  channel: "Channels",
+};
+
 export const CATEGORY_FIELDS = {
   rom: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
   kernel: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],

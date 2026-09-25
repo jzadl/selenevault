@@ -1,7 +1,8 @@
 import { parseSman } from "./sman.js";
-import { CATEGORY_FILES, CATEGORY_FIELDS, CATEGORY_LABELS } from "./categories.js";
+import { CATEGORY_FILES, CATEGORY_FIELDS, CATEGORY_LABELS, CATEGORY_PLURALS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
 import { getFileContent, getRecentAdds } from "./github.js";
+import { parseSearchArgs, matchesFilters, filtersSummary } from "./entrymeta.js";
 import { publishTelegraphPage } from "./telegraph.js";
 
 async function fetchRawViaGithub(env, filename) {
@@ -80,23 +81,29 @@ export async function cmdLatest(env, arg) {
 }
 
 export async function cmdStats(env, arg) {
-  if (arg && CATEGORY_FILES[arg]) {
-    const { entries } = await fetchSman(env, CATEGORY_FILES[arg]);
-    const label = escapeMd(CATEGORY_LABELS[arg]);
-    return `*${label}s on svault:* ${entries.length}`;
+  const { category, filters } = parseSearchArgs(arg || "", CATEGORY_FILES);
+  const filterText = filtersSummary(filters);
+
+  if (category && !filterText) {
+    const { entries } = await fetchSman(env, CATEGORY_FILES[category]);
+    const label = escapeMd(CATEGORY_PLURALS[category] || CATEGORY_LABELS[category]);
+    return `*${label} on svault:* ${entries.length}`;
   }
 
-  const categoryEntries = Object.entries(CATEGORY_FILES).filter(([cat]) => cat !== "channel");
+  const cats = category ? [category] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
   const counts = await Promise.all(
-    categoryEntries.map(([cat, file]) => fetchSman(env, file).then((r) => ({ cat, count: r.entries.length })))
+    cats.map((cat) => fetchSman(env, CATEGORY_FILES[cat]).then((r) => ({
+      cat,
+      count: filterText ? r.entries.filter((e) => matchesFilters(e, filters)).length : r.entries.length,
+    })))
   );
 
-  const lines = ["*svault stats:*", ""];
+  const lines = [filterText ? `*svault stats \\(${escapeMd(filterText)}\\):*` : "*svault stats:*", ""];
   let total = 0;
   for (const { cat, count } of counts) {
     total += count;
-    const label = escapeMd(CATEGORY_LABELS[cat]);
-    lines.push(`${label}s: ${count}`);
+    const label = escapeMd(CATEGORY_PLURALS[cat] || CATEGORY_LABELS[cat]);
+    lines.push(`${label}: ${count}`);
   }
   lines.push("", `Total: ${total}`);
   return lines.join("\n");
@@ -125,24 +132,19 @@ function plainEntry(siteUrl, category, entry) {
 const TELEGRAPH_THRESHOLD = 8;
 
 export async function cmdSearch(env, arg) {
-  if (!arg) return "Usage: /search \\[category\\] query";
+  if (!arg) return "Usage: /ssearch \\[category\\] \\[by:name\\] \\[vendor:x\\] \\[date:2026\\] \\[android:14\\] \\[gapps:gapps\\] query";
 
-  const parts = arg.trim().split(/\s+/);
-  let category = null;
-  let query = arg.trim();
+  const { category, filters, query } = parseSearchArgs(arg, CATEGORY_FILES);
 
-  if (CATEGORY_FILES[parts[0].toLowerCase()]) {
-    category = parts[0].toLowerCase();
-    query = parts.slice(1).join(" ");
-  }
-
-  if (!query) return "Give me something to search for\\.";
+  if (!query && Object.keys(filters).length === 0) return "Give me something to search for\\.";
 
   const categories = category ? [category] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
   const direct = [];
   const other = [];
   const q = query.toLowerCase();
   const qNorm = normalize(query);
+  const filterText = filtersSummary(filters);
+  const titleQuery = [filterText, query].filter(Boolean).join(" ");
 
   const results = await Promise.all(
     categories.map((cat) => fetchSman(env, CATEGORY_FILES[cat]).then((r) => ({ cat, entries: r.entries })))
@@ -150,6 +152,11 @@ export async function cmdSearch(env, arg) {
 
   for (const { cat, entries } of results) {
     for (const entry of entries) {
+      if (!matchesFilters(entry, filters)) continue;
+      if (!q) {
+        direct.push({ category: cat, entry });
+        continue;
+      }
       const name = (entry.name || "").toLowerCase();
       const nameNorm = normalize(entry.name);
       if (name.includes(q) || nameNorm.includes(qNorm)) {
@@ -165,7 +172,7 @@ export async function cmdSearch(env, arg) {
   }
 
   if (direct.length === 0 && other.length === 0) {
-    return `No results for *${escapeMd(query)}*\\.`;
+    return `No results for *${escapeMd(titleQuery)}*\\.`;
   }
 
   const total = direct.length + other.length;
@@ -188,14 +195,14 @@ export async function cmdSearch(env, arg) {
     }
 
     try {
-      const url = await publishTelegraphPage(env, `svault results for "${query}"`, plainLines.join("\n"));
-      return `*Results for* \`${escapeMd(query)}\`\\: ${total} matches\\.\n[View full results](${url})`;
+      const url = await publishTelegraphPage(env, `svault results for "${titleQuery}"`, plainLines.join("\n"));
+      return `*Results for* \`${escapeMd(titleQuery)}\`\\: ${total} matches\\.\n[View full results](${url})`;
     } catch {
       // fall through to inline results if telegraph fails
     }
   }
 
-  const lines = [`*Results for* \`${escapeMd(query)}\`:`];
+  const lines = [`*Results for* \`${escapeMd(titleQuery)}\:`];
 
   if (direct.length > 0) {
     lines.push("", "*\\[ RESULTS \\]*", "");
