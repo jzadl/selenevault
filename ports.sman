@@ -188,15 +188,6 @@ url: https://drive.google.com/drive/folders/1AT_CanjU5vbULZG1HOUPZoWvvIeJgWpP?us
 note: Android 11, TW based MIUI 12.5 mod for selene/selenes/eos, all vbmeta patched, debloated. Known bug: theme settings crash. Tags: #Miui12.5 #MIUI #R #Selene.
 vendor: rvendor
 
-name: Remodded OS
-version: v1
-maintainer: KobbieMainoo93
-size: unknown
-date: 2024-07-20
-url: https://drive.google.com/file/d/1-QdNGxxC5t1OHxcsNlPNVr46f74VuGKH/view?usp=drive_link
-note: MIUI 14 mod, Kronos control center, MiSoundMod, FPS unlock, MiSans, Security 9.1.8 modded. Clean flash recommended, battery drain cuz GG services (use GMS Doze module).
-vendor: svendor
-
 name: RemodUI
 version: Next (MIUI 14 CN)
 maintainer: KobbieMainoo93
