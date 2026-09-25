@@ -510,8 +510,10 @@ function populateFilters(){
   });
 }
 
-// Categories with the full filter set; guides/channels get search+creator only.
-const FULL_FILTER_CATS = ["rom.sman", "kernels.sman", "recovery.sman", "firmware.sman", "ports.sman", "tools.sman"];
+// Categories with the full filter set; kernels/recovery get vendor only;
+// guides/channels get search+creator only.
+const FULL_FILTER_CATS = ["rom.sman", "firmware.sman", "ports.sman", "tools.sman"];
+const VENDOR_FILTER_CATS = [...FULL_FILTER_CATS, "kernels.sman", "recovery.sman"];
 
 let activeCategory = null;
 
@@ -528,7 +530,9 @@ function buildTabs(){
 
 function updateFilterVisibility(){
   const full = FULL_FILTER_CATS.includes(activeCategory);
-  ["filter-vendor", "filter-android", "filter-gapps"].forEach(id => {
+  const withVendor = VENDOR_FILTER_CATS.includes(activeCategory);
+  document.getElementById("filter-vendor").style.display = withVendor ? "" : "none";
+  ["filter-android", "filter-gapps"].forEach(id => {
     document.getElementById(id).style.display = full ? "" : "none";
   });
   document.getElementById("filter-noissues").closest("label").style.display = full ? "" : "none";
