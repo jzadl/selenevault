@@ -153,15 +153,6 @@ note: Android 13, MIUI TN mod, eos support. Flash via Install_Stock/Install_Root
 vendor: svendor
 
 name: MIUI Lite
-version: 14.0.2 TW
-maintainer: TheRealAldehyde & ManchesterUnited723
-size: unknown
-date: 2024-06-29
-url: https://drive.google.com/file/d/17K7BrzbwlqO4ajxRLuIU_3H29mwvA5ND/view?usp=drivesdk
-note: Android 13, TW based with global support, debloated, modded EU iOS launcher, HyperOS dialer, Leica/Realme search mods. Flash on MIUI 14. Tags: #Miui14 #MIUI #T #Selene.
-vendor: svendor
-
-name: MIUI Lite
 version: v2 14.0.2 Taiwan
 maintainer: ManchesterUnited723
 size: unknown
