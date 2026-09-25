@@ -48,7 +48,14 @@ async function commitAndPush(env, files, message) {
   try {
     await git(env, ["push", "origin", "main"]);
   } catch (err) {
-    throw new Error("git push failed (" + gitErrTail(err) + ")");
+    console.error("git push failed, retrying once:", gitErrTail(err));
+    await new Promise((r) => setTimeout(r, 5000));
+    try {
+      await git(env, ["push", "origin", "main"]);
+    } catch (err2) {
+      console.error("git push retry failed:", gitErrTail(err2));
+      throw new Error("git push failed (" + gitErrTail(err2) + ")");
+    }
   }
   return { pushed: true };
 }
