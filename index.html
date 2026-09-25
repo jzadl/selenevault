@@ -279,12 +279,18 @@ function clusterEntries(entries) {
 }
 
 function parseAndroid(e) {
+  if (e.android !== undefined && e.android !== null && String(e.android).trim() !== "") {
+    return String(e.android).trim();
+  }
   const text = (e.note || "") + " " + (e.version || "");
   const m = text.match(/android\s+(\d+)/i) || text.match(/#a(\d\d?)\b/i);
   return m ? m[1] : "";
 }
 
 function parseGapps(e) {
+  if (e.gapps !== undefined && e.gapps !== null && String(e.gapps).trim() !== "") {
+    return String(e.gapps).trim().toLowerCase();
+  }
   const t = ((e.note || "") + " " + (e.version || "") + " " + (e.url || "")).toLowerCase();
   const mentionsGapps = /(gapps|google services|google-services|play ?store|\bgms\b)/.test(t)
     && !/no[\s-]?gapps|without gapps/.test(t);
@@ -295,6 +301,9 @@ function parseGapps(e) {
 const ISSUE_RE = /\bbug\s*:|known bugs?|known issues?|\bbroken\b|\blag\w*\b|\bcrash\w*\b|doesn'?t (pass|work)|incompatible\b/i;
 
 function hasIssues(e) {
+  if (e.issues !== undefined && e.issues !== null && String(e.issues).trim() !== "") {
+    return true;
+  }
   return ISSUE_RE.test(e.note || "");
 }
 

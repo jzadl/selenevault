@@ -8,6 +8,7 @@ date: 2022-01-09
 url: https://t.me/KCPORT/89
 note: Android 11. Fixed install rom zip bug on latest build.
 vendor: rvendor
+android: 11
 
 name: PBRP
 version: 4.0 Unofficial (S vendor)
@@ -44,6 +45,7 @@ date: 2024-04-12
 url: https://t.me/fukiamimir/200
 note: R Vendor, don't flash on MIUI 13/14. Decrypts Android 12+ AOSP, stock kernel, FTS compatible.
 vendor: rvendor
+android: 12
 
 name: Hitori Ame Recovery Project
 version: v0.0.1_infdev (official)
@@ -53,6 +55,7 @@ date: 2024-06-07
 url: https://t.me/fukiamimir/221
 note: R Vendor recovery, decrypts Android 12+ AOSP.
 vendor: rvendor
+android: 12
 
 name: Hitori Ame Recovery Project
 version: v0.0.2_infdev_r (official)
@@ -62,6 +65,7 @@ date: 2024-10-07
 url: https://t.me/fukiamimir/334
 note: R Vendor recovery, decrypts Android 12+ AOSP. Fixed flashing progress bar, invisible pattern lock, wrong battery percent placement.
 vendor: rvendor
+android: 12
 
 name: Hitori Ame Recovery Project
 version: v0.0.2-S_infdev (official)

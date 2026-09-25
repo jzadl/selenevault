@@ -71,6 +71,7 @@ date: 2024-09-15
 url: https://t.me/fukiamimir/319
 note: MIUI 12.5/RVendor only. Linux 4.14.352 OpenELA LTS, disabled AAL/AEE, bpf updates for Android 15. Known issue: FTS screen dead touch after boot (reboot recovery then system fixes it).
 vendor: rvendor
+android: 15
 
 name: Niigo Kernel
 version: yuki VII
@@ -98,6 +99,7 @@ date: 2024-03-19
 url: unknown
 note: MIUI 12.5/RVendor only. Linux 4.14.339 OpenELA LTS, double_tap node, BPF uprev to 5.4 for Android 15. Known issue: FTS screen dead touch after boot.
 vendor: rvendor
+android: 15
 
 name: Sea Kernel
 version: R1.4 / Aeleen (Weekly)

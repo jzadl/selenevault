@@ -61,7 +61,11 @@ note: Android 13. R Vendor
 
 Fields vary per category (`guide`/`channel` entries only use
 `name`/`url`/`note`; the rest also use `version`, `maintainer`, `size`,
-`date`, `vendor`). Lines starting with `#` are comments.
+`date`, `vendor`). Three optional fields power the filters and may be added
+to any entry: `android:` (major version, e.g. `14`), `gapps:`
+(`gapps`/`vanilla`), `issues:` (known bugs, empty means none). When absent,
+the frontends fall back to parsing `note`. Lines starting with `#` are
+comments.
 
 | File | What's in it |
 |------|--------------|

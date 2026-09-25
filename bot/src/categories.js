@@ -32,22 +32,22 @@ export const CATEGORY_PLURALS = {
 };
 
 export const CATEGORY_FIELDS = {
-  rom: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
-  kernel: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
-  recovery: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
-  firmware: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
-  port: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor"],
-  tool: ["name", "version", "maintainer", "size", "date", "url", "note"],
+  rom: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
+  kernel: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
+  recovery: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
+  firmware: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
+  port: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
+  tool: ["name", "version", "maintainer", "size", "date", "url", "note", "android", "gapps", "issues"],
   guide: ["name", "url", "note"],
   channel: ["name", "url", "note"],
 };
 
 export const CATEGORY_REQUIRED = {
-  rom: ["name", "maintainer", "url", "size", "vendor"],
-  kernel: ["name", "maintainer", "url", "size", "vendor"],
-  recovery: ["name", "maintainer", "url", "size", "vendor"],
-  firmware: ["name", "maintainer", "url", "size", "vendor"],
-  port: ["name", "maintainer", "url", "size", "vendor"],
+  rom: ["name", "maintainer", "url", "size", "vendor", "android"],
+  kernel: ["name", "maintainer", "url", "size", "vendor", "android"],
+  recovery: ["name", "maintainer", "url", "size", "vendor", "android"],
+  firmware: ["name", "maintainer", "url", "size", "vendor", "android"],
+  port: ["name", "maintainer", "url", "size", "vendor", "android"],
   tool: ["name", "maintainer", "url"],
   guide: ["name", "url"],
   channel: ["name", "url"],

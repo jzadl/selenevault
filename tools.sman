@@ -26,6 +26,7 @@ date: unknown
 url: https://drive.google.com/drive/mobile/folders/16WnaIXTCQtdRrLtZbAN9dKSG6bt1DTw8?usp=sharing
 note: Custom vendor based on MIUI 14.0.7, main goal is to fix bugs and improve user experience. Supports Android 13+ GSI only. Features: https://telegra.ph/Features-07-16-6, flashing instructions: https://telegra.ph/Flashing-guide-07-16, settings after first boot: https://telegra.ph/Settings-after-first-boot-07-16
 vendor: svendor
+android: 13
 
 name: MIUI Boot images
 version: unknown

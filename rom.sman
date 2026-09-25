@@ -8,6 +8,7 @@ date: 2025-09-05
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-20.0-20250905-UNOFFICIAL-selene.zip/download
 note: Android 13
 vendor: rvendor
+android: 13
 
 name: LineageOS 20.0
 version: 20.0-20241119
@@ -17,6 +18,7 @@ date: 2024-11-19
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-20.0-20241119-UNOFFICIAL-selene.zip/download
 note: Android 13
 vendor: rvendor
+android: 13
 
 name: RisingOS
 version: 5.2.1-20241024
@@ -26,6 +28,8 @@ date: 2024-10-24
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2.1-FINAL-STABLE-EOL-20241024-VANILLA-COMMUNITY-selene-ota.zip/download
 note: Android 14, Final EOL, Vanilla, Community
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: PixelOS
 version: 14.0-20241003
@@ -35,6 +39,7 @@ date: 2024-10-03
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/PixelOS_selene-14.0-20241003-0842.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: DerpFest
 version: 15-20241001
@@ -44,6 +49,7 @@ date: 2024-10-01
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-15-Community-Alpha-selene-20241001.zip/download
 note: Android 15, Community, Alpha
 vendor: rvendor
+android: 15
 
 name: RisingOS
 version: 5.2-20240910
@@ -53,6 +59,8 @@ date: 2024-09-10
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2-FINAL-EOL-20240910-VANILLA-COMMUNITY-selene-ota.zip/download
 note: Android 14, Final EOL, Community
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: TenX-OS
 version: 0.1-20240830
@@ -62,6 +70,7 @@ date: 2024-08-30
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/TenX-OS-v0.1_selene-14.0-20240830-1219-Revival-UnOfficial.zip/download
 note: Android 14, Revival
 vendor: rvendor
+android: 14
 
 name: PixelStar
 version: 3.2-20240826
@@ -71,6 +80,7 @@ date: 2024-08-26
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/pixelstar-3.2-uday-selene-unofficial-1650-20240826.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: AlphaDroid
 version: 14.0-v2.4-20240821
@@ -80,6 +90,8 @@ date: 2024-08-21
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240821-selene-vanilla-v2.4.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: RisingOS
 version: 5.0-20240820-gapps
@@ -89,6 +101,8 @@ date: 2024-08-20
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.0-FINAL-20240820-GAPPS-COMMUNITY-selene-ota.zip/download
 note: Android 14, GApps, Community
 vendor: rvendor
+android: 14
+gapps: gapps
 
 name: RisingOS
 version: 5.0-20240820-vanilla
@@ -98,6 +112,8 @@ date: 2024-08-20
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.0-FINAL-20240820-VANILLA-COMMUNITY-selene-ota.zip/download
 note: Android 14, Community
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: LineageOS 21.0
 version: 21.0-20240818
@@ -107,6 +123,7 @@ date: 2024-08-18
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/lineage-21.0-20240818-UNOFFICIAL-selene.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: RisingOS
 version: 4.2-20240808-core
@@ -116,6 +133,7 @@ date: 2024-08-08
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-4.2-RELEASE-20240808-CORE-COMMUNITY-selene-ota.zip/download
 note: Android 14, Core, Community
 vendor: rvendor
+android: 14
 
 name: RisingOS
 version: 4.2-20240808-vanilla
@@ -125,6 +143,8 @@ date: 2024-08-08
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-4.2-RELEASE-20240808-VANILLA_AOSP-COMMUNITY-selene-ota.zip/download
 note: Android 14, AOSP, Community
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: crDroid Android
 version: 14.0-v10.6
@@ -134,6 +154,7 @@ date: 2024-08-07
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/crDroidAndroid-14.0-20240807-selene-v10.6.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: Halcyon
 version: 14.2-20240615
@@ -143,6 +164,7 @@ date: 2024-06-15
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/halcyon_selene-14.2-20240615-0650-UNOFFICIAL.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: DerpFest
 version: 14-20240614
@@ -152,6 +174,7 @@ date: 2024-06-14
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/DerpFest-14-Community-Stable-selene-20240614.zip/download
 note: Android 14, Community, Stable
 vendor: rvendor
+android: 14
 
 name: DroidX
 version: 2.1-20240610
@@ -161,6 +184,8 @@ date: 2024-06-10
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/droidx-2.1-20240610-1012-UNOFFICIAL-selene-Vanilla.zip/download
 note: Android 14, Unofficial
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Awaken
 version: 4.5-20240608
@@ -170,6 +195,7 @@ date: 2024-06-08
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/awaken-4.5-ursa-selene-unofficial-1424-20240608.zip/download
 note: Android 14, Ursa
 vendor: rvendor
+android: 14
 
 name: EvolutionX
 version: 14.0-v9.0
@@ -179,6 +205,7 @@ date: 2024-06-01
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/EvolutionX-14.0-20240601-selene-v9.0-Unofficial.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: Everest
 version: 1.2-20240529
@@ -188,6 +215,8 @@ date: 2024-05-29
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Everest-1.2-Gokyo-selene-UNOFFICIAL-GAPPS-1219-20240529.zip/download
 note: Android 14, Gokyo, GApps
 vendor: rvendor
+android: 14
+gapps: gapps
 
 name: crDroid Android
 version: 14.0-v10.5
@@ -197,6 +226,7 @@ date: 2024-05-28
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/crDroidAndroid-14.0-20240528-selene-v10.5.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: PixelOS
 version: 14.0-20240526
@@ -206,6 +236,7 @@ date: 2024-05-26
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/PixelOS_selene-14.0-20240526-0636.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
 
 name: RisingOS
 version: 3.1-20240524-core
@@ -215,6 +246,7 @@ date: 2024-05-24
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-3.1-RELEASE-20240524-CORE-COMMUNITY-selene-ota.zip/download
 note: Android 14, Core, Community
 vendor: rvendor
+android: 14
 
 name: AlphaDroid
 version: 14.0-v2.1-20240522
@@ -224,6 +256,8 @@ date: 2024-05-22
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240522-selene-vanilla-v2.1.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Matrixx
 version: 10.5.1-20240518
@@ -233,6 +267,8 @@ date: 2024-05-18
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Matrixx-v10.5.1-Unofficial-selene-Gapps-20240518.zip/download
 note: Android 14, GApps
 vendor: rvendor
+android: 14
+gapps: gapps
 
 name: AlphaDroid
 version: 14.0-v2.1-20240517
@@ -242,6 +278,8 @@ date: 2024-05-17
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/AlphaDroid-14.0-20240517-selene-vanilla-v2.1.zip/download
 note: Android 14
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Project Sakura
 version: 9.1-20240516
@@ -251,6 +289,8 @@ date: 2024-05-16
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/ProjectSakura-9.1-20240516-1834-VANILLA-selene-UNOFFICIAL.zip/download
 note: Android 14, Unofficial
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Cherish OS
 version: 5.5-20240512
@@ -260,6 +300,8 @@ date: 2024-05-12
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/Cherish-OS-v5.5-20240512-1529-aosp_selene-UNOFFICIAL-GApps.zip/download
 note: Android 14, AOSP, GApps
 vendor: rvendor
+android: 14
+gapps: gapps
 
 name: Nusantara Project Surakarta
 version: Official
@@ -269,6 +311,7 @@ date: 2022-08-30
 url: https://nusantararom.org/device/selene/
 note: Android 12.1, S/L Vendor. Upstream kernel 4.14.288, selene/selenes/eos board support.
 vendor: rvendor
+android: 12
 
 name: Kaleidoscope Sunflowerleaf
 version: Unofficial (initial S vendor)
@@ -278,6 +321,7 @@ date: 2022-08-31
 url: https://www.pling.com/p/1885588/
 note: Android 12.1, S Vendor, OSS. User build with encryption enabled.
 vendor: svendor
+android: 12
 
 name: Kaleidoscope Sunflowerleaf
 version: Unofficial (S vendor update)
@@ -287,6 +331,7 @@ date: 2022-09-12
 url: https://www.pling.com/p/1885588/
 note: Android 12.1, S Vendor, OSS.
 vendor: svendor
+android: 12
 
 name: Havoc OS
 version: 4.19 Unofficial
@@ -296,6 +341,7 @@ date: 2022-11-03
 url: https://www.pling.com/p/1926079/
 note: Android 11, R Vendor. Bugs: blur broken, MTP maybe broken.
 vendor: rvendor
+android: 11
 
 name: Cherish OS
 version: 3.6 Official
@@ -305,6 +351,7 @@ date: 2022-04-10
 url: http://www.pling.com/p/1692434/
 note: Android 12L. Upstream kernel 4.14.275, VoLTE fix for India, Dolby from Moto G.
 vendor: rvendor
+android: 12
 
 name: LineageOS
 version: Unofficial (Feb 2023)
@@ -314,6 +361,7 @@ date: 2023-02-08
 url: https://t.me/atharv2951_builds/2
 note: Android 13, R Vendor, OSS. AOD/90Hz work, no faceunlock, VoLTE/VoWiFi broken.
 vendor: rvendor
+android: 13
 
 name: Pixel Experience Plus
 version: Unofficial (08/03/23)
@@ -323,6 +371,7 @@ date: 2023-03-08
 url: https://mega.nz/file/2l9HXD4T#SON2LtFGgvWhiTnhmKF56RZpqIM1ba12TkW8YASSldQ
 note: Android 13, OSS_R. MIUI 12.x only, not MIUI 13. Special devices need Yukina kernel.
 vendor: rvendor
+android: 13
 
 name: Pixel Experience Plus
 version: Unofficial (12/03/23)
@@ -332,6 +381,7 @@ date: 2023-03-12
 url: https://mega.nz/file/24NW0QjC#LRDcKcJaO1RqNNzWcvpNd65NktDlvVtJ5fl1AWXb01Y
 note: Android 13, OSS_R. Switched to Paramex kernel, MIUI13 surfaceflinger props.
 vendor: rvendor
+android: 13
 
 name: LineageOS 22.2
 version: Unofficial
@@ -341,6 +391,7 @@ date: 2025-04-01
 url: https://hyp.sh/FaDlM0O
 note: Android 15 QPR2, R Vendor. Flash with provided boot.img, custom recoveries may not work. Screen recording dead.
 vendor: rvendor
+android: 15
 
 name: CherishOS
 version: Unofficial (26/03/23)
@@ -350,6 +401,8 @@ date: 2023-03-26
 url: https://t.me/YudhoPatriantoDriveChannel/102
 note: Android 13, OSS_R, R Vendor. GApps build. MIUI 12.x only.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: RiceDroid
 version: Unofficial (26/03/23)
@@ -359,6 +412,7 @@ date: 2023-03-26
 url: https://mega.nz/file/Hw9AmDSa#_g79uojhTvXVqA8DiDbwmX15TtTNykS-rDTb_ZlKrLA
 note: Android 13, OSS_R. SELinux permissive, VoLTE/VoWiFi broken.
 vendor: rvendor
+android: 13
 
 name: RiceDroid
 version: Unofficial (29/03/23)
@@ -368,6 +422,7 @@ date: 2023-03-30
 url: https://mega.nz/file/yo8zTaYS#A1Bm-O-52g2RXPRfWBIU_yxtaXTUzU-BYfsfQ_R7VdE
 note: Android 13, OSS_R. Switched to SELinux enforcing, fixed VoLTE/VoWiFi. MIUI 12.x only.
 vendor: rvendor
+android: 13
 
 name: RiceDroid
 version: Unofficial (01/04/23)
@@ -377,6 +432,7 @@ date: 2023-04-01
 url: https://mega.nz/file/e4c2mIhY#vToU0exfPa2Qg9XolnKL1Mt4AGRcotPEcihy1Hka9OE
 note: Android 13, OSS_R. Fixed storage and 90hz issue, no longer needs Luna kernel.
 vendor: rvendor
+android: 13
 
 name: Superior OS
 version: Unofficial (03/04/23)
@@ -386,6 +442,7 @@ date: 2023-04-03
 url: https://mega.nz/file/G5k2FD5T#EXII371N1iE80PR6KoM_b3oS7nGMXnxTnQGlVLeMFR8
 note: Android 13, OSS_R. SELinux enforcing. Needs Luna kernel on SC and non-SC devices.
 vendor: rvendor
+android: 13
 
 name: RiceDroid
 version: Unofficial (07/04/23)
@@ -395,6 +452,7 @@ date: 2023-04-07
 url: https://mega.nz/file/DgkjxBQa#9ieY4CbBJu3xx4lETMyLzhndYTGDJ6yB88D50TSX27Y
 note: Android 13, OSS_R. Introduces BesLoudness, MtkRadio, kernel tweaks.
 vendor: rvendor
+android: 13
 
 name: PixelExperience
 version: Unofficial (11/04/23)
@@ -404,6 +462,7 @@ date: 2023-04-11
 url: https://mega.nz/file/Xp8SXIwY#X48aD91-SwJ58pO687DLTNyh0MY_PHHjPtzlXGx83Es
 note: Android 13, OSS_R. Fixed VoLTE/VoWiFi, upstream kernel 4.14.311.
 vendor: rvendor
+android: 13
 
 name: PixelExperience
 version: Unofficial (20/04/23)
@@ -413,6 +472,7 @@ date: 2023-04-25
 url: https://mega.nz/file/2hMB2ayD#RAhDl4xFnJXjqkm4Rsr7mSoqLv3TFV7WPl4pir6VPps
 note: Android 13, OSS_R. Switched to OSS powerhal, faster boot, better battery.
 vendor: rvendor
+android: 13
 
 name: VoidUI
 version: Unofficial
@@ -422,6 +482,8 @@ date: 2023-04-25
 url: https://mega.nz/file/OwN10JYQ#XBYtDWyYkmQVoYjXzs_kr2w565m1dU-yKcok6BvepmE
 note: Android 13, OSSR. GApps build, fixed camera and SysUI crash.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: crDroid
 version: Unofficial (25/04/23)
@@ -431,6 +493,8 @@ date: 2023-04-26
 url: https://mega.nz/file/L5cU0bAb#4q0y42iB2ukSo7u8kmIZSqzbaNtesECQ34_PDSqMgNM
 note: Android 13, OSSR. GApps build, MIUI 12.x only.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: RisingOS
 version: 1.0 Unofficial
@@ -440,6 +504,8 @@ date: 2023-04-27
 url: https://sourceforge.net/projects/krxyzndocs/files/Selene-test/risingOS-v1.0-Atlantis-202304261254-selene-CORE-COMMUNITY.zip/download
 note: Android 13, OSSR. GApps build, fixed camera and VoLTE/VoWiFi.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: PixelExtended
 version: 5.7 Unofficial
@@ -449,6 +515,8 @@ date: 2023-04-29
 url: https://sourceforge.net/projects/krxyzndocs/files/selene/PixelExtended-5.7_selene-13.0-20230428-0324-UNOFFICIAL.zip/download
 note: Android 13.0, OSSR. GApps build.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: OctaviOS
 version: Unofficial
@@ -458,6 +526,9 @@ date: 2023-05-04
 url: https://mega.nz/file/jkkEAZAR#jINNdn7eL__76D2qLTkI7cuUCvzbxcrThngpYvevzUs
 note: Android 13, OSSR. GApps build, MIUI 12.x only. Bug: DT2W.
 vendor: rvendor
+android: 13
+gapps: gapps
+issues: yes
 
 name: RisingOS
 version: 1.1 Unofficial
@@ -467,6 +538,7 @@ date: 2023-05-11
 url: https://mega.nz/file/jp8CWDpQ#xpXYS3Na0wNvJTSR-Ch6hR90tIclR4QSjz3YBFnOzGA
 note: Android 13. Fixed DT2W and VoLTE.
 vendor: rvendor
+android: 13
 
 name: crDroid
 version: Unofficial (18/05/23)
@@ -476,6 +548,8 @@ date: 2023-05-18
 url: https://mega.nz/file/b99TxSDC#cRwfSj4mSUCv-2crwn96b3VMbYzTS_idtbORhNj2UkQ
 note: Android 13, OSSR. Vanilla build, fixed SysUI crash and DT2W. MIUI 12.x only.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: BananaDroid Tanduk
 version: Unofficial Vanilla
@@ -485,6 +559,8 @@ date: 2023-05-20
 url: https://sourceforge.net/projects/krxyzndocs/files/selene/BananaDroid-Tanduk-selene-UNOFFICIAL-20230513-Vanilla.zip/download
 note: Android 13, OSS, R Vendor, Vanilla. Yukina Kernel by default. MIUI 12.5/R Vendor only.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: xDroid Pixel
 version: Beta Unofficial
@@ -494,6 +570,7 @@ date: 2023-06-04
 url: https://sourceforge.net/projects/krxyzndocs/files/selene/INA.XD.13.0.49-selene-04062023-1513-REL.zip/download
 note: Android 13, OSS, R Vendor. GrapheneOS camera and Sea Kernel by default. MIUI 12.5/R Vendor only.
 vendor: rvendor
+android: 13
 
 name: LineageOS
 version: Unofficial (28/07/23)
@@ -503,6 +580,7 @@ date: 2023-07-28
 url: https://mega.nz/file/Sk1QHKQT#JeMdYsmNMEiICjt-B_YHl_ghjD4qP17sD3-tjUqjmEo
 note: Android 13. Upstream kernel 4.14.319 with KernelSU, fixed fast charging and audio stuttering.
 vendor: svendor
+android: 13
 
 name: SuperiorOS
 version: Unofficial (28/07/23, ryzenforce)
@@ -512,6 +590,7 @@ date: 2023-07-28
 url: https://sourceforge.net/projects/redmi10/files/SuperiorOS-Thirteen-selene-COMMUNITY-20230728-1758.zip/download
 note: Android 13.0. HDR/AOSP color props, upstream kernel 4.14.320. GApps and Vanilla variants.
 vendor: rvendor
+android: 13
 
 name: SuperiorOS
 version: Thirteen Unofficial GApps/Vanilla
@@ -521,6 +600,7 @@ date: 2023-07-28
 url: https://sourceforge.net/projects/redmi10/files/SuperiorOS-Thirteen-selene-GAPPS-COMMUNITY-20230728-1714.zip/download
 note: Android 13, R_OSS, R Vendor. GApps and Vanilla variants available.
 vendor: rvendor
+android: 13
 
 name: DerpFest
 version: Unofficial (31/07/23)
@@ -530,6 +610,7 @@ date: 2023-07-31
 url: https://drive.google.com/file/d/1nhnWtoBCGigmCrzj_yy9pjfo8aaXmJCD/view?usp=sharing
 note: Android 13, R_OSS, R Vendor. GApps builtin (no vanilla). Laggy QS known issue.
 vendor: rvendor
+android: 13
 
 name: DerpFest Tango
 version: Unofficial
@@ -539,6 +620,7 @@ date: 2023-08-03
 url: https://drive.google.com/file/d/1cyWS9zkcmu4okl35cd5bpjBv-lTWqIps/view?usp=sharing
 note: Android 13, R_OSS, R Vendor. Fixed high brightness issue, legacy bootanimation.
 vendor: rvendor
+android: 13
 
 name: ArrowOS
 version: 13.1 Unofficial
@@ -548,6 +630,8 @@ date: 2023-08-08
 url: https://drive.google.com/file/d/1bDXyKA8VUmRMcq64DVMiRYRnjYYgPYum/view?usp=sharing
 note: Android 13, R_OSS, R Vendor, vanilla. GrapheneOS camera by default. 90hz inconsistent.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: SkylineUI
 version: Unofficial (initial)
@@ -557,6 +641,8 @@ date: 2023-08-12
 url: https://drive.google.com/file/d/1zO0yCq7WVu7amA94Q2RjjlvbM8kCOhUR/view?usp=sharing
 note: Android 13, R_OSS, R Vendor. Based on PixelExperience Plus, GApps included.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: ProtonPlus
 version: 13.2 Unofficial
@@ -566,6 +652,8 @@ date: 2023-08-26
 url: https://drive.google.com/file/d/1axLN1Qmxacwra0BY-p0nbX2nJb87Si-e/view?usp=sharing
 note: Android 13, R_OSS, R Vendor, vanilla. MIUI-like brightness, janky audio known issue.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: CherishOS
 version: 4.11 Unofficial
@@ -575,6 +663,8 @@ date: 2023-09-06
 url: https://sourceforge.net/projects/yudhoprjktroms/files/cherish4.11/Cherish-OS-v4.11-20230904-1221-selene-UNOFFICIAL-GApps.zip/download
 note: Android 13.0. Upstream kernel 4.14.324, fixed VoLTE/VoWiFi. R Vendor, MIUI 12.5.15+.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: ProjectBlaze
 version: 2.9 Unofficial
@@ -584,6 +674,7 @@ date: 2023-09-06
 url: https://sourceforge.net/projects/yudhoprjktroms/files/projectblaze2.9/
 note: Android 13.0. Upstream kernel 4.14.324, fixed D2TW. R Vendor, MIUI 12.5.15+.
 vendor: rvendor
+android: 13
 
 name: PixelOS
 version: Unofficial (07/09/23)
@@ -593,6 +684,8 @@ date: 2023-09-08
 url: https://sourceforge.net/projects/yudhoprjktroms/files/pixelos/
 note: Android 13.0. Graphene Camera, GApps. R Vendor, MIUI 12.5.15+.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: SkylineUI
 version: 8.5 Unofficial
@@ -602,6 +695,7 @@ date: 2023-09-10
 url: https://drive.google.com/file/d/1is4IRrnc7Cg3q48ApJhu0r_adhYdeTZ-/view?usp=sharing
 note: Android 13, R_OSS, R Vendor. Synced August patch, upstream kernel 4.14.325.
 vendor: rvendor
+android: 13
 
 name: EvolutionX
 version: 7.9.8 Lugaw Community
@@ -611,6 +705,8 @@ date: 2023-09-19
 url: https://sourceforge.net/projects/yudhoprjktroms/files/Evolution-X/Lugaw/
 note: Android 13.0, R_OSS, R Vendor. GApps build. No file manager/browser preinstalled.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: FireDroid
 version: 1.8 Unofficial
@@ -620,6 +716,8 @@ date: 2023-09-21
 url: https://sourceforge.net/projects/yudhoprjktroms/files/FireDroid/1.8/
 note: Android 13.0, R_OSS, R Vendor, GApps. FP only works on fpc, not goodix_fp.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: Pixel Experience
 version: Unofficial (01/10/23)
@@ -629,6 +727,8 @@ date: 2023-10-01
 url: https://t.me/YudhoPatriantoDriveDiscussions/21009
 note: Android 13. Synced September patch, GApps included.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: Pixel Experience Plus
 version: Unofficial (01/10/23)
@@ -638,6 +738,8 @@ date: 2023-10-02
 url: https://t.me/YudhoPatriantoDriveDiscussions/21200
 note: Android 13. Synced September patch, GApps included.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: crDroid
 version: 9.9 Unofficial
@@ -647,6 +749,8 @@ date: 2023-10-08
 url: https://drive.google.com/file/d/1jo83RD-njk_z8JnopU1yRrpJf44beIxM/view?usp=drive_link
 note: Android 13, R_OSS, R Vendor, vanilla. Kernel Linux 4.14.326, September patch.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: DroidX UI
 version: Unofficial
@@ -656,6 +760,8 @@ date: 2023-10-10
 url: https://sourceforge.net/projects/krxyzndocs/files/Hanz/Droidx-selene/droidx-1.5.3-20231010-UNOFFICIAL-selene-Gapps.zip/download
 note: Android 13, OSS, R Vendor, GApps. MIUI 12.5/R Vendor only.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: RisingOS Elysium
 version: 1.4 Community
@@ -665,6 +771,8 @@ date: 2023-10-13
 url: https://sourceforge.net/projects/yudhoprjktroms/files/RisingOS/Elysium
 note: Android 13.0, R_OSS, R Vendor. GApps build.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: Alphadroid
 version: 1.10 Unofficial
@@ -674,6 +782,8 @@ date: 2023-10-26
 url: https://sourceforge.net/projects/yudhoprjktroms/files/Alphadroid/1.10/
 note: Android 13.0, R_OSS, R Vendor, GApps. Maintainer name may not display in settings.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: AlphaDroid
 version: 1.10 Official
@@ -683,6 +793,8 @@ date: 2023-10-27
 url: https://sourceforge.net/projects/alphadroid-project/files/selene/AlphaDroid-13.0-20231027-selene-gapps-v1.10.zip/download
 note: Android 13. GApps build. Official release for selene.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: ColtOS
 version: 13.4 minimal Unofficial
@@ -692,6 +804,8 @@ date: 2023-11-01
 url: https://sourceforge.net/projects/yudhoprjktroms/files/ColtOS/minimal/
 note: Android 13.0, R_OSS, R Vendor, GApps.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: Evolution X
 version: 7.9.9 Tocino Community
@@ -701,6 +815,8 @@ date: 2023-11-05
 url: https://pixeldrain.com/u/vSHuFGkH
 note: Android 13, R_OSS, R Vendor, GApps. October patch, keylayout support for 3-button headset.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: SparkOS
 version: 13.9 Unofficial
@@ -710,6 +826,8 @@ date: 2023-11-07
 url: https://sourceforge.net/projects/yudhoprjktroms/files/SparkOS/13.9/
 note: Android 13.0, R_OSS, R Vendor, GApps.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: AfterLife Project
 version: 4.0 Wrath Unofficial
@@ -719,6 +837,7 @@ date: 2023-12-10
 url: https://sourceforge.net/projects/fukiame-builds/files/afterlife/231210/AfterLife-V4.0-Wrath-COMMUNITY-selene-20231210-Vanilla.zip/download
 note: Android 13, R_OSS, R Vendor. Vanilla and CoreGApps variants.
 vendor: rvendor
+android: 13
 
 name: LeafOS
 version: 3.1 Unofficial (initial)
@@ -728,6 +847,8 @@ date: 2024-01-04
 url: https://sourceforge.net/projects/fukiame-builds/files/leaf/240104/leaf-3.1-20240104-UNOFFICIAL-VANILLA-selene.zip/download
 note: Android 14, R Vendor, R_OSS. Vanilla only, no lock screen customization.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: LeafOS
 version: 3.1 Unofficial (10/01/24)
@@ -737,6 +858,8 @@ date: 2024-01-10
 url: https://sourceforge.net/projects/fukiame-builds/files/leaf/240110/leaf-3.1-20240110-UNOFFICIAL-VANILLA-selene.zip/download
 note: Android 14, R Vendor, R_OSS. Fixed 90hz refresh rate, smoother brightness curve.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Project Matrixx
 version: Community (11/01/24)
@@ -746,6 +869,8 @@ date: 2024-01-11
 url: https://sourceforge.net/projects/fukiame-builds/files/matrixx/240111/Matrixx-v10.2.0-Unofficial-selene-Vanilla-20240111.zip/download
 note: Android 14, R Vendor, R_OSS. Vanilla only. Funky screen on some NVT devices with stock kernel.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: crDroid
 version: v10.1 Unofficial
@@ -755,6 +880,8 @@ date: 2024-01-25
 url: https://sourceforge.net/projects/fukiame-builds/files/crdroid/240125/crDroidAndroid-14.0-20240125-selene-v10.1.zip/download
 note: Android 14, R_OSS, R Vendor, vanilla only. VoLTE broken, some devices reboot on calls under 40% battery.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: HorizonDroid Luna
 version: 13.0 Unofficial
@@ -764,6 +891,8 @@ date: 2024-02-04
 url: https://sourceforge.net/projects/yudhoprjktroms/files/HorizonDroid/Android13/HorizonDroid-Luna-selene-13.0-20240203-2327-Unofficial.zip/download
 note: Android 13.0, R_OSS, R Vendor, GApps.
 vendor: rvendor
+android: 13
+gapps: gapps
 
 name: DerpFest 14
 version: Community Stable
@@ -773,6 +902,8 @@ date: 2024-02-10
 url: https://sourceforge.net/projects/fukiame-builds/files/derpfest/240210/DerpFest-14-Community-Stable-selene-20240210.zip/download
 note: Android 14, R_OSS, R Vendor. GApps included, VoLTE and offline charging issues.
 vendor: rvendor
+android: 14
+gapps: gapps
 
 name: LineageOS
 version: Unofficial (18/02/24)
@@ -782,6 +913,7 @@ date: 2024-02-21
 url: https://www.pling.com/p/2130715/
 note: Android 11, OSS_R.
 vendor: rvendor
+android: 11
 
 name: DotOS
 version: Unofficial
@@ -791,6 +923,7 @@ date: 2024-02-21
 url: https://www.pling.com/p/2131494/
 note: Android 11, OSS_R. Merged android-security-11.0.0_r76.
 vendor: rvendor
+android: 11
 
 name: XDroid-CAF
 version: Unofficial
@@ -800,6 +933,7 @@ date: 2024-02-28
 url: https://www.pling.com/p/2133527/
 note: Android 11, OSS_R. Fixed BT audio SysUI crash and uid/gid autoset for obb games.
 vendor: rvendor
+android: 11
 
 name: Project Matrixx
 version: Community (29/02/24)
@@ -809,6 +943,8 @@ date: 2024-02-29
 url: https://sourceforge.net/projects/fukiame-builds/files/matrixx/240229/Matrixx-v10.3.0-Unofficial-selene-Vanilla-20240229.zip/download
 note: Android 14, R_OSS, R Vendor, vanilla only. VoLTE dead.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Superior Extended
 version: Unofficial
@@ -818,6 +954,8 @@ date: 2024-03-03
 url: https://sourceforge.net/projects/fukiame-builds/files/superior_extended/240303/SuperiorExtended-COMMUNITY-14-selene-VANILLA-20240303-0400.zip/download
 note: Android 14, R Vendor, vanilla only, 64bit apps only. VoLTE dead, not Play certified.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: Project Afterlife
 version: Unofficial (06/03/24)
@@ -827,6 +965,7 @@ date: 2024-03-05
 url: https://www.pling.com/p/2135214/
 note: Android 13, OSS_R. Gapps/CoreGApps/Vanilla variants. Do not change kernel (breaks DT2W).
 vendor: rvendor
+android: 13
 
 name: Project Afterlife
 version: Unofficial (hotfix 09/03/24)
@@ -836,6 +975,7 @@ date: 2024-03-09
 url: https://www.pling.com/p/2135214/
 note: Android 13, OSS_R. Fixed offline charging, fingerprint, keylayout.
 vendor: rvendor
+android: 13
 
 name: Miku UI Udon
 version: Unofficial (10/03/24)
@@ -845,6 +985,7 @@ date: 2024-03-10
 url: https://t.me/fukiamimir/175
 note: Android 14, 64bit apps only. VoLTE dead, Play Integrity DEVICE fails.
 vendor: rvendor
+android: 14
 
 name: RisingOS 2.2 Ignis
 version: Unofficial
@@ -854,6 +995,7 @@ date: 2024-05-15
 url: https://t.me/fukiamimir/216
 note: Android 14 QPR2. Fixed VoLTE, thermal config. Incompatible with most custom kernels.
 vendor: rvendor
+android: 14
 
 name: MikuUI v0.9.0 Udon v2
 version: Unofficial
@@ -863,6 +1005,7 @@ date: 2024-05-17
 url: https://t.me/fukiamimir/217
 note: Android 14 QPR2. Fixed VoLTE, thermal config, missing libperfmgr. Doesn't pass Play Integrity DEVICE by default.
 vendor: rvendor
+android: 14
 
 name: SuperiorOS
 version: Unofficial (07/06/24)
@@ -872,6 +1015,7 @@ date: 2024-06-07
 url: https://t.me/fukiamimir/236
 note: Android 14 QPR2. Signed build, must clean flash, vanilla, recommends NikGapps U Core.
 vendor: rvendor
+android: 14
 
 name: AICP
 version: Unofficial
@@ -881,6 +1025,8 @@ date: 2024-08-07
 url: https://sourceforge.net/projects/fukiame-builds/files/aicp/240809/aicp_selene_t-18.0-UNOFFICIAL-20240807.zip/download
 note: Android 13, R Vendor, vanilla. Play Integrity DEVICE dies.
 vendor: rvendor
+android: 13
+gapps: vanilla
 
 name: Pixel Experience
 version: Unofficial (01/01/22)
@@ -890,6 +1036,7 @@ date: 2022-01-01
 url: https://mega.nz/file/GMMBnaBb#Rox_uB2Hv4gq_i6bfPJodclo2bd7DipiRwMKqrIoyqw
 note: Android 11. First PE build for selene. Credits: ceb8khs, SakthivelNadar, ashblk, chcepizze, TheMalachite (DT), askairt (test).
 vendor: rvendor
+android: 11
 
 name: exTHmUI
 version: 14.0 Utsuho Unofficial (13/04/24)
@@ -899,6 +1046,8 @@ date: 2024-04-13
 url: https://sourceforge.net/projects/fukiame-builds/files/exthm/240413/exTHmUI-14.0-Utsuho-selene-DEBUG-20240409.zip/download
 note: Android 14 QPR1. Only vanilla variant, SELinux enforcing, VoLTE dead, Play Integrity fails DEVICE. R Vendor.
 vendor: rvendor
+android: 14
+gapps: vanilla
 
 name: RisingOS
 version: 5.2.1-20241011 (Vanilla)
@@ -908,6 +1057,9 @@ date: 2024-10-11
 url: https://sourceforge.net/projects/hasan6034-builds/files/selene/RisingOS-5.2.1-FINAL-STABLE-EOL-20241011-VANILLA-COMMUNITY-selene-ota.zip/download
 note: Android 14, Final EOL Vanilla, Community. Miui camera and Lawnchair launcher included. Bug: VoLTE.
 vendor: rvendor
+android: 14
+gapps: vanilla
+issues: yes
 
 name: CherishOS
 version: v3.9.5
@@ -917,6 +1069,8 @@ date: 2022-11-10
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.9.5-20221110-0510-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.9
@@ -926,6 +1080,8 @@ date: 2022-07-10
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.9-20220709-0117-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.7
@@ -935,6 +1091,8 @@ date: 2022-06-05
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.7-20220509-0944-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.6.5
@@ -944,6 +1102,8 @@ date: 2022-04-25
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6.5-20220423-0644-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.6
@@ -953,6 +1113,8 @@ date: 2022-04-10
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6-20220409-2119-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.6
@@ -962,6 +1124,8 @@ date: 2022-04-06
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.6-20220406-1454-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.5.5
@@ -971,6 +1135,8 @@ date: 2022-04-06
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.5-20220405-2129-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.5.5
@@ -980,6 +1146,8 @@ date: 2022-03-29
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.5-20220329-0939-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.5.2
@@ -989,6 +1157,8 @@ date: 2022-03-26
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.5.2-20220325-1638-selene-OFFICIAL-GApps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.4.5
@@ -998,6 +1168,8 @@ date: 2022-02-22
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.4.5-20220222-0041-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.4
@@ -1007,6 +1179,8 @@ date: 2022-02-13
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.4-20220212-1222-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.3.5
@@ -1016,6 +1190,8 @@ date: 2022-02-07
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220203-1844-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 
 name: CherishOS
 version: v3.3.5
@@ -1025,4 +1201,6 @@ date: 2022-02-06
 url: https://sourceforge.net/projects/cherish-os/files/device/selene/Cherish-OS-v3.3.5-20220127-1437-selene-OFFICIAL-Gapps.zip/download
 note: Official GApps build. Android 11.
 vendor: rvendor
+android: 11
+gapps: gapps
 

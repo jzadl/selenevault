@@ -12,6 +12,9 @@ const FIELD_LABELS = {
   url: "download link",
   note: "note",
   vendor: "vendor",
+  android: "Android version",
+  gapps: "GApps/Vanilla info",
+  issues: "known issues",
 };
 
 export function findMissingFields(parsed) {
@@ -43,7 +46,10 @@ Output ONLY a JSON object, no markdown, no explanation, no code fences. The JSON
   "date": ISO format YYYY-MM-DD. If the post gives a date as DD/MM/YY (day/month/2-digit-year, common in these posts, e.g. "Build date:18/09/26"), convert it to 20YY-MM-DD, so "18/09/26" becomes "2026-09-18". Do not swap day and month, do not misread the year.,
   "url": the download link, or null if not present,
   "note": a short one or two sentence summary of the changelog or key details, plain text, no markdown,
-  "vendor": "rvendor" for Android 11-12 / MIUI 12.5, "svendor" for Android 13+ / MIUI 13+ / HyperOS, or null if not determinable
+  "vendor": "rvendor" for Android 11-12 / MIUI 12.5, "svendor" for Android 13+ / MIUI 13+ / HyperOS, or null if not determinable,
+  "android": the Android major version number as written (e.g. "14"), or null if not mentioned,
+  "gapps": "gapps" if the build includes Google apps/services, "vanilla" if it explicitly has none, or null if unclear,
+  "issues": a short plain-text list of known bugs/limitations, or null if none are mentioned
 }
 
 If a field cannot be determined, use null. Never invent data. Keep "note" concise, focused on what changed or what is notable, not a full changelog dump. Use plain ASCII hyphens, never special unicode dashes.`;

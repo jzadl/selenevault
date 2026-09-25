@@ -7,6 +7,7 @@ size: 2.89G
 date: 2026-08-16
 url: https://pixeldrain.com/u/1Bs3BGx5
 note: Port for selene/eos, Android 15, stock mod. Full message with details: https://t.me/Redmi10Up/22
+android: 15
 
 name: HyperOS
 version: V1.0.2.0 (Port)
@@ -16,6 +17,7 @@ date: 2024-06-06
 url: https://drive.google.com/drive/folders/1-Zi50LFfvYeaVD32YrQUZ09YxbMnYfBA?usp=sharing
 note: Android 13, ported from Fire (same G88), fully stock, based on Global. Fastboot ROM, no blur, AOD available, face unlock doesn't work. Let it settle 10-15 mins.
 vendor: svendor
+android: 13
 
 name: HyperOS
 version: V1.0.4.0 (Port)
@@ -25,6 +27,7 @@ date: 2024-06-14
 url: https://drive.google.com/drive/folders/1UZgEn_HtZTkzGKoY17gPezkIfPBzyqKu?usp=sharing
 note: Android 14, ported (fleur), Global based for selene/eos. Mods: launcher, Leica cam, file explorer, SystemUI-plugin, Miui dialer and MMS. No blur, account activation takes a bit.
 vendor: svendor
+android: 14
 
 name: HyperRemodUI
 version: 1.0.5.UMOCNXM (Port)
@@ -34,6 +37,7 @@ date: 2024-08-16
 url: https://drive.google.com/file/d/1r6co5rXH9_wCvn2kwIFimWPG_lNAcgn2/view?usp=sharing
 note: Android 14, HyperOS port, fastboot ROM, clean flash recommended. Tags: #selene #eos #upsidedowncake #HyperOS.
 vendor: svendor
+android: 14
 
 name: RUI
 version: Mix 14.0.4 | 14.0.2 v2
@@ -52,6 +56,7 @@ date: 2024-09-03
 url: https://drive.google.com/file/d/1p78oamF-MjjfNmk2j7w4LuME29-YgwcG/view?usp=sharing
 note: Realme UI 12.5 port, bootloader lock spoof, Security 8.1.2, debloated gapps + Via Browser. Tags: #MIUI #R #Selene #RUI.
 vendor: rvendor
+gapps: gapps
 
 name: HyperOS Lite
 version: 13.05.2025
@@ -61,6 +66,7 @@ date: 2025-05-13
 url: https://pixeldrain.com/u/EDSh7Fhb
 note: Android 13, most lightweight version of HyperOS, maximum debloat, launcher with animations, blur enabled, AOD enabled, custom oem logo. Install over any HyperOS port then run script. Tags: #UNOFFICIAL #PORT #firmware #android13.
 vendor: svendor
+android: 13
 
 name: FlymeOS
 version: 10.2.0.0A (Port)
@@ -70,6 +76,8 @@ date: 2025-10-02
 url: https://hyp.sh/FlymeOS
 note: Android 13, port, mandatory encryption removed, VoLTE dead. Requires MIUI 14 China 14.0.5.0.TKUCNX base. Flash FlymeOS-A13-01122023-Gapps-Selene. Tags: #FlymeOS #PORT #Selene #China.
 vendor: svendor
+android: 13
+gapps: gapps
 
 name: OS2 (HyperOS)
 version: 2.0.6.0.ULGCNXM China (Port)
@@ -79,6 +87,7 @@ date: 2025-12-20
 url: https://shrinkme.click/OS2_PortSelene_By_Satvik090
 note: Android 14, HyperOS 2.0.6.0 China port for Redmi 10 Prime. GPlay services, mods (launcher, theme manager, AOD, app vault), non-rooted, device spoofing. No bugs left. Tags: #SELENE #EOS #HYPEROS #A14 #STOCK #PORT #MOD.
 vendor: svendor
+android: 14
 
 name: HyperOS
 version: V1.0.5.0
@@ -88,6 +97,7 @@ date: 2024-06-22
 url: https://drive.google.com/drive/folders/1BBt5HlKTq2aLuGJBj-nArpueURYuqCeo?usp=drive_link
 note: Android 14, CN based added global support, debloated, optimized for gaming. Mods: launcher, security, theme, Leica cam, file explorer, dialer, MMS. AOD, depth effect, magazine, install script for windows/mac/arch-linux/ubuntu. Tags: #HyperOS #MIUI #U #Selene.
 vendor: svendor
+android: 14
 
 name: HyperOS Lite
 version: V1.0.2.0
@@ -97,6 +107,8 @@ date: 2024-06-08
 url: https://drive.google.com/drive/folders/1NHQu5mzDDZOv_pp4V1cVONCL2MzRlG3i?usp=drive_link
 note: Android 13, all system partitions converted to R/W, system logging partially disabled, APK protection disabled, NikGapps, Leica cam, mi dialer, all vbmeta patched. Tags: #HyperOS #MIUI #T #Selene.
 vendor: svendor
+android: 13
+gapps: gapps
 
 name: MIUI LITE
 version: Android 11 (22/05/2025)
@@ -115,6 +127,9 @@ date: 2025-08-16
 url: https://mega.nz/file/bXgAxTzQ#QV5FQWQsOIJzsLiWImOUn2hxbdqR5pvLrdsNIp097fw
 note: MIUI INT custom build, fastboot flashable. Make sure you are on MIUI 14 before flashing. Bug: GoogleServicesFramework/PlayServices/PlayStore, fix with LiteGApps Core Android 13 Magisk module. Flash via Termux fastboot scripts.
 vendor: svendor
+android: 13
+gapps: gapps
+issues: yes
 
 name: MiuiTN
 version: V2.3
@@ -124,6 +139,7 @@ date: 2024-06-26
 url: https://drive.google.com/drive/folders/1UsRH4dYB1q9P-Z5s8JRU_YD9G8Jj3PqV?usp=sharing
 note: Android 13, MIUI TN mod, eos support. Flash via Install_Stock/Install_Root. Tags: #MiuiTN #MIUI #T #Selene #EOS.
 vendor: svendor
+android: 13
 
 name: MIUI Lite
 version: v2 14.0.2 Taiwan
@@ -133,6 +149,7 @@ date: 2024-07-02
 url: https://pixeldrain.com/u/RTvDryzt
 note: Android 13, TW based. Kronos iOS control center, sLMK for 4GB RAM, FPS unlock, Leica camera, patched Joyose and modded thermal. Clean flash recommended.
 vendor: svendor
+android: 13
 
 name: MemeOS
 version: V1.1
@@ -142,6 +159,8 @@ date: 2024-07-04
 url: https://drive.google.com/drive/folders/1GdKklnRUTYN5iN9gG7llgY1O9mSFO_O-?usp=sharing
 note: Android 13, EU based rom for selene/selenes/eos, all vbmeta patched, debloated. Known bugs: status bar clock format, charging animation style, super wallpapers. Flash on MIUI 14. Tags: #MemeOS #MIUI #T #Selene #EOS.
 vendor: svendor
+android: 13
+issues: yes
 
 name: HyperOS Gaming
 version: v1
@@ -151,6 +170,7 @@ date: 2024-07-09
 url: https://drive.google.com/file/d/1yyS-jN6SBNs0PDcIyLTIeOS8t0T0XTvu/view?usp=drivesdk
 note: HyperOS mod for gaming, Thermods v3.1, modded Joyose, new control center (KronosMod). Bug: Xiaomi 14 wallpapers. Based on TheRealAldehyde base. Should use cooler.
 vendor: svendor
+issues: yes
 
 name: Miui12.5 TW Mod
 version: 16/07/2024
@@ -160,6 +180,8 @@ date: 2024-07-16
 url: https://drive.google.com/drive/folders/1AT_CanjU5vbULZG1HOUPZoWvvIeJgWpP?usp=sharing
 note: Android 11, TW based MIUI 12.5 mod for selene/selenes/eos, all vbmeta patched, debloated. Known bug: theme settings crash. Tags: #Miui12.5 #MIUI #R #Selene.
 vendor: rvendor
+android: 11
+issues: yes
 
 name: RemodUI
 version: Next (MIUI 14 CN)
@@ -178,6 +200,8 @@ date: 2024-08-06
 url: https://drive.google.com/file/d/1lH_dx90vO30t9mPLLvHaYB1E2tuguR8z/view?usp=sharing
 note: Realme UI mod on MIUI 12.5 China, Google services added, modded apps, new Roboto font. Bug: wallpaper change crash. Tags: #Remod #R #China.
 vendor: rvendor
+gapps: gapps
+issues: yes
 
 name: RemodUI
 version: Mix (V14.0.4.TKUIDXM + V14.0.2.TKUTWXM)
@@ -187,6 +211,7 @@ date: 2024-08-09
 url: https://drive.google.com/file/d/14KJjtghlvPtNUoxGXuXRBFzKsSXStx5-/view?usp=drive_link
 note: Android 13, Realme UI mod, mixed ID and TW MIUI 14 bases, fastboot ROM, clean flash recommended. Tags: #MIUI #T #ID #TW.
 vendor: svendor
+android: 13
 
 name: RemodTN×UI
 version: V13.0.6.SKUCNXM
@@ -196,6 +221,7 @@ date: 2024-08-13
 url: https://drive.google.com/file/d/10vGiVOftoMnamW_hhTakfXSznRQdZbji/view?usp=drive_link
 note: Realme UI mod, MIUI 13 China base (Android 12), fastboot ROM, clean flash recommended.
 vendor: svendor
+android: 12
 
 name: MIUIXL
 version: 12/10/2024
@@ -233,3 +259,6 @@ url: https://pixeldrain.com/u/wKVqU5rA
 note: Android 16, HyperOS 3 port from Xiaomi Lake. Pre-rooted with KSU-Next 3.3.0, debloated, Google services and Play Store included. Known bugs: Reading Mode/Color Schemes, AOD, stacked Recents, and some personalization/theme issues. Clean flash mandatory. Flash from MIUI 13 or MIUI 14.
 vendor: svendor
 vendor: svendor
+android: 16
+gapps: gapps
+issues: yes
