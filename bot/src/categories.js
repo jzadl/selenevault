@@ -38,8 +38,8 @@ export const CATEGORY_FIELDS = {
   firmware: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
   port: ["name", "version", "maintainer", "size", "date", "url", "note", "vendor", "android", "gapps", "issues"],
   tool: ["name", "version", "maintainer", "size", "date", "url", "note", "android", "gapps", "issues"],
-  guide: ["name", "url", "note"],
-  channel: ["name", "url", "note"],
+  guide: ["name", "url", "note", "date"],
+  channel: ["name", "url", "note", "date"],
 };
 
 export const CATEGORY_REQUIRED = {

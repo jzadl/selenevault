@@ -117,6 +117,16 @@ function isOwner(env, userId) {
   return ids.includes(String(userId));
 }
 
+// YYYY-MM-DD from a Telegram message date (fallback when Groq finds no date).
+function msgDateStr(msg) {
+  if (!msg || !msg.date) return null;
+  try {
+    return new Date(msg.date * 1000).toISOString().slice(0, 10);
+  } catch {
+    return null;
+  }
+}
+
 async function replyTo(env, msg, text, options = {}) {
   if (msg && isGroupChat(msg.chat.type)) {
     return sendEphemeral(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id, text, { fallback: true, ...options });
@@ -874,6 +884,10 @@ async function handleAddParse(env, msg, postText) {
     await replyTo(env, msg, "Couldn't parse that: " + escapeMdSafe(String(err.message || err)), { replyToMessageId: msg.message_id });
     return;
   }
+  if (!parsed.date) {
+    const fallback = msgDateStr(msg);
+    if (fallback) parsed.date = fallback;
+  }
   try {
     if (status && status.ok && status.result && status.result.ephemeral_message_id) {
       await deleteEphemeralMessage(env.TELEGRAM_BOT_TOKEN, chatId, msg.from.id, status.result.ephemeral_message_id);
@@ -1010,6 +1024,10 @@ async function handleFollowUp(env, msg, pending) {
     } catch {}
     await replyTo(env, msg, "Couldn't merge that: " + escapeMdSafe(String(err.message || err)), { replyToMessageId: msg.message_id });
     return;
+  }
+  if (!merged.date) {
+    const fallback = msgDateStr(msg);
+    if (fallback) merged.date = fallback;
   }
   try {
     if (status && status.ok && status.result && status.result.ephemeral_message_id) {
