@@ -9,6 +9,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import handler from "./src/index.js";
+import { runLinkCheck } from "./src/linkcheck.js";
 
 const BOT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DOTENV_PATH = path.join(BOT_DIR, ".env");
@@ -103,3 +104,19 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`svault-bot listening on 127.0.0.1:${PORT}`);
 });
+
+// Daily dead-link check (all categories). Notifies owners only on problems.
+const LINKCHECK_INTERVAL_MS = Number(env.LINKCHECK_INTERVAL_HOURS || 24) * 60 * 60 * 1000;
+let linkcheckRunning = false;
+setInterval(async () => {
+  if (linkcheckRunning) return;
+  linkcheckRunning = true;
+  try {
+    const res = await runLinkCheck(env, null);
+    console.log(`scheduled linkcheck: ${res.checked} checked, ${res.problems} problems`);
+  } catch (err) {
+    console.error("scheduled linkcheck failed:", err?.message || err);
+  } finally {
+    linkcheckRunning = false;
+  }
+}, LINKCHECK_INTERVAL_MS);

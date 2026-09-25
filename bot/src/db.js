@@ -85,6 +85,22 @@ export async function deletePendingByUser(_url, _key, chatId, userId, opType) {
   );
 }
 
+export async function getPendingById(_url, _key, id) {
+  const res = await getPool().query(`SELECT * FROM pending_ops WHERE id = $1`, [id]);
+  return res.rows.length > 0 ? rowToPending(res.rows[0]) : null;
+}
+
+// True while a "keep" verdict for this URL is still fresh (link checker).
+export async function hasLinkKeep(_url, _key, url) {
+  const res = await getPool().query(
+    `SELECT 1 FROM pending_ops
+     WHERE op_type = 'linkkeep' AND data ->> 'url' = $1 AND expires_at > NOW()
+     LIMIT 1`,
+    [url]
+  );
+  return res.rows.length > 0;
+}
+
 const PENDING_TTL_SECONDS = 60 * 30;
 
 export function expiresAt() {

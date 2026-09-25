@@ -1,4 +1,4 @@
-import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerInlineQuery, answerGuestQuery } from "./telegram.js";
+import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, createNotifyIssue, entryToRawBlock } from "./github.js";
@@ -6,6 +6,7 @@ import { upsertPending, getPending, deletePending, deletePendingByUser, expiresA
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
+import { runLinkCheck, handleLinkCallback } from "./linkcheck.js";
 
 const HELP_TEXT = [
   "*svault bot commands*",
@@ -23,6 +24,7 @@ const HELP_TEXT = [
   "/sadd \\- add an entry \\(reply to a post\\)",
   "/supdate \\[category\\] \\[name\\] \\- update an entry",
   "/sremove \\[category\\] \\[name\\] \\[creator\\] \\- remove an entry",
+  "/schecklinks \\[category\\] \\- check download links \\(owner only\\)",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
@@ -97,6 +99,7 @@ const DEFAULT_COMMANDS = [
 
 const ADMIN_COMMANDS = [
   { command: "sadd", description: "Add an entry (reply to a post)", is_ephemeral: true },
+  { command: "schecklinks", description: "Check download links (owner only)" },
   { command: "supdate", description: "Update an entry: /supdate [category] [name]" },
   { command: "sremove", description: "Remove an entry: /sremove [category] [name] [creator]" },
 ];
@@ -147,6 +150,22 @@ export default {
       } catch {
         await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, []);
       }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (update.callback_query) {
+      try {
+        const q = update.callback_query;
+        if (String(q.data || "").startsWith("linkkeep:") || String(q.data || "").startsWith("linkdel:")) {
+          if (!isOwner(env, q.from?.id)) {
+            await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, q.id, "Admins only.").catch(() => {});
+          } else {
+            await handleLinkCallback(env, q);
+          }
+        } else {
+          await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, q.id).catch(() => {});
+        }
+      } catch {}
       return new Response("ok", { status: 200 });
     }
 
@@ -344,6 +363,24 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
         replyToMessageId: msg.message_id,
         replyMarkup: { inline_keyboard: [[{ text: "Open Vault", web_app: { url: vaultUrl } }]] },
       });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/schecklinks") {
+      if (!isOwner(env, msg.from.id)) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Only the owner can use this\\.", {
+          replyToMessageId: msg.message_id,
+        });
+        return new Response("ok", { status: 200 });
+      }
+      const cat = (arg || "").trim().toLowerCase() || null;
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Checking links, I'll report personally when done\\.", {
+        replyToMessageId: msg.message_id,
+      });
+      runLinkCheck(env, cat).then(
+        (res) => console.log(`linkcheck done: ${res.checked} checked, ${res.problems} problems`),
+        (err) => console.error("linkcheck failed:", err?.message || err)
+      );
       return new Response("ok", { status: 200 });
     }
 
