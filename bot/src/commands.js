@@ -2,7 +2,7 @@ import { parseSman } from "./sman.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, CATEGORY_LABELS, CATEGORY_PLURALS } from "./categories.js";
 import { escapeMd } from "./telegram.js";
 import { getFileContent, getRecentAdds } from "./github.js";
-import { parseSearchArgs, matchesFilters, filtersSummary } from "./entrymeta.js";
+import { parseSearchArgs, matchesFilters, filtersSummary, fuzzyNameHit } from "./entrymeta.js";
 import { publishTelegraphPage } from "./telegraph.js";
 
 async function fetchRawViaGithub(env, filename) {
@@ -159,7 +159,7 @@ export async function cmdSearch(env, arg) {
       }
       const name = (entry.name || "").toLowerCase();
       const nameNorm = normalize(entry.name);
-      if (name.includes(q) || nameNorm.includes(qNorm)) {
+      if (name.includes(q) || nameNorm.includes(qNorm) || fuzzyNameHit(entry.name, query)) {
         direct.push({ category: cat, entry });
         continue;
       }
@@ -238,7 +238,7 @@ export async function searchEntries(env, query) {
     for (const entry of entries) {
       const name = (entry.name || "").toLowerCase();
       const nameNorm = normalize(entry.name);
-      if (name.includes(q) || nameNorm.includes(qNorm)) {
+      if (name.includes(q) || nameNorm.includes(qNorm) || fuzzyNameHit(entry.name, query)) {
         direct.push({ category: cat, entry });
         continue;
       }

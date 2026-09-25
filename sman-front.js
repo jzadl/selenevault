@@ -245,6 +245,40 @@ function normalizeCreator(name) {
   return (name || "").trim().toLowerCase();
 }
 
+// Typo-tolerant name match (Levenshtein on words): "linege" finds LineageOS.
+function lev(a, b) {
+  if (a === b) return 0;
+  const la = a.length, lb = b.length;
+  if (!la) return lb;
+  if (!lb) return la;
+  let prev = [];
+  for (let j = 0; j <= lb; j++) prev[j] = j;
+  for (let i = 1; i <= la; i++) {
+    const cur = [i];
+    for (let j = 1; j <= lb; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[lb];
+}
+
+function fuzzyNameHit(entry, q) {
+  const qc = (q || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  if (qc.length < 4) return false;
+  const limit = qc.length >= 6 ? 2 : 1;
+  const b = entry.querySelector ? entry.querySelector("b") : null;
+  const words = ((b ? b.textContent : "") || "").toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4);
+  return words.some(w => {
+    if (lev(w, qc) <= limit) return true;
+    // Compound words ("lineageos"): compare against prefixes too.
+    for (let len = Math.max(4, qc.length - 2); len <= Math.min(w.length, qc.length + 2); len++) {
+      if (lev(w.slice(0, len), qc) <= limit) return true;
+    }
+    return false;
+  });
+}
+
 function splitCollaborators(name) {
   return (name || "")
     .split(/\s+(?:and|&|x)\s+/i)
@@ -333,7 +367,7 @@ function selectCategory(f, pushUrl = true){
 }
 
 function entryMatches(entry, q, creator, vendor, android, gapps, noissues) {
-  const matchesSearch = !q || (entry.dataset.search || "").includes(q);
+  const matchesSearch = !q || (entry.dataset.search || "").includes(q) || fuzzyNameHit(entry, q);
   const entryCreators = (entry.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
   const matchesCreator = !creator || entryCreators.includes(creator);
   const matchesVendor = !vendor || (entry.dataset.vendor || "").split(",").includes(vendor);
