@@ -1204,3 +1204,11 @@ vendor: rvendor
 android: 11
 gapps: gapps
 
+name: OxygenOS
+version: 16.0.5
+maintainer: Farh4d979
+date: 2026-09-25
+note: Heavily debloated OxygenOS ROM with firmware and KSU kernel included; requires clean flash and 1-2 hours to settle.
+vendor: svendor
+android: 16
+issues: Face unlock; DT2W; Some live wallpapers don't work due to hardware
