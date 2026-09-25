@@ -135,15 +135,6 @@ note: MIUI INT custom build, fastboot flashable. Make sure you are on MIUI 14 be
 vendor: svendor
 
 name: MIUINT
-version: v1.1 (V14.0.7.0.TKUMIXM)
-maintainer: Nothings Community (ersoe20)
-size: unknown
-date: 2025-11-05
-url: https://nothings.koyeb.app/NTBuild/MIUI/v1.1/SELENEGlobal
-note: MIUI INT v1.1 fastboot ROM, encryption storage, MIUI 14 Global based, device SELENEGlobal. Go to stock ROM before flashing. Enable autostart if notification delay.
-vendor: svendor
-
-name: MIUINT
 version: v1.2 (V14.0.2.0.TKUCNXM)
 maintainer: Nothings Community (ersoe20)
 size: unknown
