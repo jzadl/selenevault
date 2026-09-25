@@ -156,6 +156,24 @@ select {
   width: auto;
   margin: 0;
 }
+.copybtn {
+  background: none;
+  border: 1px solid var(--tg-theme-hint-color, #444);
+  color: var(--tg-theme-hint-color, #888);
+  font-family: monospace;
+  font-size: 11px;
+  padding: 0 5px;
+  margin-left: 6px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.entry.flash {
+  animation: flash 2s ease-out;
+}
+@keyframes flash {
+  0%, 40% { border-color: var(--tg-theme-button-color, #0aa); }
+  100% { border-color: #333; }
+}
 footer {
   text-align: center;
   color: var(--tg-theme-hint-color, #666);
@@ -196,6 +214,7 @@ footer a {
     <option value="unknown">Unknown</option>
   </select>
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
+  <label class="check"><input type="checkbox" id="sort-newest"> Newest first</label>
 </div>
 <nav class="chips">
   <a href="#cat-rom">ROMs</a>
@@ -338,21 +357,48 @@ function issuesBadge(e) {
   return hasIssues(e) ? ` <span class="badge warn">issues</span>` : "";
 }
 
-function entryHtml(e) {
+const NEW_DAYS = 14;
+
+function entryDateStr(e) {
+  const m = (e.date || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : "";
+}
+
+function isNew(e) {
+  const d = entryDateStr(e);
+  if (!d) return false;
+  const days = (Date.now() - new Date(d + "T00:00:00Z").getTime()) / 864e5;
+  return days >= 0 && days <= NEW_DAYS;
+}
+
+function newBadge(e) {
+  return isNew(e) ? ` <span class="badge new">NEW</span>` : "";
+}
+
+function groupMaxDate(items) {
+  let max = "";
+  (Array.isArray(items) ? items : [items]).forEach(e => {
+    const d = entryDateStr(e);
+    if (d && d > max) max = d;
+  });
+  return max;
+}
+
+function entryHtml(e, id) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
-    <b>${esc(e.name||"")}</b>${issuesBadge(e)} ${esc(e.version||"")}
-    <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
+  return `<div class="entry" id="${id}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}" data-date="${esc(entryDateStr(e))}">
+    <b>${esc(e.name||"")}</b>${issuesBadge(e)}${newBadge(e)} ${esc(e.version||"")}
+    <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""} <button class="copybtn" data-copy="${id}" title="Copy link to this entry">#</button></div>
     <div>${esc(e.note||"")}</div>
     ${e.url ? `<a href="${esc(e.url)}" target="_blank">${esc(e.url)}</a>` : ""}
   </div>`;
 }
 
-function singleGroupHtml(f, e) {
+function singleGroupHtml(f, e, id, ord) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
-    <summary>${esc(e.name||"")}${badgesHtml(e)} <span class="count">(1 build)</span></summary>
-    <div class="entries">${entryHtml(e)}</div>
+  return `<details class="group" data-ord="${ord}" data-maxdate="${esc(entryDateStr(e))}" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
+    <summary>${esc(e.name||"")}${badgesHtml(e)}${newBadge(e)} <span class="count">(1 build)</span></summary>
+    <div class="entries">${entryHtml(e, id)}</div>
   </details>`;
 }
 
@@ -370,13 +416,18 @@ async function load(){
       html += `<h2 id="cat-${f.replace(".sman", "")}">${categoryLabel(f)} (${entries.length})</h2>`;
       allCategories.push(f);
 
+      const fbase = f.replace(".sman", "");
+      let eidx = 0;
+      let gidx = 0;
+      const nextId = () => `e-${fbase}-${eidx++}`;
+
       if (f === "channels.sman" || f === "guides.sman") {
         entries.forEach(e => {
           if (e.maintainer) allCreators.add(e.maintainer);
           if (e.vendor) allVendors.add(e.vendor);
           const a = parseAndroid(e);
           if (a) allAndroids.add(a);
-          html += singleGroupHtml(f, e);
+          html += singleGroupHtml(f, e, nextId(), gidx++);
         });
         continue;
       }
@@ -394,7 +445,7 @@ async function load(){
         groupEntries.sort((a, b) => (b.date||"").localeCompare(a.date||""));
 
         if (groupEntries.length === 1) {
-          html += singleGroupHtml(f, groupEntries[0]);
+          html += singleGroupHtml(f, groupEntries[0], nextId(), gidx++);
           return;
         }
 
@@ -402,9 +453,11 @@ async function load(){
         const search = groupEntries.map(e => (e.name+" "+e.maintainer+" "+e.note).toLowerCase()).join(" ");
         const creators = [...new Set(groupEntries.map(e => e.maintainer).filter(Boolean))].join(",");
         const vendors = [...new Set(groupEntries.map(e => e.vendor).filter(Boolean))].join(",");
-        html += `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(creators)}" data-vendor="${esc(vendors)}">
-          <summary>${esc(displayName)}${badgesHtml(groupEntries)} <span class="count">(${groupEntries.length} builds)</span></summary>
-          <div class="entries">${groupEntries.map(entryHtml).join("")}</div>
+        const ids = groupEntries.map(() => nextId());
+        const newHere = groupEntries.some(isNew) ? ` <span class="badge new">NEW</span>` : "";
+        html += `<details class="group" data-ord="${gidx++}" data-maxdate="${esc(groupMaxDate(groupEntries))}" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(creators)}" data-vendor="${esc(vendors)}">
+          <summary>${esc(displayName)}${badgesHtml(groupEntries)}${newHere} <span class="count">(${groupEntries.length} builds)</span></summary>
+          <div class="entries">${groupEntries.map((en, i) => entryHtml(en, ids[i])).join("")}</div>
         </details>`;
       });
     } catch(err) {
@@ -513,6 +566,69 @@ document.getElementById("filter-vendor").addEventListener("change", applyFilters
 document.getElementById("filter-android").addEventListener("change", applyFilters);
 document.getElementById("filter-gapps").addEventListener("change", applyFilters);
 document.getElementById("filter-noissues").addEventListener("change", applyFilters);
+document.getElementById("sort-newest").addEventListener("change", applySorting);
+
+function applySorting(){
+  const newest = document.getElementById("sort-newest").checked;
+  document.querySelectorAll("#out > h2").forEach(h => {
+    const groups = [];
+    let n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") {
+      const nx = n.nextElementSibling;
+      if (n.classList && n.classList.contains("group")) groups.push(n);
+      n = nx;
+    }
+    groups.sort((a, b) => {
+      if (newest) {
+        const ka = a.dataset.maxdate || "", kb = b.dataset.maxdate || "";
+        if (ka !== kb) {
+          if (!ka) return 1;
+          if (!kb) return -1;
+          return kb.localeCompare(ka);
+        }
+      }
+      return Number(a.dataset.ord || 0) - Number(b.dataset.ord || 0);
+    });
+    // Re-append in order right after the h2:
+    let anchor = h;
+    groups.forEach(g => { anchor.after(g); anchor = g; });
+  });
+}
+
+document.addEventListener("click", ev => {
+  const btn = ev.target.closest ? ev.target.closest("[data-copy]") : null;
+  if (!btn) return;
+  const link = window.location.origin + window.location.pathname + "#" + btn.dataset.copy;
+  const done = () => {
+    const old = btn.textContent;
+    btn.textContent = "ok";
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(done).catch(() => window.prompt("Copy link:", link));
+  } else {
+    window.prompt("Copy link:", link);
+  }
+});
+
+function revealHashTarget(){
+  const hash = (window.location.hash || "").replace(/^#/, "");
+  if (!hash.startsWith("e-")) return false;
+  const target = document.getElementById(hash);
+  if (!target) return false;
+  const group = target.closest(".group");
+  if (group) {
+    group.style.display = "";
+    group.open = true;
+    target.style.display = "";
+  }
+  setTimeout(() => {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    target.classList.add("flash");
+    setTimeout(() => target.classList.remove("flash"), 2200);
+  }, 100);
+  return true;
+}
 
 async function init(){
   await load();
@@ -539,6 +655,8 @@ async function init(){
       const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
       if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
+  } else {
+    revealHashTarget();
   }
 }
 
