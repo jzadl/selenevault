@@ -753,6 +753,11 @@ async function handleGuestMessage(env, gmsg) {
     const lines = [];
     if (!command) {
       lines.push("Mention the bot with a command in any chat\\, e\\.g\\. `@selenevaultbot /slatest`\\.");
+    } else if (["/sadd", "/supdate", "/sremove"].includes(command)) {
+      // Entry management needs the bot inside the chat (reply context + dialog).
+      lines.push("`" + escapeMdSafe(command) + "` doesn't work in guest chats\\ — I'm not in this chat\\.");
+      lines.push("", "Add @" + escapeMd(env.BOT_USERNAME || "selenevaultbot") + " to the group as a member, then reply to a post with `" + escapeMdSafe(command) + "`\\.");
+      return sendReply(lines.join("\n"));
     } else {
       lines.push("`" + escapeMdSafe(command) + "` is not supported in guest chats\\.");
     }
