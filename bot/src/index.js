@@ -24,7 +24,7 @@ const HELP_TEXT = [
   "/sadd \\- add an entry \\(reply to a post\\)",
   "/supdate \\[category\\] \\[name\\] \\- update an entry",
   "/sremove \\[category\\] \\[name\\] \\[creator\\] \\- remove an entry",
-  "/schecklinks \\[category\\] \\- check download links \\(owner only\\)",
+  "/schecklinks \\- check all download links \\(owner only\\)",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
@@ -373,11 +373,10 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
         });
         return new Response("ok", { status: 200 });
       }
-      const cat = (arg || "").trim().toLowerCase() || null;
-      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Checking links, I'll report personally when done\\.", {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Checking all links, I'll report personally when done\\.", {
         replyToMessageId: msg.message_id,
       });
-      runLinkCheck(env, cat).then(
+      runLinkCheck(env, null).then(
         (res) => console.log(`linkcheck done: ${res.checked} checked, ${res.problems} problems`),
         (err) => console.error("linkcheck failed:", err?.message || err)
       );
