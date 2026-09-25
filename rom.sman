@@ -756,15 +756,6 @@ url: https://sourceforge.net/projects/fukiame-builds/files/crdroid/240125/crDroi
 note: Android 14, R_OSS, R Vendor, vanilla only. VoLTE broken, some devices reboot on calls under 40% battery.
 vendor: rvendor
 
-name: PixelStar Uday
-version: Unofficial
-maintainer: fukiame
-size: unknown
-date: 2024-01-31
-url: https://pixeldrain.com/u/5ZijRTC7
-note: Android 14, R_OSS, R Vendor, GApps. VoLTE broken, offline charging issue.
-vendor: rvendor
-
 name: HorizonDroid Luna
 version: 13.0 Unofficial
 maintainer: YudhoPatrianto
