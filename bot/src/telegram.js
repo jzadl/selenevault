@@ -82,6 +82,28 @@ export async function deleteEphemeralMessage(token, chatId, userId, ephemeralMes
   return res.json();
 }
 
+export async function sendChatAction(token, chatId, action) {
+  const res = await fetch("https://api.telegram.org/bot" + token + "/sendChatAction", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, action: action || "typing" }),
+  });
+  return res.json();
+}
+
+export async function sendRichMessage(token, chatId, richMessage, options = {}) {
+  const body = { chat_id: chatId, rich_message: richMessage };
+  if (options.replyToMessageId) {
+    body.reply_parameters = { message_id: options.replyToMessageId };
+  }
+  const res = await fetch("https://api.telegram.org/bot" + token + "/sendRichMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
 export async function sendMessageDraft(token, chatId, draftId, text) {
   const res = await fetch("https://api.telegram.org/bot" + token + "/sendMessageDraft", {
     method: "POST",

@@ -1,5 +1,5 @@
-import { sendMessage, sendEphemeral, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
-import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
+import { sendMessage, sendEphemeral, sendMessageDraft, sendChatAction, sendRichMessage, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
+import { cmdLatest, cmdStats, cmdStatsRich, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
 import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock, listTrash, restoreTrashEntry, getFileContent } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt, rememberChat, knownChatIds } from "./db.js";
@@ -213,8 +213,19 @@ export default {
 
     if (update.inline_query) {
       try {
-        const results = await buildInlineResults(env, update.inline_query.query || "");
-        await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, results);
+        const query = update.inline_query.query || "";
+        let results = query.trim().startsWith("/")
+          ? await buildInlineCommandResults(env, query)
+          : await buildInlineResults(env, query);
+        let res = await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, results);
+        if (!res.ok) {
+          for (const r of results) {
+            if (r.input_message_content && r.input_message_content.parse_mode) {
+              delete r.input_message_content.parse_mode;
+            }
+          }
+          res = await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, results);
+        }
       } catch {
         await answerInlineQuery(env.TELEGRAM_BOT_TOKEN, update.inline_query.id, []);
       }
@@ -524,10 +535,16 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
     if (command === "/isthisonsv") {
       const replyMsg = msg.reply_to_message;
       const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
-      if (msg.chat.type === "private" && replyText) {
-        try {
-          await sendMessageDraft(env.TELEGRAM_BOT_TOKEN, msg.chat.id, 1, "Searching svault...");
-        } catch {}
+      if (replyText) {
+        if (msg.chat.type === "private") {
+          try {
+            await sendMessageDraft(env.TELEGRAM_BOT_TOKEN, msg.chat.id, 1, "Searching svault...");
+          } catch {}
+        } else {
+          try {
+            await sendChatAction(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "typing");
+          } catch {}
+        }
       }
       let isReply;
       try {
@@ -716,14 +733,27 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
     }
 
     const streamable = ["/slatest", "/sstats", "/ssearch", "/schannels"];
-    if (msg.chat.type === "private" && streamable.includes(command)) {
-      try {
-        await sendMessageDraft(env.TELEGRAM_BOT_TOKEN, msg.chat.id, 1, "Searching svault...");
-      } catch {}
+    if (streamable.includes(command)) {
+      if (msg.chat.type === "private") {
+        try {
+          await sendMessageDraft(env.TELEGRAM_BOT_TOKEN, msg.chat.id, 1, "Searching svault...");
+        } catch {}
+      } else {
+        try {
+          await sendChatAction(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "typing");
+        } catch {}
+      }
     }
 
     let reply;
     try {
+      if (command === "/sstats") {
+        const rich = await cmdStatsRich(env, arg);
+        const result = await sendRichMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, rich, {
+          replyToMessageId: msg.message_id,
+        });
+        if (result.ok) return new Response("ok", { status: 200 });
+      }
       reply = await handleCommand(env, command, arg);
     } catch (err) {
       reply = "Something broke on my end, try again in a bit\\.\n`" + escapeMdSafe(String(err)) + "`";
@@ -793,6 +823,61 @@ async function handleCommand(env, command, arg) {
 
 const GUEST_COMMANDS = ["/start", "/shelp", "/sstart", "/snews", "/slatest", "/sstats", "/ssearch", "/schannels", "/sping", "/isthisonsv"];
 
+async function replyForCommand(env, command, arg, ctxMsg) {
+  if (command === "/start") {
+    const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
+    return welcomeText() + "\n\nOpen the vault: " + vaultUrl;
+  }
+  if (command === "/sping") {
+    return await cmdPing(env, null, ctxMsg);
+  }
+  if (command === "/isthissonsv") {
+    const replyMsg = ctxMsg ? ctxMsg.reply_to_message : null;
+    const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
+    return replyText ? await cmdIsThisOnSv(env, replyText) : "Reply to a message with a ROM\\/kernel\\/port name, then mention the bot: `@selenevaultbot /isthissonsv`\\.";
+  }
+  return handleCommand(env, command, arg);
+}
+
+async function buildInlineCommandResults(env, query) {
+  const tokens = query.split(/\s+/);
+  const command = (tokens[0] || "").split("@")[0].toLowerCase();
+  const arg = tokens.slice(1).join(" ");
+
+  if (!command || !GUEST_COMMANDS.includes(command)) {
+    const lines = [];
+    if (!command) {
+      lines.push("Mention the bot with a command in any chat\\, e\\.g\\. `@selenevaultbot /slatest`\\.");
+    } else {
+      lines.push("`" + escapeMdSafe(command) + "` is not supported inline\\.");
+    }
+    lines.push("", "Try: " + GUEST_COMMANDS.map((c) => "`" + c + "`").join(" "));
+    return [{
+      type: "article",
+      id: "inline-unknown",
+      title: command ? command : "svault commands",
+      description: command ? "Not supported inline" : "Search or run a command",
+      input_message_content: { message_text: lines.join("\n"), parse_mode: "MarkdownV2" },
+    }];
+  }
+
+  let reply;
+  try {
+    reply = await replyForCommand(env, command, arg, null);
+  } catch (err) {
+    reply = "Something broke on my end, try again in a bit\\.";
+  }
+  if (!reply) return [];
+
+  return [{
+    type: "article",
+    id: "inline-cmd",
+    title: command,
+    description: (reply || "").replace(/[*_`\\[\]()]/g, "").slice(0, 100),
+    input_message_content: { message_text: reply, parse_mode: "MarkdownV2" },
+  }];
+}
+
 async function handleGuestMessage(env, gmsg) {
   const queryId = gmsg.guest_query_id;
   if (!queryId) return;
@@ -843,18 +928,7 @@ async function handleGuestMessage(env, gmsg) {
 
   let reply;
   try {
-    if (command === "/start") {
-      const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
-      reply = welcomeText() + "\n\nOpen the vault: " + vaultUrl;
-    } else if (command === "/sping") {
-      reply = await cmdPing(env, null, gmsg);
-    } else if (command === "/isthisonsv") {
-      const replyMsg = gmsg.reply_to_message;
-      const replyText = replyMsg ? (replyMsg.text || replyMsg.caption || "") : "";
-      reply = replyText ? await cmdIsThisOnSv(env, replyText) : "Reply to a message with a ROM\\/kernel\\/port name, then mention the bot: `@selenevaultbot /isthisonsv`\\.";
-    } else {
-      reply = await handleCommand(env, command, arg);
-    }
+    reply = await replyForCommand(env, command, arg, gmsg);
   } catch (err) {
     reply = "Something broke on my end, try again in a bit\\.";
   }

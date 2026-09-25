@@ -80,14 +80,15 @@ export async function cmdLatest(env, arg) {
   return `*Latest addition:*\n\n${formatEntry(env.SITE_URL, category, then.latest.entry)}`;
 }
 
-export async function cmdStats(env, arg) {
+export async function statsData(env, arg) {
   const { category, filters } = parseSearchArgs(arg || "", CATEGORY_FILES);
   const filterText = filtersSummary(filters);
 
   if (category && !filterText) {
     const { entries } = await fetchSman(env, CATEGORY_FILES[category]);
-    const label = escapeMd(CATEGORY_PLURALS[category] || CATEGORY_LABELS[category]);
-    return `*${label} on svault:* ${entries.length}`;
+    return {
+      single: { label: CATEGORY_PLURALS[category] || CATEGORY_LABELS[category], count: entries.length },
+    };
   }
 
   const cats = category ? [category] : Object.keys(CATEGORY_FILES).filter((c) => c !== "channel");
@@ -98,15 +99,69 @@ export async function cmdStats(env, arg) {
     })))
   );
 
-  const lines = [filterText ? `*svault stats \\(${escapeMd(filterText)}\\):*` : "*svault stats:*", ""];
+  return {
+    filterText,
+    rows: counts.map(({ cat, count }) => ({
+      label: CATEGORY_PLURALS[cat] || CATEGORY_LABELS[cat],
+      count,
+    })),
+  };
+}
+
+export async function cmdStats(env, arg) {
+  const data = await statsData(env, arg);
+  if (data.single) {
+    return `*${escapeMd(data.single.label)} on svault:* ${data.single.count}`;
+  }
+
+  const lines = [data.filterText ? `*svault stats \\(${escapeMd(data.filterText)}\\):*` : "*svault stats:*", ""];
   let total = 0;
-  for (const { cat, count } of counts) {
+  for (const { label, count } of data.rows) {
     total += count;
-    const label = escapeMd(CATEGORY_PLURALS[cat] || CATEGORY_LABELS[cat]);
-    lines.push(`${label}: ${count}`);
+    lines.push(`${escapeMd(label)}: ${count}`);
   }
   lines.push("", `Total: ${total}`);
   return lines.join("\n");
+}
+
+export async function cmdStatsRich(env, arg) {
+  const data = await statsData(env, arg);
+
+  if (data.single) {
+    return {
+      blocks: [
+        { type: "heading", size: 2, text: data.single.label + " on svault" },
+        {
+          type: "table",
+          is_bordered: true,
+          is_compact: true,
+          cells: [
+            [{ text: "Category", is_header: true }, { text: "Entries", is_header: true, align: "center" }],
+            [{ text: data.single.label }, { text: String(data.single.count), align: "center" }],
+          ],
+        },
+      ],
+    };
+  }
+
+  const title = data.filterText ? `svault stats (${data.filterText})` : "svault stats";
+  const total = data.rows.reduce((sum, r) => sum + r.count, 0);
+  return {
+    blocks: [
+      { type: "heading", size: 2, text: title },
+      {
+        type: "table",
+        is_bordered: true,
+        is_compact: true,
+        is_striped: true,
+        cells: [
+          [{ text: "Category", is_header: true }, { text: "Entries", is_header: true, align: "center" }],
+          ...data.rows.map(({ label, count }) => [{ text: label }, { text: String(count), align: "center" }]),
+          [{ text: "Total", is_header: true }, { text: String(total), align: "center", is_header: true }],
+        ],
+      },
+    ],
+  };
 }
 
 function normalize(s) {
