@@ -1,12 +1,13 @@
 import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
-import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock, listTrash, restoreTrashEntry } from "./github.js";
+import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock, listTrash, restoreTrashEntry, getFileContent } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./db.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
 import { runLinkCheck, handleLinkCallback, probeUrl } from "./linkcheck.js";
+import { parseSman } from "./sman.js";
 import { subAdd, subRemove, subList, subChats } from "./subscribe.js";
 import { listLinkcheck } from "./db.js";
 
@@ -908,6 +909,11 @@ async function handleAddParse(env, msg, postText) {
     }
   }
 
+  let dupeWarning = "";
+  try {
+    dupeWarning = await findDuplicateWarning(env, file, parsed);
+  } catch {}
+
   const preview = [
     "Is this correct?:",
     "",
@@ -916,6 +922,7 @@ async function handleAddParse(env, msg, postText) {
     block,
     "```",
     linkVerdict,
+    dupeWarning,
     "",
     "Reply *yes*, *no* \\(with missing fields\\), or *cancel*\\.",
   ].join("\n");
@@ -1124,6 +1131,41 @@ async function announceToSubscribers(env, msg, file, text) {
       await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, text).catch(() => {});
     }
     } catch {}
+}
+
+// Warn when the parsed entry looks like a duplicate: same name+maintainer
+// in the target file, or the same URL anywhere in the vault.
+async function findDuplicateWarning(env, file, parsed) {
+  const norm = (s) => (s || "").trim().toLowerCase();
+  const name = norm(parsed.name);
+  const maintainer = norm(parsed.maintainer);
+  const url = (parsed.url || "").trim();
+  if (!name && !url) return "";
+
+  const files = [...new Set([...Object.values(CATEGORY_FILES), file])];
+  const hits = [];
+  for (const f of files) {
+    let content;
+    try {
+      ({ content } = await getFileContent(env, f));
+    } catch {
+      continue;
+    }
+    const { entries } = parseSman(content);
+    for (const e of entries) {
+      if (name && norm(e.name) === name && maintainer && norm(e.maintainer) === maintainer && f === file) {
+        hits.push(`Possible duplicate of *${escapeMd(e.name)}*${e.date ? ` \\(${escapeMd(e.date)}\\)` : ""} in \`${escapeMd(f)}\``);
+        break;
+      }
+      if (url && (e.url || "").trim() === url) {
+        hits.push("Same URL already listed in `" + escapeMd(f) + "`: *" + escapeMd(e.name || "entry") + "*");
+        break;
+      }
+    }
+    if (hits.length >= 2) break;
+  }
+  if (hits.length === 0) return "";
+  return "\n⚠ " + hits.join("\n⚠ ");
 }
 
 async function handleLinkQueue(env, msg) {
