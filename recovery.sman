@@ -1,15 +1,6 @@
 about: Custom recoveries for selene.
 
 name: TWRP
-version: Unofficial (01/01/22)
-maintainer: yazidkucrit
-size: unknown
-date: 2022-01-01
-url: https://drive.google.com/file/d/1tE1ZVQjmJ5IhRwQeJJyDvw5YvMm3-0BF/view?usp=sharing
-note: Android 11. Switched to ZipEntry64, fixed OTA >4GiB fuse error.
-vendor: rvendor
-
-name: TWRP
 version: Unofficial (07/01/22)
 maintainer: yazidkucrit
 size: unknown
