@@ -224,15 +224,6 @@ url: https://drive.google.com/file/d/10vGiVOftoMnamW_hhTakfXSznRQdZbji/view?usp=
 note: Realme UI mod, MIUI 13 China base (Android 12), fastboot ROM, clean flash recommended.
 vendor: svendor
 
-name: RemodUI
-version: Based on MIUI 14.0.3.0 TN 2.3
-maintainer: TranKhanh
-size: unknown
-date: 2024-08-16
-url: https://1drv.ms/u/c/6eae814d9a24afe4/ESwRYFy6lrtBvztR7wCKwXUBWQsSi_C4e8A0EUsH5CgzEg?e=qaBp9jk
-note: Android 13, Realme UI mod, fastboot ROM, clean flash recommended.
-vendor: svendor
-
 name: MIUIXL
 version: 12/10/2024
 maintainer: stolefromcloudflare
