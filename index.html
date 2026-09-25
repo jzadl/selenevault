@@ -116,6 +116,16 @@ select {
   <select id="filter-vendor">
     <option value="">All vendors</option>
   </select>
+  <select id="filter-android">
+    <option value="">All Android</option>
+  </select>
+  <select id="filter-gapps">
+    <option value="">GApps/Vanilla</option>
+    <option value="gapps">GApps</option>
+    <option value="vanilla">Vanilla</option>
+    <option value="unknown">Unknown</option>
+  </select>
+  <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
 </div>
 <div id="out">loading...</div>
 
@@ -196,9 +206,29 @@ function clusterEntries(entries) {
   return clusters.map(c => c.entries);
 }
 
+function parseAndroid(e) {
+  const text = (e.note || "") + " " + (e.version || "");
+  const m = text.match(/android\s+(\d+)/i) || text.match(/#a(\d\d?)\b/i);
+  return m ? m[1] : "";
+}
+
+function parseGapps(e) {
+  const t = ((e.note || "") + " " + (e.version || "") + " " + (e.url || "")).toLowerCase();
+  const mentionsGapps = /(gapps|google services|google-services|play ?store|\bgms\b)/.test(t)
+    && !/no[\s-]?gapps|without gapps/.test(t);
+  if (/\bvanilla\b/.test(t)) return mentionsGapps ? "mixed" : "vanilla";
+  return mentionsGapps ? "gapps" : "unknown";
+}
+
+const ISSUE_RE = /\bbug\s*:|known bugs?|known issues?|\bbroken\b|\blag\w*\b|\bcrash\w*\b|doesn'?t (pass|work)|incompatible\b/i;
+
+function hasIssues(e) {
+  return ISSUE_RE.test(e.note || "");
+}
+
 function entryHtml(e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
+  return `<div class="entry" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
     <b>${esc(e.name||"")}</b> ${esc(e.version||"")}
     <div class="meta">${esc(e.maintainer||"")} ${e.date?"| "+esc(e.date):""} ${e.vendor?"| "+esc(e.vendor):""}</div>
     <div>${esc(e.note||"")}</div>
@@ -208,7 +238,7 @@ function entryHtml(e) {
 
 function singleGroupHtml(f, e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
+  return `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}" data-android="${esc(parseAndroid(e))}" data-gapps="${esc(parseGapps(e))}" data-issues="${hasIssues(e) ? "1" : ""}">
     <summary>${esc(e.name||"")} <span class="count">(1 build)</span></summary>
     <div class="entries">${entryHtml(e)}</div>
   </details>`;
@@ -216,6 +246,7 @@ function singleGroupHtml(f, e) {
 
 const allCreators = new Set();
 const allVendors = new Set();
+const allAndroids = new Set();
 const allCategories = [];
 
 async function load(){
@@ -231,6 +262,8 @@ async function load(){
         entries.forEach(e => {
           if (e.maintainer) allCreators.add(e.maintainer);
           if (e.vendor) allVendors.add(e.vendor);
+          const a = parseAndroid(e);
+          if (a) allAndroids.add(a);
           html += singleGroupHtml(f, e);
         });
         continue;
@@ -239,6 +272,8 @@ async function load(){
       entries.forEach(e => {
         if (e.maintainer) allCreators.add(e.maintainer);
         if (e.vendor) allVendors.add(e.vendor);
+        const a = parseAndroid(e);
+        if (a) allAndroids.add(a);
       });
 
       const clusters = clusterEntries(entries);
@@ -311,14 +346,25 @@ function populateFilters(){
     opt.textContent = v;
     vendorSelect.appendChild(opt);
   });
+
+  const androidSelect = document.getElementById("filter-android");
+  [...allAndroids].sort((a, b) => Number(a) - Number(b)).forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a;
+    opt.textContent = "Android " + a;
+    androidSelect.appendChild(opt);
+  });
 }
 
-function entryMatches(entry, q, creator, vendor) {
+function entryMatches(entry, q, creator, vendor, android, gapps, noissues) {
   const matchesSearch = !q || (entry.dataset.search || "").includes(q);
   const entryCreators = (entry.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
   const matchesCreator = !creator || entryCreators.includes(creator);
   const matchesVendor = !vendor || (entry.dataset.vendor || "").split(",").includes(vendor);
-  return matchesSearch && matchesCreator && matchesVendor;
+  const matchesAndroid = !android || (entry.dataset.android || "").split(",").includes(android);
+  const matchesGapps = !gapps || (entry.dataset.gapps || "") === gapps || ((entry.dataset.gapps || "") === "mixed" && (gapps === "gapps" || gapps === "vanilla"));
+  const matchesIssues = !noissues || (entry.dataset.issues || "") !== "1";
+  return matchesSearch && matchesCreator && matchesVendor && matchesAndroid && matchesGapps && matchesIssues;
 }
 
 function applyFilters(){
@@ -326,6 +372,9 @@ function applyFilters(){
   const category = document.getElementById("filter-category").value;
   const creator = document.getElementById("filter-creator").value;
   const vendor = document.getElementById("filter-vendor").value;
+  const android = document.getElementById("filter-android").value;
+  const gapps = document.getElementById("filter-gapps").value;
+  const noissues = document.getElementById("filter-noissues").checked;
 
   // Every entry lives inside a .group now, so filters apply per entry:
   // non-matching entries hide even inside a matching group.
@@ -336,12 +385,12 @@ function applyFilters(){
     }
     let anyVisible = false;
     el.querySelectorAll(":scope > .entries > .entry").forEach(entry => {
-      const visible = entryMatches(entry, q, creator, vendor);
+      const visible = entryMatches(entry, q, creator, vendor, android, gapps, noissues);
       entry.style.display = visible ? "" : "none";
       if (visible) anyVisible = true;
     });
     el.style.display = anyVisible ? "" : "none";
-    if (anyVisible && (q || creator || vendor) && el.tagName === "DETAILS") el.open = true;
+    if (anyVisible && (q || creator || vendor || android || gapps || noissues) && el.tagName === "DETAILS") el.open = true;
   });
 
   const url = new URL(window.location);
@@ -349,6 +398,9 @@ function applyFilters(){
   if (category) url.searchParams.set("category", category); else url.searchParams.delete("category");
   if (creator) url.searchParams.set("creator", creator); else url.searchParams.delete("creator");
   if (vendor) url.searchParams.set("vendor", vendor); else url.searchParams.delete("vendor");
+  if (android) url.searchParams.set("android", android); else url.searchParams.delete("android");
+  if (gapps) url.searchParams.set("gapps", gapps); else url.searchParams.delete("gapps");
+  if (noissues) url.searchParams.set("noissues", "1"); else url.searchParams.delete("noissues");
   history.replaceState(null, "", url);
 }
 
@@ -356,6 +408,9 @@ document.getElementById("search").addEventListener("input", applyFilters);
 document.getElementById("filter-category").addEventListener("change", applyFilters);
 document.getElementById("filter-creator").addEventListener("change", applyFilters);
 document.getElementById("filter-vendor").addEventListener("change", applyFilters);
+document.getElementById("filter-android").addEventListener("change", applyFilters);
+document.getElementById("filter-gapps").addEventListener("change", applyFilters);
+document.getElementById("filter-noissues").addEventListener("change", applyFilters);
 
 async function init(){
   await load();
@@ -364,13 +419,19 @@ async function init(){
   const category = params.get("category");
   const creator = params.get("creator");
   const vendor = params.get("vendor");
+  const android = params.get("android");
+  const gapps = params.get("gapps");
+  const noissues = params.get("noissues");
 
   if (q) document.getElementById("search").value = q;
   if (category) document.getElementById("filter-category").value = category;
   if (creator) document.getElementById("filter-creator").value = creator;
   if (vendor) document.getElementById("filter-vendor").value = vendor;
+  if (android) document.getElementById("filter-android").value = android;
+  if (gapps) document.getElementById("filter-gapps").value = gapps;
+  if (noissues) document.getElementById("filter-noissues").checked = true;
 
-  if (q || category || creator || vendor) {
+  if (q || category || creator || vendor || android || gapps || noissues) {
     applyFilters();
     setTimeout(() => {
       const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
