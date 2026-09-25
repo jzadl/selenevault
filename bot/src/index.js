@@ -12,6 +12,7 @@ import { subAdd, subRemove, subList, subChats } from "./subscribe.js";
 const HELP_TEXT = [
   "*svault bot commands*",
   "",
+  "/start \\- open the vault",
   "/slatest \\[category\\] \\- newest addition",
   "/sstats \\[category\\] \\[filters\\] \\- entry counts",
   "/ssearch \\[category\\] \\[filters\\] query \\- find an entry",
@@ -63,6 +64,21 @@ function escapeMdSafe(text) {
   return (text || "").replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => "\\" + c).slice(0, 300);
 }
 
+function welcomeText() {
+  return [
+    "*Welcome to selenevault\\!*",
+    "",
+    "Index of ROMs, kernels, recoveries, firmware, ports, tools and guides for Xiaomi Redmi 10 \\(selene\\)\\.",
+    "",
+    "Tap the button below to open the vault, or use /shelp for commands\\.",
+  ].join("\n");
+}
+
+function vaultButton(env) {
+  const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
+  return { inline_keyboard: [[{ text: "Open Vault", web_app: { url: vaultUrl } }]] };
+}
+
 // Direct channel notifications (replaces the GitHub-issues relay).
 // Sends MarkdownV2 to every TELEGRAM_CHAT_IDS entry, plain-text fallback.
 async function notifyChats(env, text) {
@@ -105,6 +121,7 @@ async function replyTo(env, msg, text, options = {}) {
 }
 
 const DEFAULT_COMMANDS = [
+  { command: "start", description: "Start the bot and open the vault" },
   { command: "shelp", description: "Show all bot commands" },
   { command: "vault", description: "Open the vault mini app" },
   { command: "snews", description: "Latest update message" },
@@ -373,6 +390,14 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
           : "https://raw.githubusercontent.com/jzadl/selenevault/main/bot/assets/preview.webp";
       await sendPhoto(env.TELEGRAM_BOT_TOKEN, msg.chat.id, photoUrl, {
         replyToMessageId: msg.message_id,
+      });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/start") {
+      await replyTo(env, msg, welcomeText(), {
+        replyToMessageId: msg.message_id,
+        replyMarkup: vaultButton(env),
       });
       return new Response("ok", { status: 200 });
     }
@@ -659,7 +684,7 @@ async function handleCommand(env, command, arg) {
   }
 }
 
-const GUEST_COMMANDS = ["/shelp", "/sstart", "/snews", "/slatest", "/sstats", "/ssearch", "/schannels", "/sping", "/isthisonsv"];
+const GUEST_COMMANDS = ["/start", "/shelp", "/sstart", "/snews", "/slatest", "/sstats", "/ssearch", "/schannels", "/sping", "/isthisonsv"];
 
 async function handleGuestMessage(env, gmsg) {
   const queryId = gmsg.guest_query_id;
@@ -706,7 +731,10 @@ async function handleGuestMessage(env, gmsg) {
 
   let reply;
   try {
-    if (command === "/sping") {
+    if (command === "/start") {
+      const vaultUrl = (env.SITE_URL || "https://svault.jzadl.xyz") + "/app";
+      reply = welcomeText() + "\n\nOpen the vault: " + vaultUrl;
+    } else if (command === "/sping") {
       reply = await cmdPing(env, null, gmsg);
     } else if (command === "/isthisonsv") {
       const replyMsg = gmsg.reply_to_message;

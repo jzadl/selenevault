@@ -1,5 +1,6 @@
 *svault bot commands*
 
+/start \- open the vault
 /slatest \[category\] \- newest addition
 /snews \- latest update message
 /sstats \[category\] \[filters\] \- entry counts

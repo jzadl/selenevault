@@ -114,19 +114,28 @@ select {
   min-width: 120px;
   outline: none;
 }
-.chips {
+.tabs {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding: 2px 0 10px;
+  padding: 2px 0 8px;
 }
-.chips a {
-  color: var(--tg-theme-button-color, cyan);
+.tabs button {
+  background: var(--tg-theme-bg-color, #000);
+  color: var(--tg-theme-text-color, #ddd);
   border: 1px solid var(--tg-theme-hint-color, #444);
-  padding: 4px 10px;
-  text-decoration: none;
-  white-space: nowrap;
+  padding: 6px 12px;
+  font-family: monospace;
   font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+}
+.tabs button.active {
+  background: var(--tg-theme-button-color, cyan);
+  border-color: var(--tg-theme-button-color, cyan);
+  color: var(--tg-theme-button-text-color, #000);
+  font-weight: bold;
 }
 .badge {
   display: inline-block;
@@ -193,11 +202,9 @@ footer a {
 </head>
 <body>
 <h1>selenevault</h1>
+<nav class="tabs" id="tabs"></nav>
 <input id="search" placeholder="search...">
 <div class="filters">
-  <select id="filter-category">
-    <option value="">All categories</option>
-  </select>
   <select id="filter-creator">
     <option value="">All creators</option>
   </select>
@@ -216,16 +223,6 @@ footer a {
   <label class="check"><input type="checkbox" id="filter-noissues"> Hide reported issues</label>
   <label class="check"><input type="checkbox" id="sort-newest"> Newest first</label>
 </div>
-<nav class="chips">
-  <a href="#cat-rom">ROMs</a>
-  <a href="#cat-kernels">Kernels</a>
-  <a href="#cat-recovery">Recovery</a>
-  <a href="#cat-firmware">Firmware</a>
-  <a href="#cat-ports">Ports</a>
-  <a href="#cat-tools">Tools</a>
-  <a href="#cat-guides">Guides</a>
-  <a href="#cat-channels">Channels</a>
-</nav>
 <div id="out">loading...</div>
 <footer>maintained by <a href="https://t.me/xiaomiselene" target="_blank">@xiaomiselene</a> &amp; <a href="https://t.me/gro0wl" target="_blank">gro0wl</a></footer>
 
@@ -480,14 +477,6 @@ function splitCollaborators(name) {
 }
 
 function populateFilters(){
-  const categorySelect = document.getElementById("filter-category");
-  allCategories.forEach(f => {
-    const opt = document.createElement("option");
-    opt.value = f;
-    opt.textContent = categoryLabel(f);
-    categorySelect.appendChild(opt);
-  });
-
   const creatorSelect = document.getElementById("filter-creator");
   const creatorDisplay = new Map();
   [...allCreators].forEach(c => {
@@ -521,6 +510,47 @@ function populateFilters(){
   });
 }
 
+// Categories with the full filter set; guides/channels get search+creator only.
+const FULL_FILTER_CATS = ["rom.sman", "kernels.sman", "recovery.sman", "firmware.sman", "ports.sman", "tools.sman"];
+
+let activeCategory = null;
+
+function buildTabs(){
+  const nav = document.getElementById("tabs");
+  allCategories.forEach(f => {
+    const b = document.createElement("button");
+    b.dataset.cat = f;
+    b.textContent = categoryLabel(f);
+    b.addEventListener("click", () => selectCategory(f));
+    nav.appendChild(b);
+  });
+}
+
+function updateFilterVisibility(){
+  const full = FULL_FILTER_CATS.includes(activeCategory);
+  ["filter-vendor", "filter-android", "filter-gapps"].forEach(id => {
+    document.getElementById(id).style.display = full ? "" : "none";
+  });
+  document.getElementById("filter-noissues").closest("label").style.display = full ? "" : "none";
+}
+
+function selectCategory(f, pushUrl = true){
+  activeCategory = f;
+  document.querySelectorAll("#tabs button").forEach(b => {
+    b.classList.toggle("active", b.dataset.cat === f);
+  });
+  document.querySelectorAll("#out > h2").forEach(h => {
+    h.style.display = (h.id === "cat-" + f.replace(".sman", "")) ? "" : "none";
+  });
+  updateFilterVisibility();
+  applyFilters();
+  if (pushUrl) {
+    const url = new URL(window.location);
+    url.searchParams.set("category", f);
+    history.replaceState(null, "", url);
+  }
+}
+
 function entryMatches(entry, q, creator, vendor, android, gapps, noissues) {
   const matchesSearch = !q || (entry.dataset.search || "").includes(q);
   const entryCreators = (entry.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
@@ -534,7 +564,7 @@ function entryMatches(entry, q, creator, vendor, android, gapps, noissues) {
 
 function applyFilters(){
   const q = document.getElementById("search").value.toLowerCase();
-  const category = document.getElementById("filter-category").value;
+  const category = activeCategory;
   const creator = document.getElementById("filter-creator").value;
   const vendor = document.getElementById("filter-vendor").value;
   const android = document.getElementById("filter-android").value;
@@ -560,7 +590,6 @@ function applyFilters(){
 }
 
 document.getElementById("search").addEventListener("input", applyFilters);
-document.getElementById("filter-category").addEventListener("change", applyFilters);
 document.getElementById("filter-creator").addEventListener("change", applyFilters);
 document.getElementById("filter-vendor").addEventListener("change", applyFilters);
 document.getElementById("filter-android").addEventListener("change", applyFilters);
@@ -618,6 +647,9 @@ function revealHashTarget(){
   if (!target) return false;
   const group = target.closest(".group");
   if (group) {
+    if (group.dataset.category && group.dataset.category !== activeCategory) {
+      selectCategory(group.dataset.category, false);
+    }
     group.style.display = "";
     group.open = true;
     target.style.display = "";
@@ -632,6 +664,7 @@ function revealHashTarget(){
 
 async function init(){
   await load();
+  buildTabs();
   const params = new URLSearchParams(window.location.search);
   const q = params.get("q");
   const category = params.get("category");
@@ -642,14 +675,15 @@ async function init(){
   const noissues = params.get("noissues");
 
   if (q) document.getElementById("search").value = q;
-  if (category) document.getElementById("filter-category").value = category;
   if (creator) document.getElementById("filter-creator").value = creator;
   if (vendor) document.getElementById("filter-vendor").value = vendor;
   if (android) document.getElementById("filter-android").value = android;
   if (gapps) document.getElementById("filter-gapps").value = gapps;
   if (noissues) document.getElementById("filter-noissues").checked = true;
 
-  if (q || category || creator || vendor || android || gapps || noissues) {
+  selectCategory(allCategories.includes(category) ? category : "rom.sman", false);
+
+  if (q || creator || vendor || android || gapps || noissues) {
     applyFilters();
     setTimeout(() => {
       const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
