@@ -116,15 +116,6 @@ url: https://mega.nz/file/bXgAxTzQ#QV5FQWQsOIJzsLiWImOUn2hxbdqR5pvLrdsNIp097fw
 note: MIUI INT custom build, fastboot flashable. Make sure you are on MIUI 14 before flashing. Bug: GoogleServicesFramework/PlayServices/PlayStore, fix with LiteGApps Core Android 13 Magisk module. Flash via Termux fastboot scripts.
 vendor: svendor
 
-name: MIUINT
-version: v1.2 (V14.0.5.0.TKUCNXM)
-maintainer: Nothings Community (ersoe20)
-size: unknown
-date: 2026-02-02
-url: https://nothingsvn.ct.ws/download?path=/MIUI/v1.2/SELENE
-note: MIUI INT v1.2 fastboot ROM, encryption storage, MIUI 14 China based. Go to stock ROM before flashing. Enable autostart if notification delay.
-vendor: svendor
-
 name: MemeUI Pure
 version: v1
 maintainer: ManchesterUnited723
