@@ -218,7 +218,7 @@ function entryHtml(e) {
 
 function singleGroupHtml(f, e) {
   const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
-  return `<details class="group" open data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
+  return `<details class="group" data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
     <summary>${esc(e.name||"")} <span class="count">(1 build)</span></summary>
     <div class="entries">${entryHtml(e)}</div>
   </details>`;
