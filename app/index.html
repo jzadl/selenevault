@@ -165,7 +165,8 @@ function compact(name) {
   return (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-const GENERIC_SUFFIXES = new Set(["project", "official", "unofficial", "edition", "release", "build"]);
+const GENERIC_SUFFIXES = new Set(["project", "official", "unofficial", "edition", "release", "build",
+  "plus", "lite", "pro", "max", "ultra", "turbo", "go", "ui", "legacy", "android"]);
 
 function namesMatch(nameA, nameB) {
   const a = stripVersion(nameA);
@@ -177,12 +178,15 @@ function namesMatch(nameA, nameB) {
   const [shorter, longer] = ca.length <= cb.length ? [ca, cb] : [cb, ca];
   const shorterOriginal = ca.length <= cb.length ? a : b;
   const longerOriginal = ca.length <= cb.length ? b : a;
-  if (longer.startsWith(shorter)) {
+    if (longer.startsWith(shorter)) {
     const shorterWordCount = shorterOriginal.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean).length;
     const longerWords = longerOriginal.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
     const extraWords = longerWords.slice(shorterWordCount);
+    // A single extra trailing word is usually a codename/maintainer/variant
+    // of the same family (Elysium, Tango, Uday, legacy, ...).
+    if (extraWords.length === 1) return true;
     if (extraWords.length > 0 && extraWords.every(w => GENERIC_SUFFIXES.has(w))) return true;
-  }
+    }
   return false;
 }
 
@@ -212,6 +216,14 @@ function entryHtml(e) {
   </div>`;
 }
 
+function singleGroupHtml(f, e) {
+  const search = (e.name+" "+e.maintainer+" "+e.note).toLowerCase();
+  return `<details class="group" open data-category="${esc(f)}" data-search="${esc(search)}" data-creator="${esc(e.maintainer||"")}" data-vendor="${esc(e.vendor||"")}">
+    <summary>${esc(e.name||"")} <span class="count">(1 build)</span></summary>
+    <div class="entries">${entryHtml(e)}</div>
+  </details>`;
+}
+
 const allCreators = new Set();
 const allVendors = new Set();
 const allCategories = [];
@@ -228,7 +240,8 @@ async function load(){
       if (f === "channels.sman" || f === "guides.sman") {
         entries.forEach(e => {
           if (e.maintainer) allCreators.add(e.maintainer);
-          html += entryHtml(e);
+          if (e.vendor) allVendors.add(e.vendor);
+          html += singleGroupHtml(f, e);
         });
         continue;
       }
@@ -244,7 +257,7 @@ async function load(){
         groupEntries.sort((a, b) => (b.date||"").localeCompare(a.date||""));
 
         if (groupEntries.length === 1) {
-          html += `<div class="group-wrap" data-category="${esc(f)}">${entryHtml(groupEntries[0])}</div>`;
+          html += singleGroupHtml(f, groupEntries[0]);
           return;
         }
 
@@ -310,33 +323,35 @@ function populateFilters(){
   });
 }
 
+function entryMatches(entry, q, creator, vendor) {
+  const matchesSearch = !q || (entry.dataset.search || "").includes(q);
+  const entryCreators = (entry.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
+  const matchesCreator = !creator || entryCreators.includes(creator);
+  const matchesVendor = !vendor || (entry.dataset.vendor || "").split(",").includes(vendor);
+  return matchesSearch && matchesCreator && matchesVendor;
+}
+
 function applyFilters(){
   const q = document.getElementById("search").value.toLowerCase();
   const category = document.getElementById("filter-category").value;
   const creator = document.getElementById("filter-creator").value;
   const vendor = document.getElementById("filter-vendor").value;
 
-  document.querySelectorAll(".group-wrap > .entry, #out > .entry").forEach(el => {
-    const wrap = el.closest(".group-wrap") || el;
-    const cat = wrap.dataset.category || "";
-    const matchesSearch = !q || el.dataset.search.includes(q);
-    const matchesCategory = !category || cat === category;
-    const entryCreators = (el.dataset.creator || "").split(",").flatMap(splitCollaborators).map(normalizeCreator);
-    const matchesCreator = !creator || entryCreators.includes(creator);
-    const matchesVendor = !vendor || (el.dataset.vendor || "").split(",").includes(vendor);
-    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
-    (wrap === el ? el : wrap).style.display = visible ? "" : "none";
-  });
-
+  // Every entry lives inside a .group now, so filters apply per entry:
+  // non-matching entries hide even inside a matching group.
   document.querySelectorAll(".group").forEach(el => {
-    const matchesSearch = !q || el.dataset.search.includes(q);
-    const matchesCategory = !category || el.dataset.category === category;
-    const groupCreators = el.dataset.creator.split(",").flatMap(splitCollaborators).map(normalizeCreator);
-    const matchesCreator = !creator || groupCreators.includes(creator);
-    const matchesVendor = !vendor || el.dataset.vendor.split(",").includes(vendor);
-    const visible = matchesSearch && matchesCategory && matchesCreator && matchesVendor;
-    el.style.display = visible ? "" : "none";
-    if (visible && (q || creator || vendor) && el.tagName === "DETAILS") el.open = true;
+    if (category && el.dataset.category !== category) {
+      el.style.display = "none";
+      return;
+    }
+    let anyVisible = false;
+    el.querySelectorAll(":scope > .entries > .entry").forEach(entry => {
+      const visible = entryMatches(entry, q, creator, vendor);
+      entry.style.display = visible ? "" : "none";
+      if (visible) anyVisible = true;
+    });
+    el.style.display = anyVisible ? "" : "none";
+    if (anyVisible && (q || creator || vendor) && el.tagName === "DETAILS") el.open = true;
   });
 }
 
@@ -361,7 +376,7 @@ async function init(){
   if (q || category || creator || vendor) {
     applyFilters();
     setTimeout(() => {
-      const firstVisible = [...document.querySelectorAll(".entry, .group, .group-wrap")].find(el => el.style.display !== "none");
+      const firstVisible = [...document.querySelectorAll(".entry, .group")].find(el => el.style.display !== "none");
       if (firstVisible) firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
   }
