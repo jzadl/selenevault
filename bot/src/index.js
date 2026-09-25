@@ -1,13 +1,14 @@
 import { sendMessage, sendEphemeral, deleteEphemeralMessage, sendMessageDraft, setMyCommands, setChatMenuButton, isBotAdmin, getChatMember, escapeMd, setMessageReaction, deleteMessage, sendPhoto, editMessageText, answerCallbackQuery, answerInlineQuery, answerGuestQuery } from "./telegram.js";
 import { cmdLatest, cmdStats, cmdSearch, cmdChannels, cmdIsThisOnSv, cmdPing, fetchRawSman, buildInlineResults } from "./commands.js";
 import { parsePostWithGroq, mergeWithGroq, toSmanBlock, missingFieldsMessage } from "./groq.js";
-import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock } from "./github.js";
+import { appendSmanEntry, updateSmanEntry, removeSmanEntry, entryToRawBlock, listTrash, restoreTrashEntry } from "./github.js";
 import { upsertPending, getPending, deletePending, deletePendingByUser, expiresAt } from "./db.js";
 import { CATEGORY_FILES, CATEGORY_FIELDS, fileToCategory } from "./categories.js";
 import { findEntriesByFile, buildMatchList, parseEntryFields, buildDiff, parseFileFromArgs } from "./supdate.js";
 import { findEntryByCreator, generateRandomEmoji, buildRemovePreview, parseRemoveArgs } from "./sremove.js";
 import { runLinkCheck, handleLinkCallback, probeUrl } from "./linkcheck.js";
 import { subAdd, subRemove, subList, subChats } from "./subscribe.js";
+import { listLinkcheck } from "./db.js";
 
 const HELP_TEXT = [
   "*svault bot commands*",
@@ -32,6 +33,9 @@ const HELP_TEXT = [
   "/supdate \\[category\\] \\[name\\] \\- update an entry",
   "/sremove \\[category\\] \\[name\\] \\[creator\\] \\- remove an entry",
   "/schecklinks \\- check all download links \\(owner only\\)",
+  "/slinkqueue \\- pending dead\\-link reports \\(owner only\\)",
+  "/strash \\- recently deleted entries",
+  "/srestore \\[name\\] \\- restore an entry from trash",
   "",
   "Categories: rom, kernel, recovery, firmware, port, tool, guide",
 ].join("\n");
@@ -137,6 +141,9 @@ const DEFAULT_COMMANDS = [
 const ADMIN_COMMANDS = [
   { command: "sadd", description: "Add an entry (reply to a post)", is_ephemeral: true },
   { command: "schecklinks", description: "Check download links (owner only)" },
+  { command: "slinkqueue", description: "Pending dead-link reports (owner only)" },
+  { command: "strash", description: "Recently deleted entries" },
+  { command: "srestore", description: "Restore an entry from trash: /srestore name" },
   { command: "supdate", description: "Update an entry: /supdate [category] [name]" },
   { command: "sremove", description: "Remove an entry: /sremove [category] [name] [creator]" },
 ];
@@ -588,7 +595,7 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
       return new Response("ok", { status: 200 });
     }
 
-    const needsAdmin = ["/sadd", "/supdate", "/sremove"];
+    const needsAdmin = ["/sadd", "/supdate", "/sremove", "/strash", "/srestore"];
     if (needsAdmin.includes(command)) {
       try {
         const admin = await isBotAdmin(env.TELEGRAM_BOT_TOKEN, msg.chat.id, msg.from.id, env.OWNER_ID);
@@ -620,6 +627,34 @@ const isCommand = text.startsWith("/s") || text.toLowerCase().startsWith("/isthi
     if (command === "/supdate") {
       try {
         await handleUpdateStart(env, msg, arg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/slinkqueue") {
+      if (!isOwner(env, msg.from.id)) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Only the owner can use this\\.", {
+          replyToMessageId: msg.message_id,
+        });
+        return new Response("ok", { status: 200 });
+      }
+      try {
+        await handleLinkQueue(env, msg);
+      } catch (err) {
+        await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
+          replyToMessageId: msg.message_id,
+        });
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (command === "/strash" || command === "/srestore") {
+      try {
+        await handleTrash(env, msg, command, arg);
       } catch (err) {
         await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Something broke: `" + escapeMdSafe(String(err.message || err)) + "`", {
           replyToMessageId: msg.message_id,
@@ -1071,6 +1106,94 @@ async function announceToSubscribers(env, msg, file, text) {
       await sendMessage(env.TELEGRAM_BOT_TOKEN, cid, text).catch(() => {});
     }
     } catch {}
+}
+
+async function handleLinkQueue(env, msg) {
+  const rows = await listLinkcheck(null, null).catch(() => []);
+  if (rows.length === 0) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Link queue is empty\\. Nothing awaits action\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+  let dead = 0;
+  const perFile = {};
+  for (const row of rows) {
+    let d = {};
+    try {
+      d = JSON.parse(row.data);
+    } catch {}
+    if (d.state === "dead") dead++;
+    perFile[row.file] = (perFile[row.file] || 0) + 1;
+  }
+  const lines = [
+    `*Link queue:* ${rows.length} pending`,
+    "",
+    `Dead: ${dead} \\- needs review: ${rows.length - dead}`,
+    "",
+    ...Object.entries(perFile).map(([f, n]) => "`" + escapeMd(f) + "`: " + n),
+  ];
+  await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, lines.join("\n"), {
+    replyToMessageId: msg.message_id,
+  });
+}
+
+async function handleTrash(env, msg, command, arg) {
+  if (command === "/strash") {
+    const items = await listTrash(env).catch(() => []);
+    if (items.length === 0) {
+      await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Trash is empty\\.", {
+        replyToMessageId: msg.message_id,
+      });
+      return;
+    }
+    const n = Math.min(parseInt(String(arg).trim(), 10) || 10, 30);
+    const lines = [`*Trash \\(last ${Math.min(n, items.length)}\\):*`, ""];
+    items.slice(-n).reverse().forEach((it, i) => {
+      const when = it.removedAt ? ", " + it.removedAt : "";
+      lines.push(i + 1 + "\\. *" + escapeMd(it.name) + "* (" + escapeMd(it.file) + escapeMd(when) + ")");
+    });
+    lines.push("", "Restore with /srestore \\[name\\]\\.");
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, lines.join("\n"), {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+
+  // /srestore
+  const query = String(arg || "").trim().toLowerCase();
+  if (!query) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Usage: /srestore \\[name\\]", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+  const items = await listTrash(env).catch(() => []);
+  const matches = items.filter((it) => it.name.toLowerCase().includes(query));
+  if (matches.length === 0) {
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, "Nothing matching *" + escapeMd(query) + "* in trash\\.", {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+  if (matches.length > 1) {
+    const lines = ["*Multiple matches, be more specific:*", ""];
+    matches.slice(0, 10).forEach((it) => {
+      lines.push(`*${escapeMd(it.name)}* \\(${escapeMd(it.file)}\\)`);
+    });
+    await sendMessage(env.TELEGRAM_BOT_TOKEN, msg.chat.id, lines.join("\n"), {
+      replyToMessageId: msg.message_id,
+    });
+    return;
+  }
+  const it = matches[0];
+  try {
+    await restoreTrashEntry(env, it.file, it.block, "RESTORE: " + it.name + " to " + it.file);
+  } catch (err) {
+    await replyTo(env, msg, "Restore failed: " + escapeMdSafe(String(err.message || err)), { replyToMessageId: msg.message_id });
+    return;
+  }
+  await replyTo(env, msg, "Restored\\! *" + escapeMd(it.name) + "* is back in `" + escapeMd(it.file) + "`", { replyToMessageId: msg.message_id });
 }
 
 async function handleUpdateStart(env, msg, arg) {

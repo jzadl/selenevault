@@ -21,5 +21,8 @@ Example: /ssearch rom by:hasan android:14 lineage
 /supdate \[category\] \[name\] \- update an entry
 /sremove \[category\] \[name\] \[creator\] \- remove an entry
 /schecklinks \- check all download links \(owner only\)
+/slinkqueue \- pending dead\-link reports \(owner only\)
+/strash \- recently deleted entries
+/srestore \[name\] \- restore an entry from trash
 
 Categories: rom, kernel, recovery, firmware, port, tool, guide

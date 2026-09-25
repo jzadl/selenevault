@@ -90,6 +90,14 @@ export async function getPendingById(_url, _key, id) {
   return res.rows.length > 0 ? rowToPending(res.rows[0]) : null;
 }
 
+// Live linkcheck reports awaiting action, oldest first.
+export async function listLinkcheck(_url, _key) {
+  const res = await getPool().query(
+    `SELECT * FROM pending_ops WHERE op_type = 'linkcheck' AND expires_at > NOW() ORDER BY created_at`
+  );
+  return res.rows.map(rowToPending);
+}
+
 // URLs with an unexpired linkcheck report (already notified, awaiting action).
 export async function pendingLinkUrls(_url, _key) {
   const res = await getPool().query(
