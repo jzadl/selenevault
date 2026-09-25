@@ -99,15 +99,6 @@ note: Android 13, all system partitions converted to R/W, system logging partial
 vendor: svendor
 
 name: HyperOS Stardust
-version: Unofficial v14 Beta 1.0
-maintainer: Aibeto (TC_Aibeto)
-size: unknown
-date: 2024-05-03
-url: https://drive.google.com/file/d/1nPGyhcSzuMLAGjA6PBbYDQlb5yraZYYK/view?usp=sharing
-note: HyperOS for Selene. R/S/T vendors can all be flashed. Use DSU or flash images one by one in fastbootd. Not for Redmi 10 2022 NFC (eos). Fix system camera, blur, Advanced Materials 2.0, game startup acceleration. Tags: #selene #beta #HyperOS.
-vendor: all
-
-name: HyperOS Stardust
 version: Unofficial v21 Beta 2 (normal build)
 maintainer: Aibeto (TC_Aibeto)
 size: unknown
